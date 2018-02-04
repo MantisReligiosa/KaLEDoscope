@@ -78,15 +78,19 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandBuilder.cs" />
+    <Compile Include="CommandBuilderTest.cs" />
     <Compile Include="IndexerTests.cs" />
     <Compile Include="TestCRCFormat.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BLL\Frames\Frames.csproj">
+    <ProjectReference Include="..\..\BLL\Frames\Bll.Commands.csproj">
       <Project>{4cc03a13-e2d2-432b-906f-c0d9d9d213c5}</Project>
-      <Name>Frames</Name>
+      <Name>Bll.Commands</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DomainObjects\DomainEntities\DomainEntities.csproj">
+      <Project>{C563D0DB-AFA5-4351-92A5-A49E06BD64AB}</Project>
+      <Name>DomainEntities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\HashProvider\HashProvider.csproj">
       <Project>{DECA12CF-3FD7-483F-B240-F4CC3677529E}</Project>

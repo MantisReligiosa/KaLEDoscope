@@ -1,6 +1,6 @@
 ﻿namespace Interfaces.Infrastructure
 {
-    public interface IIndexer
+    public interface IFrameIndexer
     {
         ushort GetIdentifier();
         void Reset();
