@@ -4,6 +4,7 @@ using Interfaces.Bll;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Collections.Generic;
+using System;
 
 namespace Bll.Commands
 {
@@ -14,18 +15,22 @@ namespace Bll.Commands
         private ushort _frameIndex;
         private bool isAnswerRecieved = false;
         private Frame _answer;
+        private string _senderAddress;
+
+        public int RecievingTimeout { get; set; } = 500;
 
         public TransactionDispatcher(IConnection connection, IFrameBuilder frameBulider)
         {
             _connection = connection;
             _frameBulider = frameBulider;
-            _connection.RecponceRecieved += OnDataRecieved;
+            _connection.ResponceRecieved += OnDataRecieved;
         }
 
-        private void OnDataRecieved(object sender, byte[] bytes)
+        private void OnDataRecieved(object sender, ResponceInformation responceInformation)
         {
-            _answer = _frameBulider.ParseResponce(bytes);
-            isAnswerRecieved = _answer.Index == _frameIndex;
+            _answer = _frameBulider.ParseResponce(responceInformation.Data);
+            _senderAddress = responceInformation.SenderAddress;
+            isAnswerRecieved = (_answer.Index == _frameIndex);
         }
 
         public virtual void Send(Frame command)
@@ -35,33 +40,36 @@ namespace Bll.Commands
             _connection.Send(bytes);
         }
 
-        public async Task<Frame> RecieveAnswerAsync()
+        public Frame RecieveAnswer()
         {
-            return await Task.Run(() =>
-            {
-                while (!isAnswerRecieved) { }
-                return _answer;
-            });
+            var timer = new Timer(RecievingTimeout);
+            bool timeIsUp = false;
+            timer.Elapsed += (o, e) => { timeIsUp = true; };
+            timer.Start();
+            while (!isAnswerRecieved && !timeIsUp) { }
+            _connection.Close();
+            if (timeIsUp)
+                throw new TimeoutException();
+            return _answer;
         }
 
-        public async Task<List<Frame>> RecieveAnswersAsync(double awaitingInterval)
+        public List<Tuple<string, Frame>> RecieveAnswers(double awaitingInterval)
         {
-            return await Task.Run(() =>
+            var result = new List<Tuple<string, Frame>>();
+            var timer = new Timer(awaitingInterval);
+            bool timeIsUp = false;
+            timer.Elapsed += (o, e) => { timeIsUp = true; };
+            timer.Start();
+            while (!timeIsUp)
             {
-                var result = new List<Frame>();
-                var timer = new Timer(awaitingInterval);
-                bool timeIsUp = false;
-                timer.Elapsed += (o, e) => { timeIsUp = true; };
-                while (!timeIsUp)
+                if (isAnswerRecieved)
                 {
-                    if (isAnswerRecieved)
-                    {
-                        result.Add(_answer);
-                        isAnswerRecieved = false;
-                    }
-                };
-                return result;
-            });
+                    result.Add(new Tuple<string, Frame>(_senderAddress, _answer));
+                    isAnswerRecieved = false;
+                }
+            };
+            _connection.Close();
+            return result;
         }
     }
 }
