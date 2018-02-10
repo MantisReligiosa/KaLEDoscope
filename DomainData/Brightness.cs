@@ -2,7 +2,14 @@
 {
     public class Brightness
     {
-        public bool Auto { get; set; }
-        public bool Manual { get; set; }
+        public Mode Mode { get; set; }
+        public int ManualValue { get; set; }
+    }
+
+    public enum Mode
+    {
+        Auto,
+        Manual,
+        Scheduled
     }
 }

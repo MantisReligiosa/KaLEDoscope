@@ -1,13 +1,13 @@
-﻿using System;
+﻿using DomainData;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServiceInterfaces
+namespace Timer
 {
-    public interface IPlugin
+    public class TimerDevice : Device
     {
-        void Activate();
     }
 }

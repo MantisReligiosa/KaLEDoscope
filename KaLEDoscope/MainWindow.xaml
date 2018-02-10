@@ -48,9 +48,14 @@
             </TreeView.Resources>
         </TreeView>
         <ListBox Name="lbLog" Grid.Column="2" Grid.Row="2" ItemsSource="{Binding Path=LogItems}">
-            
+
         </ListBox>
-        <TabControl x:Name="tabControl" Grid.Column="2" Grid.Row="0">
+        <TabControl 
+                x:Name="tabControl" 
+                Grid.Column="2" 
+                Grid.Row="0" 
+                ItemsSource="{Binding Path=DeviceTabs}" 
+                SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
         </TabControl>
     </Grid>
 </Window>

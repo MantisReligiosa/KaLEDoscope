@@ -12,5 +12,6 @@ namespace DomainData
         public Schedule Schedule { get; set; }
         public Brightness Brightness { get; set; }
         public Network Network { get; set; }
+        public int Id { get; set; }
     }
 }

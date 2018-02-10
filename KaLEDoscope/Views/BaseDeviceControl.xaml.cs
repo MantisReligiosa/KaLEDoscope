@@ -18,9 +18,9 @@ namespace KaLEDoscope
     /// <summary>
     /// Interaction logic for BaseDevice.xaml
     /// </summary>
-    public partial class BaseDevice : UserControl
+    public partial class BaseDeviceControl : UserControl
     {
-        public BaseDevice()
+        public BaseDeviceControl()
         {
             InitializeComponent();
         }

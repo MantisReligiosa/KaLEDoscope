@@ -66,15 +66,25 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ApplicationInfrastructure.cs" />
-    <Compile Include="BaseDevice.xaml.cs">
-      <DependentUpon>BaseDevice.xaml</DependentUpon>
+    <Compile Include="Views\BaseDeviceControl.xaml.cs">
+      <DependentUpon>BaseDeviceControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ClosableTab.cs" />
+    <Compile Include="Views\CloseableHeader.xaml.cs">
+      <DependentUpon>CloseableHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CustomDeviceControl.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="Models\LogItem.cs" />
     <Compile Include="Models\DeviceNode.cs" />
     <Compile Include="Models\ProtocolNode.cs" />
-    <Compile Include="ViewModel.cs" />
-    <Page Include="BaseDevice.xaml">
+    <Compile Include="ViewModel\BaseDeviceViewModel.cs" />
+    <Compile Include="ViewModel\MainViewModel.cs" />
+    <Page Include="Views\BaseDeviceControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CloseableHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -127,6 +137,10 @@
     <ProjectReference Include="..\DomainData\DomainData.csproj">
       <Project>{7ED09EF5-1AFC-4955-8D77-3C3D61C4FB51}</Project>
       <Name>DomainData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\Devices\Timer\Timer.csproj">
+      <Project>{96D808B9-C3F8-4604-BE96-2C85074EC088}</Project>
+      <Name>Timer</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure\DirectConnect\DirectConnect.csproj">
       <Project>{faa63c26-f283-466a-8486-8eecc976d515}</Project>
