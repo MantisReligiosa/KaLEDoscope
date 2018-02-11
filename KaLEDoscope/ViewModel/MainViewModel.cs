@@ -3,6 +3,8 @@ using DirectConnect;
 using DomainData;
 using KaLEDoscope.ViewModel;
 using KaLEDoscope.Views;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -77,9 +79,13 @@ namespace KaLEDoscope
                     Device = device,
                 });
             }
-
             ProtocolNodes.Add(mqtt);
             ProtocolNodes.Add(directConnect);
+        }
+
+        public void ClearNodes()
+        {
+            ProtocolNodes.Clear();
         }
 
         private DelegateCommand showDevicePlugin;
@@ -127,6 +133,82 @@ namespace KaLEDoscope
                     });
                 }
                 return showDevicePlugin;
+            }
+        }
+
+        private DelegateCommand scanDevices;
+        public Input.ICommand ScanDevices
+        {
+            get
+            {
+                if (scanDevices == null)
+                {
+                    scanDevices = new DelegateCommand((o) =>
+                      {
+                          ClearNodes();
+                          MakeNodes();
+                      });
+                }
+                return scanDevices;
+            }
+        }
+
+        private DelegateCommand saveConfig;
+        public Input.ICommand SaveConfig
+        {
+            get
+            {
+                if (saveConfig == null)
+                {
+                    saveConfig = new DelegateCommand((o) =>
+                      {
+                          var dialog = new SaveFileDialog
+                          {
+                              FileName = "Config",
+                              DefaultExt = ".json",
+                              Filter = "JSON configuration (.json)|*.json"
+                          };
+                          if (dialog.ShowDialog() == true)
+                          {
+                              var fileName = dialog.FileName;
+                              var serialized = JsonConvert.SerializeObject(ProtocolNodes);
+                              System.IO.File.WriteAllText(fileName, serialized);
+                          }
+                      });
+                }
+                return saveConfig;
+            }
+        }
+
+        private Input.ICommand loadConfig;
+        public Input.ICommand LoadConfig
+        {
+            get
+            {
+                if (loadConfig == null)
+                {
+                    loadConfig = new DelegateCommand((o) =>
+                      {
+                          ClearNodes();
+                          var dialog = new OpenFileDialog
+                          {
+                              FileName = "Config",
+                              DefaultExt = ".json",
+                              Filter = "JSON configuration (.json)|*.json"
+                          };
+                          if (dialog.ShowDialog() == true)
+                          {
+                              var fileName = dialog.FileName;
+                              var serialized = System.IO.File.ReadAllText(fileName);
+                              var nodes = JsonConvert.DeserializeObject<List<ProtocolNode>>(serialized);
+                              foreach (var node in nodes)
+                              {
+                                  ProtocolNodes.Add(node);
+                              }
+                          }
+                      });
+                }
+                return loadConfig;
             }
         }
 

@@ -29,7 +29,6 @@ namespace KaLEDoscope
             ILogger logger = new SeviceLog();
             var viewModel = new MainViewModel(logger);
             DataContext = trvMenu.DataContext = lbLog.DataContext = viewModel;
-            viewModel.MakeNodes();
             _infrastructure.Tabs = tabControl.Items;
         }
 
