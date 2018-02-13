@@ -42,7 +42,29 @@ namespace CommandProcessing
                 };
                 device.Brightness = new Brightness
                 {
-                    Mode = Mode.Auto
+                    Mode = Mode.Auto,
+                    ManualValue = 5,
+                    BrightnessPeriods = new List<BrightnessPeriod>
+                    {
+                        new BrightnessPeriod
+                        {
+                            From = new TimeSpan(0,0,0),
+                            To = new TimeSpan(8,0,0),
+                            Value = 8
+                        },
+                        new BrightnessPeriod
+                        {
+                            From = new TimeSpan(8,0,0),
+                            To = new TimeSpan(18,0,0),
+                            Value = 2
+                        },
+                        new BrightnessPeriod
+                        {
+                            From = new TimeSpan(18,0,0),
+                            To = new TimeSpan(23,59,59),
+                            Value = 8
+                        }
+                    }
                 };
                 device.Schedule = new Schedule
                 {
@@ -66,7 +88,8 @@ namespace CommandProcessing
                     },
                     Brightness = new Brightness
                     {
-                        Mode = Mode.Manual
+                        Mode = Mode.Manual,
+                        BrightnessPeriods = new List<BrightnessPeriod>()
                     },
                     Schedule = new Schedule
                     {

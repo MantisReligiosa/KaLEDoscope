@@ -29,6 +29,7 @@ namespace KaLEDoscope.Views
                new SizeChangedEventHandler(label_TabTitle_SizeChanged);
         }
 
+
         public event EventHandler OnTabCloseClick;
 
         public string Title

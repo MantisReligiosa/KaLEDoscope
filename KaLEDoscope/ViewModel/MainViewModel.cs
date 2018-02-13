@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using Timer;
 using Input = System.Windows.Input;
@@ -103,6 +104,17 @@ namespace KaLEDoscope
                         {
                             var tabControl = new TabControl();
                             var customTabItem = new TabItem();
+                            var grid = new Grid();
+                            grid.RowDefinitions.Add(new RowDefinition
+                            {
+                                Height = GridLength.Auto
+                            });
+                            grid.RowDefinitions.Add(new RowDefinition
+                            {
+                                Height = new GridLength(1, GridUnitType.Star)
+                            });
+
+
                             customTabItem.Content = new BaseDeviceControl
                             {
                                 HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
@@ -112,12 +124,20 @@ namespace KaLEDoscope
                             customTabItem.Header = "Базовые настройки";
                             tabControl.Items.Add(customTabItem);
                             tabControl.TabStripPlacement = Dock.Left;
+                            var toolbar = new ToolBar();
+                            toolbar.Items.Add(new Button
+                            {Content="Синхронизировать" });
+                            grid.Children.Add(tabControl);
+                            grid.Children.Add(toolbar);
+                            Grid.SetRow(tabControl, 1);
+                            Grid.SetRow(toolbar, 0);
                             var newTabItem = new ClosableTab
                             {
                                 Title = $"{deviceNode.Device.Name} id:{deviceNode.Device.Id}",
-                                Content = tabControl,
+                                Content = grid,
                                 DataContext = deviceNode.Device
                             };
+
                             newTabItem.OnTabCloseClick += (sender, arguments) =>
                             {
                                 var tab = (ClosableTab)sender;

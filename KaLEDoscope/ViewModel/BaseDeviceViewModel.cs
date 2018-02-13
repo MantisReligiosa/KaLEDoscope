@@ -2,6 +2,7 @@
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -26,12 +27,93 @@ namespace KaLEDoscope.ViewModel
             }
         }
 
+        public ObservableCollection<BrightnessPeriod> BrightnessPeriods { get; set; } = new ObservableCollection<BrightnessPeriod>();
+
+        private string _subnetMask;
         public string SubnetMask
         {
             get
             {
-                return FormatSubnet(SubnetMaskByte);
+                return _subnetMask;
             }
+            set
+            {
+                if (_subnetMask?.Equals(value) ?? false)
+                {
+                    return;
+                }
+                byte maskByte;
+                if (ParceSubnet(value, out maskByte))
+                {
+                    _subnetMask = value;
+                    SubnetMaskByte = maskByte;
+                }
+                else
+                {
+                    SubnetMask = "255.255.255.0";
+                    SubnetMaskByte = 24;
+                }
+                OnPropertyChanged(nameof(SubnetMask));
+                OnPropertyChanged(nameof(SubnetMaskByte));
+            }
+        }
+
+        private bool ParceSubnet(string mask, out byte subnetMaskByte)
+        {
+            subnetMaskByte = default(byte);
+            var bytesStr = mask.Split('.');
+            if (bytesStr.Length != 4)
+            {
+                subnetMaskByte = 24;
+            }
+            var fullByte = (byte)0xff;
+            Dictionary<byte, byte> allowedBytes = new Dictionary<byte, byte>
+                {
+                    {0,0 },
+                    {1,128 },
+                    {2,192 },
+                    {3,224 },
+                    {4,240 },
+                    {5,248 },
+                    {6,252 },
+                    {7,254 }
+                };
+            List<byte> bytes = new List<byte>();
+            foreach (var byteStr in bytesStr)
+            {
+                byte b;
+                if (byte.TryParse(byteStr, out b))
+                {
+                    bytes.Add(b);
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            bool terminate = false;
+            foreach (var b in bytes)
+            {
+                if (terminate && b != 0)
+                {
+                    return false;
+                }
+                if (b == fullByte)
+                {
+                    subnetMaskByte += 8;
+                }
+                else
+                {
+                    if (!allowedBytes.Any(kvp => kvp.Value == b))
+                    {
+                        return false;
+                    }
+                    var pair = allowedBytes.FirstOrDefault(kvp => kvp.Value == b);
+                    terminate = true;
+                    subnetMaskByte += pair.Key;
+                }
+            }
+            return true;
         }
 
         public byte SubnetMaskByte
@@ -42,9 +124,14 @@ namespace KaLEDoscope.ViewModel
             }
             set
             {
+                if (Device.Network.SubnetMask == value)
+                {
+                    return;
+                }
                 Device.Network.SubnetMask = value;
-                OnPropertyChanged(nameof(SubnetMaskByte));
+                SubnetMask = FormatSubnet(value);
                 OnPropertyChanged(nameof(SubnetMask));
+                OnPropertyChanged(nameof(SubnetMaskByte));
             }
         }
 
@@ -322,6 +409,8 @@ namespace KaLEDoscope.ViewModel
         public BaseDeviceViewModel(Device device, ILogger logger)
         {
             Device = device;
+            SubnetMask = FormatSubnet(device.Network.SubnetMask);
+            BrightnessPeriods = new ObservableCollection<BrightnessPeriod>(device.Brightness.BrightnessPeriods);
         }
 
         private string FormatSubnet(byte value)

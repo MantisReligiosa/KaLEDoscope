@@ -56,21 +56,10 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <TextBox Grid.Column="0" 
-                             IsReadOnly="False"
-                             IsEnabled="False" 
                              Height="23"
                              TextWrapping="Wrap" 
                              VerticalAlignment="Top"
-                             Width="95"
-                             Text="{Binding SubnetMask, Mode=OneWay}"
-                            />
-                    <TextBox Grid.Column="1" 
-                             HorizontalAlignment="Left" 
-                             Height="23"
-                             TextWrapping="Wrap" 
-                             VerticalAlignment="Top"
-                             Width="25"
-                             Text="{Binding SubnetMaskByte}"
+                             Text="{Binding SubnetMask, Mode=TwoWay}"
                             />
                 </Grid>
                 <Label Content="Шлюз" 
@@ -145,7 +134,33 @@
                             />
                 </Grid>
                 <RadioButton Grid.Row="3" Content="По расписанию" IsChecked="{Binding ScheduledBrightness}"/>
-                <ListBox Grid.Row="4" IsEnabled="{Binding ScheduledBrightness}"/>
+                <ListView Grid.Row="4" IsEnabled="{Binding ScheduledBrightness}" ItemsSource="{Binding BrightnessPeriods}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="От" >
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding From}" Width="50"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="До" >
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding To}" Width="50"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Яркость" >
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Value}" Width="50"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Header="Расписание работы">
