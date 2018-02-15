@@ -9,5 +9,8 @@ namespace Timer
 {
     public class TimerDevice : Device
     {
+        public int BoardTypeId { get; set; }
+        public int DisplayFormatId { get; set; }
+        public int FontTypeId { get; set; }
     }
 }

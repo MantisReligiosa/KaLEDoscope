@@ -28,6 +28,18 @@ namespace KaLEDoscope
         public ObservableCollection<LogItem> LogItems { get; set; } = new ObservableCollection<LogItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
 
+        private readonly Dictionary<Func<Device, bool>, Func<Device, ILogger, UserControl>> _customDevicesControls
+            = new Dictionary<Func<Device, bool>, Func<Device, ILogger, UserControl>>
+        {
+            {d=> d is TimerDevice,
+             (d,l)=>   new TimerControl
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    DataContext = new TimerDeviceViewModel(d, l)
+            }}
+        };
+
         private TabItem _selectedTabItem;
         public TabItem SelectedTabItem
         {
@@ -103,7 +115,7 @@ namespace KaLEDoscope
                         if (existTab == null)
                         {
                             var tabControl = new TabControl();
-                            var customTabItem = new TabItem();
+                            var baseTabItem = new TabItem();
                             var grid = new Grid();
                             grid.RowDefinitions.Add(new RowDefinition
                             {
@@ -115,18 +127,24 @@ namespace KaLEDoscope
                             });
 
 
-                            customTabItem.Content = new BaseDeviceControl
+                            baseTabItem.Content = new BaseDeviceControl
                             {
                                 HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
                                 VerticalAlignment = System.Windows.VerticalAlignment.Stretch,
                                 DataContext = new BaseDeviceViewModel(deviceNode.Device, _logger)
                             };
-                            customTabItem.Header = "Базовые настройки";
-                            tabControl.Items.Add(customTabItem);
+                            baseTabItem.Header = "Базовые настройки";
+                            tabControl.Items.Add(baseTabItem);
                             tabControl.TabStripPlacement = Dock.Left;
                             var toolbar = new ToolBar();
                             toolbar.Items.Add(new Button
-                            {Content="Синхронизировать" });
+                            { Content = "Синхронизировать" });
+                            toolbar.Items.Add(new Button
+                            { Content = "Применить конфигурацию" });
+                            toolbar.Items.Add(new Button
+                            { Content = "Экспортировать настройки как скрипт" });
+                            toolbar.Items.Add(new Button
+                            { Content = "Применить скрипт" });
                             grid.Children.Add(tabControl);
                             grid.Children.Add(toolbar);
                             Grid.SetRow(tabControl, 1);
@@ -144,6 +162,18 @@ namespace KaLEDoscope
                                 DeviceTabs.Remove(tab);
                             };
                             DeviceTabs.Add(newTabItem);
+
+                            foreach (var customDevicesControlsKeyValuePair in _customDevicesControls)
+                            {
+                                if (customDevicesControlsKeyValuePair.Key(deviceNode.Device))
+                                {
+                                    var customTabItem = new TabItem();
+                                    var customControl = customDevicesControlsKeyValuePair.Value(deviceNode.Device, _logger);
+                                    customTabItem.Content = customControl;
+                                    customTabItem.Header = "Специальные настройки";
+                                    tabControl.Items.Add(customTabItem);
+                                }
+                            }
                             SelectedTabItem = newTabItem;
                         }
                         else

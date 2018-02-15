@@ -113,13 +113,13 @@
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="1*"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
                 </Grid.RowDefinitions>
                 <RadioButton Grid.Row="0" Content="Автоматическое" IsChecked="{Binding AutomaticBrightness}"/>
                 <RadioButton Grid.Row="1" Content="Ручная настройка (0-10)" IsChecked="{Binding ManualBrightness}"/>
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Slider SmallChange="0" Value="{Binding ManualBrightnessValue}" IsEnabled="{Binding ManualBrightness}"/>
@@ -151,7 +151,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Header="Яркость" >
+                            <GridViewColumn Header="Яркость">
                                 <GridViewColumn.CellTemplate>
                                     <DataTemplate>
                                         <TextBox Text="{Binding Value}" Width="50"/>
@@ -166,19 +166,19 @@
         <GroupBox Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Header="Расписание работы">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"></ColumnDefinition>
-                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <GroupBox Grid.Column="0" Header="Время работы">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"></ColumnDefinition>
-                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"></RowDefinition>
                             <RowDefinition Height="auto"></RowDefinition>
-                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
                         </Grid.RowDefinitions>
                         <Label Content="Старт" 
                                Grid.Row="0" 
@@ -216,15 +216,15 @@
                 <GroupBox Grid.Column="1" Header="Воспроизводить по дням недели">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*"></ColumnDefinition>
-                            <ColumnDefinition Width="1*"></ColumnDefinition>
-                            <ColumnDefinition Width="1*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"></RowDefinition>
-                            <RowDefinition Height="1*"></RowDefinition>
-                            <RowDefinition Height="1*"></RowDefinition>
-                            <RowDefinition Height="1*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
                         </Grid.RowDefinitions>
                         <CheckBox Grid.Row="0" Grid.Column="0"  Content="Пн." IsChecked="{Binding RunInMon}" IsEnabled="{Binding RunByDaysOfWeek}"/>
                         <CheckBox Grid.Row="0" Grid.Column="1"  Content="Вт." IsChecked="{Binding RunInTue}" IsEnabled="{Binding RunByDaysOfWeek}"/>
@@ -235,7 +235,6 @@
                         <CheckBox Grid.Row="2" Grid.Column="0"  Content="Вс." IsChecked="{Binding RunInSun}" IsEnabled="{Binding RunByDaysOfWeek}"/>
                         <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"  Content="Каждый день" IsChecked="{Binding RunAllWeek}"/>
                     </Grid>
-
                 </GroupBox>
             </Grid>
         </GroupBox>

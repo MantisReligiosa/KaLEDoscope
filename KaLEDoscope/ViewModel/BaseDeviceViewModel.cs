@@ -12,17 +12,19 @@ namespace KaLEDoscope.ViewModel
 {
     public class BaseDeviceViewModel : INotifyPropertyChanged
     {
-        public Device Device { get; private set; }
+        private readonly Device _device;
+
+        private readonly ILogger _logger;
 
         public string IpAddress
         {
             get
             {
-                return Device.Network.IpAddress;
+                return _device.Network.IpAddress;
             }
             set
             {
-                Device.Network.IpAddress = value;
+                _device.Network.IpAddress = value;
                 OnPropertyChanged(nameof(IpAddress));
             }
         }
@@ -120,15 +122,15 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Network.SubnetMask;
+                return _device.Network.SubnetMask;
             }
             set
             {
-                if (Device.Network.SubnetMask == value)
+                if (_device.Network.SubnetMask == value)
                 {
                     return;
                 }
-                Device.Network.SubnetMask = value;
+                _device.Network.SubnetMask = value;
                 SubnetMask = FormatSubnet(value);
                 OnPropertyChanged(nameof(SubnetMask));
                 OnPropertyChanged(nameof(SubnetMaskByte));
@@ -139,11 +141,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Network.Gateway;
+                return _device.Network.Gateway;
             }
             set
             {
-                Device.Network.Gateway = value;
+                _device.Network.Gateway = value;
                 OnPropertyChanged(nameof(Gateway));
             }
         }
@@ -152,11 +154,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Network.DnsServer;
+                return _device.Network.DnsServer;
             }
             set
             {
-                Device.Network.DnsServer = value;
+                _device.Network.DnsServer = value;
                 OnPropertyChanged(nameof(DnsServer));
             }
         }
@@ -165,11 +167,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Network.AlternativeDnsServer;
+                return _device.Network.AlternativeDnsServer;
             }
             set
             {
-                Device.Network.AlternativeDnsServer = value;
+                _device.Network.AlternativeDnsServer = value;
                 OnPropertyChanged(nameof(AlternativeDnsServer));
             }
         }
@@ -178,13 +180,13 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Brightness.Mode == Mode.Auto;
+                return _device.Brightness.Mode == Mode.Auto;
             }
             set
             {
                 if (value)
                 {
-                    Device.Brightness.Mode = Mode.Auto;
+                    _device.Brightness.Mode = Mode.Auto;
                 }
                 OnPropertyChanged(nameof(AutomaticBrightness));
             }
@@ -194,13 +196,13 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Brightness.Mode == Mode.Manual;
+                return _device.Brightness.Mode == Mode.Manual;
             }
             set
             {
                 if (value)
                 {
-                    Device.Brightness.Mode = Mode.Manual;
+                    _device.Brightness.Mode = Mode.Manual;
                 }
                 OnPropertyChanged(nameof(ManualBrightness));
             }
@@ -210,11 +212,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Brightness.ManualValue;
+                return _device.Brightness.ManualValue;
             }
             set
             {
-                Device.Brightness.ManualValue = value;
+                _device.Brightness.ManualValue = value;
                 OnPropertyChanged(nameof(ManualBrightnessValue));
             }
         }
@@ -223,13 +225,13 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Brightness.Mode == Mode.Scheduled;
+                return _device.Brightness.Mode == Mode.Scheduled;
             }
             set
             {
                 if (value)
                 {
-                    Device.Brightness.Mode = Mode.Scheduled;
+                    _device.Brightness.Mode = Mode.Scheduled;
                 }
                 OnPropertyChanged(nameof(ScheduledBrightness));
             }
@@ -239,11 +241,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.AroundTheClock;
+                return _device.Schedule.AroundTheClock;
             }
             set
             {
-                Device.Schedule.AroundTheClock = value;
+                _device.Schedule.AroundTheClock = value;
                 OnPropertyChanged(nameof(ScheduleWorkAroundTheClock));
                 OnPropertyChanged(nameof(IsScheduledWork));
             }
@@ -261,7 +263,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.StartFrom.ToString(@"hh\:mm");
+                return _device.Schedule.StartFrom.ToString(@"hh\:mm");
             }
             set
             {
@@ -270,7 +272,7 @@ namespace KaLEDoscope.ViewModel
                 {
                     timeSpan = new TimeSpan(0, 0, 0);
                 }
-                Device.Schedule.StartFrom = timeSpan;
+                _device.Schedule.StartFrom = timeSpan;
                 OnPropertyChanged(nameof(ScheduledWorkStart));
             }
         }
@@ -279,7 +281,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.FinishTo.ToString(@"hh\:mm");
+                return _device.Schedule.FinishTo.ToString(@"hh\:mm");
             }
             set
             {
@@ -288,7 +290,7 @@ namespace KaLEDoscope.ViewModel
                 {
                     timeSpan = new TimeSpan(0, 0, 0);
                 }
-                Device.Schedule.FinishTo = timeSpan;
+                _device.Schedule.FinishTo = timeSpan;
                 OnPropertyChanged(nameof(ScheduledWorkEnd));
             }
         }
@@ -297,11 +299,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.AllWeek;
+                return _device.Schedule.AllWeek;
             }
             set
             {
-                Device.Schedule.AllWeek = value;
+                _device.Schedule.AllWeek = value;
                 OnPropertyChanged(nameof(RunAllWeek));
                 OnPropertyChanged(nameof(RunByDaysOfWeek));
             }
@@ -319,11 +321,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.RunInSun;
+                return _device.Schedule.RunInSun;
             }
             set
             {
-                Device.Schedule.RunInSun = value;
+                _device.Schedule.RunInSun = value;
                 OnPropertyChanged(nameof(RunInSun));
             }
         }
@@ -332,11 +334,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.RunInMon;
+                return _device.Schedule.RunInMon;
             }
             set
             {
-                Device.Schedule.RunInMon = value;
+                _device.Schedule.RunInMon = value;
                 OnPropertyChanged(nameof(RunInMon));
             }
         }
@@ -345,11 +347,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.RunInTue;
+                return _device.Schedule.RunInTue;
             }
             set
             {
-                Device.Schedule.RunInTue = value;
+                _device.Schedule.RunInTue = value;
                 OnPropertyChanged(nameof(RunInTue));
             }
         }
@@ -358,11 +360,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.RunInWed;
+                return _device.Schedule.RunInWed;
             }
             set
             {
-                Device.Schedule.RunInWed = value;
+                _device.Schedule.RunInWed = value;
                 OnPropertyChanged(nameof(RunInWed));
             }
         }
@@ -371,11 +373,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.RunInThu;
+                return _device.Schedule.RunInThu;
             }
             set
             {
-                Device.Schedule.RunInThu = value;
+                _device.Schedule.RunInThu = value;
                 OnPropertyChanged(nameof(RunInThu));
             }
         }
@@ -384,11 +386,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.RunInFri;
+                return _device.Schedule.RunInFri;
             }
             set
             {
-                Device.Schedule.RunInFri = value;
+                _device.Schedule.RunInFri = value;
                 OnPropertyChanged(nameof(RunInFri));
             }
         }
@@ -397,18 +399,19 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return Device.Schedule.RunInSat;
+                return _device.Schedule.RunInSat;
             }
             set
             {
-                Device.Schedule.RunInSat = value;
+                _device.Schedule.RunInSat = value;
                 OnPropertyChanged(nameof(RunInSat));
             }
         }
 
         public BaseDeviceViewModel(Device device, ILogger logger)
         {
-            Device = device;
+            _device = device;
+            _logger = logger;
             SubnetMask = FormatSubnet(device.Network.SubnetMask);
             BrightnessPeriods = new ObservableCollection<BrightnessPeriod>(device.Brightness.BrightnessPeriods);
         }
