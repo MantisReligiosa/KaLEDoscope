@@ -39,11 +39,11 @@
                     <Label Grid.Row="1" Grid.Column="0" Content="Шрифт"/>
                     <Label Grid.Row="2" Grid.Column="0" Content="Вид часов"/>
                     <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding DisplayTypes}" DisplayMemberPath="Name" 
-                              SelectedItem="{Binding DisplayType}"/>
+                              SelectedItem="{Binding DisplayType}" Style="{StaticResource ComboboxStyle}"/>
                     <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="{Binding Path=DisplayType.IsFontEnabled}" 
-                              ItemsSource="{Binding FontTypes}" DisplayMemberPath="Name" SelectedItem="{Binding FontType}"/>
+                              ItemsSource="{Binding FontTypes}" DisplayMemberPath="Name" SelectedItem="{Binding FontType}" Style="{StaticResource ComboboxStyle}"/>
                     <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding DisplayFormats}" 
-                              DisplayMemberPath="Name" SelectedItem="{Binding DisplayFormat}"/>
+                              DisplayMemberPath="Name" SelectedItem="{Binding DisplayFormat}" Style="{StaticResource ComboboxStyle}"/>
                 </Grid>
             </GroupBox>
             <GroupBox Grid.Row="1" Header="Настройка таймера/секундомера">
@@ -59,7 +59,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Label Grid.Column="0" Content="Режим"/>
-                        <ComboBox Grid.Column="1" />
+                        <ComboBox Grid.Column="1" Style="{StaticResource ComboboxStyle}"/>
                     </Grid>
                     <Grid Grid.Row="1">
                         <Grid.ColumnDefinitions>
@@ -79,10 +79,11 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <Button Grid.Row="0" Grid.Column="0" Content="Старт"/>
-                        <Button Grid.Row="0" Grid.Column="1" Content="Стоп"/>
-                        <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сброс к стартовому значению"/>
-                        <Button Grid.Row="2" Grid.ColumnSpan="2" Content="СТОП (сброс в 00:00:00)"/>
+                        <!--Template="{StaticResource buttonTemplate}-->
+                        <Button Grid.Row="0" Grid.Column="0" Content="Старт" Style="{StaticResource ButtonStyle}" />
+                        <Button Grid.Row="0" Grid.Column="1" Content="Стоп" Style="{StaticResource ButtonStyle}" />
+                        <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сброс к стартовому значению" Style="{StaticResource ButtonStyle}" />
+                        <Button Grid.Row="2" Grid.ColumnSpan="2" Content="СТОП (сброс в 00:00:00)" Style="{StaticResource ButtonStyle}" />
                     </Grid>
                 </Grid>
             </GroupBox>
@@ -126,9 +127,9 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0" Grid.ColumnSpan="2"/>
+                <ComboBox Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource ComboboxStyle}"/>
                 <Label Grid.Row="1" Grid.Column="0" Content="Часовой пояс"/>
-                <ComboBox Grid.Row="1" Grid.Column="1"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboboxStyle}"/>
                 <Label Grid.Row="2" Grid.ColumnSpan="2" Content="Параметры синхронизации" HorizontalContentAlignment="Center"/>
                 <Label Grid.Row="3" Grid.Column="0" Content="Период синхронизации"/>
                 <TextBox Grid.Row="3" Grid.Column="1"/>
