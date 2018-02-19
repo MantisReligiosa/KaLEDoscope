@@ -2,7 +2,7 @@
 
 namespace DomainData
 {
-    public class Schedule
+    public class WorkSchedule
     {
         public TimeSpan StartFrom { get; set; }
         public TimeSpan FinishTo { get; set; }

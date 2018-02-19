@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace KaLEDoscope.POCO.Timer
 {
-    public class DisplayFormat : BaseClass
+    public class SyncSource : BaseClass
     {
-        public int Capacity { get; set; }
+        public bool IsCutomized { get; set; }
     }
 }

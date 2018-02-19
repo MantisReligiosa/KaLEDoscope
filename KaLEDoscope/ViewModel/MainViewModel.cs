@@ -25,7 +25,6 @@ namespace KaLEDoscope
         private ILogger _logger { get; set; }
 
         public ObservableCollection<ProtocolNode> ProtocolNodes { get; set; } = new ObservableCollection<ProtocolNode>();
-        public ObservableCollection<LogItem> LogItems { get; set; } = new ObservableCollection<LogItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
 
         private readonly Dictionary<Func<Device, bool>, Func<Device, ILogger, UserControl>> _customDevicesControls
@@ -54,16 +53,30 @@ namespace KaLEDoscope
             }
         }
 
+        private StringBuilder _log = new StringBuilder();
+        public string Log
+        {
+            get
+            {
+                return _log.ToString();
+            }
+            set
+            {
+                _log = new StringBuilder(value);
+                OnPropertyChanged(nameof(Log));
+            }
+        }
+
         public Dictionary<Func<DeviceNode>, Func<CustomDeviceControl>> CustomControls { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 
         public MainViewModel(ILogger logger)
         {
             _logger = logger;
-            _logger.InfoRaised += (sender, message) => LogItems.Add(new LogItem { LogLevel = LogLevel.Info, Message = $"{sender}: {message}" });
-            _logger.DebugRaised += (sender, message) => LogItems.Add(new LogItem { LogLevel = LogLevel.Debug, Message = $"{sender}: {message}" });
-            _logger.WarnRaised += (sender, message) => LogItems.Add(new LogItem { LogLevel = LogLevel.Warn, Message = $"{sender}: {message}" });
-            _logger.ErrorRaised += (sender, message) => LogItems.Add(new LogItem { LogLevel = LogLevel.Error, Message = $"{sender}: {message}" });
+            _logger.InfoRaised += (sender, message) => logMessage($"{sender}: Info: {message}");
+            _logger.DebugRaised += (sender, message) => logMessage($"{sender}: Debug: {message}");
+            _logger.WarnRaised += (sender, message) => logMessage($"{sender}: Warn: {message}");
+            _logger.ErrorRaised += (sender, message) => logMessage($"{sender}: Error: {message}");
         }
 
         public void MakeNodes()
@@ -71,7 +84,32 @@ namespace KaLEDoscope
             var directConnectDeviceScanner = new DeviceScanner<DirectConnection>(_logger);
             directConnectDeviceScanner.DeviceDictionary.Add(1, () => new TimerDevice
             {
-                Name = "Семисегментные часы"
+                Name = "Семисегментные часы",
+                BoardTypeId = 1,
+                CountdownTypeId = 1,
+                CountdownStartValue = new TimeSpan(0, 0, 10),
+                DisplayFormatId = 1,
+                FontTypeId = 1,
+                SyncSourceId = 1,
+                TimeZoneId = "Russian Standard Time",
+                TimeSyncPeriod = new TimeSpan(3, 0, 0),
+                TimeSyncServerIp = "192.168.0.100",
+                TimeSyncServerPort = 220,
+                AlarmSchedule = new List<Alarm>
+                {
+                    new Alarm
+                    {
+                        IsActive = true,
+                        StartTimeSpan = new TimeSpan(9,0,0),
+                        Period = new TimeSpan()
+                    },
+                    new Alarm
+                    {
+                        IsActive = false,
+                        StartTimeSpan = new TimeSpan(6,30,0),
+                        Period = new TimeSpan(0,5,0)
+                    }
+                }
             });
 
             var devices = directConnectDeviceScanner.Search();
@@ -260,6 +298,12 @@ namespace KaLEDoscope
                 }
                 return loadConfig;
             }
+        }
+
+        private void logMessage(string Message)
+        {
+            _log.AppendLine(Message);
+            OnPropertyChanged(nameof(Log));
         }
 
         protected void OnPropertyChanged(string propertyName)

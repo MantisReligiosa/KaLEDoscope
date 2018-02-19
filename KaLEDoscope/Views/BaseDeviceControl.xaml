@@ -29,7 +29,6 @@
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
                     <RowDefinition Height="auto"></RowDefinition>
-                    <RowDefinition Height="auto"></RowDefinition>
                 </Grid.RowDefinitions>
                 <Label Content="IP адрес" 
                        Grid.Row="0" 
@@ -89,20 +88,6 @@
                                     VerticalAlignment="Top"
                                     Width="120"
                                     Text="{Binding DnsServer}"
-                                    />
-                <Label Content="DNS сервер" 
-                       Grid.Row="4" 
-                       Grid.Column="0" 
-                       HorizontalAlignment="Left" 
-                       VerticalAlignment="Top"/>
-                <TextBox Grid.Row="4" 
-                                    Grid.Column="1" 
-                                    HorizontalAlignment="Left" 
-                                    Height="23"
-                                    TextWrapping="Wrap" 
-                                    VerticalAlignment="Top"
-                                    Width="120"
-                                    Text="{Binding AlternativeDnsServer}"
                                     />
             </Grid>
         </GroupBox>

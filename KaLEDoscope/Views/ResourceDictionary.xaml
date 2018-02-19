@@ -57,6 +57,12 @@
     <Style x:Key="ButtonStyle"  BasedOn="{StaticResource marginStyle}" TargetType="{x:Type Button}">
     </Style>
 
+    <Style x:Key="TextBoxStyle"  BasedOn="{StaticResource marginStyle}" TargetType="{x:Type TextBox}">
+    </Style>
+
+    <Style x:Key="TreeViewStyle"  BasedOn="{StaticResource marginStyle}" TargetType="{x:Type TreeView}">
+    </Style>
+
     <Style x:Key="ComboboxStyle" BasedOn="{StaticResource marginStyle}" TargetType="{x:Type ComboBox}">
         <Setter Property="MinWidth" Value="120"/>
     </Style>

@@ -55,7 +55,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BytesRecievedEventArgs.cs" />
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="Exchange.cs" />
+    <Compile Include="IProvider.cs" />
+    <Compile Include="ProviderItem.cs" />
+    <Compile Include="TcpProvider.cs" />
+    <Compile Include="UdpProvider.cs" />
     <Compile Include="UdpState.cs" />
     <Compile Include="ViewModel.cs" />
     <Page Include="MainWindow.xaml">

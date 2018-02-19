@@ -14,7 +14,7 @@ namespace NetworkConsole
     public class ViewModel : INotifyPropertyChanged
     {
         private int _port = 30000;
-        private UdpClient _udpClient;
+        private IProvider _provider;
         public int Port
         {
             get
@@ -98,11 +98,41 @@ namespace NetworkConsole
             }
         }
 
+        public ObservableCollection<ProviderItem> ProviderItems { get; set; }
+            = new ObservableCollection<ProviderItem>(new List<ProviderItem>
+        {
+                new ProviderItem
+                {
+                    Name = "UDP",
+                    GetProvider = ()=>new UdpProvider()
+                },
+                new ProviderItem
+                {
+                    Name="TCP",
+                    GetProvider = ()=>new TcpProvider()
+                }
+            });
+
+        private ProviderItem _providerItem;
+        public ProviderItem ProviderItem
+        {
+            get
+            {
+                return _providerItem;
+            }
+            set
+            {
+                _providerItem = value;
+                OnPropertyChanged(nameof(ProviderItem));
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ViewModel()
         {
             logMessage("Запуск");
+            ProviderItem = ProviderItems.First();
             StartListen();
         }
 
@@ -113,48 +143,25 @@ namespace NetworkConsole
 
         private void StartListen()
         {
-            var _endpoint = new IPEndPoint(IPAddress.Any, _port);
-            _udpClient = new UdpClient(_endpoint);
+            _provider = _providerItem.GetProvider();
+            var endpoint = new IPEndPoint(IPAddress.Any, _port);
 
-            var s = new UdpState();
-            s.e = _endpoint;
-            s.u = _udpClient;
+            logMessage($"Начинаю слушать порт {_port} по {_providerItem.Name}");
+            _provider.OnBytesRecieved += OnBytesRecieved;
+            _provider.StartListen(endpoint);
+        }
 
-            logMessage($"Начинаю слушать порт {_port}");
-            _udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), s);
+        private void OnBytesRecieved(object sender, BytesRecievedEventArgs e)
+        {
+            var receiveString = Encoding.UTF8.GetString(e.Bytes);
+            logMessage($"Получено: {receiveString} от {e.SenderAddress} по {_providerItem.Name}");
         }
 
         private void Close()
         {
-            logMessage("Закрываю текущее подключение");
-            _udpClient?.Close();
-        }
-
-        private void ReceiveCallback(IAsyncResult ar)
-        {
-            try
-            {
-                UdpClient u = ((UdpState)(ar.AsyncState)).u;
-                IPEndPoint e = ((UdpState)(ar.AsyncState)).e;
-
-                if (u == null)
-                {
-                    return;
-                }
-                var receiveBytes = u.EndReceive(ar, ref e);
-                var receiveString = Encoding.UTF8.GetString(receiveBytes);
-                logMessage($"Получено: {receiveString} от {e.Address}");
-
-                UdpState s = new UdpState();
-                s.e = e;
-                s.u = u;
-                u.BeginReceive(new AsyncCallback(ReceiveCallback), s);
-            }
-            catch (ObjectDisposedException) { }
-            catch (Exception ex)
-            {
-                throw new Exception("Ошибка получения данных", ex);
-            }
+            logMessage($"Закрываю текущее подключение по {_providerItem.Name}");
+            _provider.OnBytesRecieved -= OnBytesRecieved;
+            _provider.Close();
         }
 
         private void logMessage(string Message)
@@ -195,19 +202,18 @@ namespace NetworkConsole
                         if (_sendBroadcast)
                         {
                             _ipEndpoint = new IPEndPoint(IPAddress.Broadcast, _port);
-                            message += $"широковещательного сообщения на порт {_port}";
+                            message += $"широковещательного сообщения на порт {_port} по {_providerItem.Name}";
                         }
                         else
                         {
                             _ipEndpoint = new IPEndPoint(IPAddress.Parse(_address), _port);
-                            message += $"сообщения на адрес {_address}:{_port}";
+                            message += $"сообщения на адрес {_address}:{_port} по {_providerItem.Name}";
                         }
                         message += $": {_message}";
                         logMessage(message);
-                        _udpClient = new UdpClient();
-                        _udpClient.Connect(_ipEndpoint);
+                        _provider.Connect(_ipEndpoint);
                         var bytes = Encoding.UTF8.GetBytes(_message);
-                        _udpClient.Send(bytes, bytes.Length);
+                        _provider.Send(bytes, bytes.Length);
                         Close();
                         StartListen();
                     });

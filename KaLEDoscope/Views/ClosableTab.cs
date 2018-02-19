@@ -82,7 +82,6 @@ namespace KaLEDoscope.Views
         void button_close_Click(object sender, RoutedEventArgs e)
         {
             OnTabCloseClick?.Invoke(this, EventArgs.Empty);
-            //((TabControl)this.Parent).Items.Remove(this);
         }
         // Label SizeChanged - When the Size of the Label changes
         // (due to setting the Title) set position of button properly

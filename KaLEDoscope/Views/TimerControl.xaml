@@ -10,9 +10,9 @@
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
@@ -46,65 +46,58 @@
                               DisplayMemberPath="Name" SelectedItem="{Binding DisplayFormat}" Style="{StaticResource ComboboxStyle}"/>
                 </Grid>
             </GroupBox>
-            <GroupBox Grid.Row="1" Header="Настройка таймера/секундомера">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Content="Режим"/>
-                        <ComboBox Grid.Column="1" Style="{StaticResource ComboboxStyle}"/>
-                    </Grid>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Grid.Column="0" Content="Стартовое значение"/>
-                        <TextBox Grid.Column="1" />
-                    </Grid>
-                    <Grid Grid.Row="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <!--Template="{StaticResource buttonTemplate}-->
-                        <Button Grid.Row="0" Grid.Column="0" Content="Старт" Style="{StaticResource ButtonStyle}" />
-                        <Button Grid.Row="0" Grid.Column="1" Content="Стоп" Style="{StaticResource ButtonStyle}" />
-                        <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сброс к стартовому значению" Style="{StaticResource ButtonStyle}" />
-                        <Button Grid.Row="2" Grid.ColumnSpan="2" Content="СТОП (сброс в 00:00:00)" Style="{StaticResource ButtonStyle}" />
-                    </Grid>
-                </Grid>
+            <GroupBox Grid.Row="1" Header="Конфигурация будильников" HorizontalAlignment="Right" Width="252">
+                <ListView ItemsSource="{Binding AlarmSchedule}">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="30">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsActive}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Время" Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding StartTimeSpan}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Длительность" Width="80">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBox Text="{Binding Period}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
             </GroupBox>
         </Grid>
         <GroupBox Grid.Row="1" Grid.Column="1" Header="Отображаемая информация">
-            <ListView>
+            <ListView ItemsSource="{Binding DisplayFrames}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn >
+                        <GridViewColumn Width="30">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <CheckBox />
+                                    <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding IsEnabled}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Объекты">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding Name}" IsEnabled="{Binding IsEnabled}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Время отображения, сек">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox />
+                                    <TextBox Text="{Binding DisplayPeriod}" Width="100" IsEnabled="{Binding IsEnabled}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
@@ -127,53 +120,59 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <ComboBox Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource ComboboxStyle}"/>
+                <ComboBox Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource ComboboxStyle}" ItemsSource="{Binding SyncSources}" DisplayMemberPath="Name" SelectedItem="{Binding SyncSource}"/>
                 <Label Grid.Row="1" Grid.Column="0" Content="Часовой пояс"/>
-                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboboxStyle}"/>
-                <Label Grid.Row="2" Grid.ColumnSpan="2" Content="Параметры синхронизации" HorizontalContentAlignment="Center"/>
-                <Label Grid.Row="3" Grid.Column="0" Content="Период синхронизации"/>
-                <TextBox Grid.Row="3" Grid.Column="1"/>
-                <Label Grid.Row="4" Grid.Column="0" Content="Адрес сервера"/>
-                <TextBox Grid.Row="4" Grid.Column="1"/>
-                <Label Grid.Row="5" Grid.Column="0" Content="Порт"/>
-                <TextBox Grid.Row="5" Grid.Column="1"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboboxStyle}" ItemsSource="{Binding TimeZones}" DisplayMemberPath="DisplayName" SelectedItem="{Binding TimeZone}"/>
+                <Label Grid.Row="2" Grid.ColumnSpan="2" Content="Параметры синхронизации" HorizontalContentAlignment="Center" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <Label Grid.Row="3" Grid.Column="0" Content="Период синхронизации" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding TimeSyncPeriod}" IsEnabled="{Binding SyncSource.IsCutomized}" Style="{StaticResource TextBoxStyle}"/>
+                <Label Grid.Row="4" Grid.Column="0" Content="Адрес сервера" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Style="{StaticResource TextBoxStyle}" IsEnabled="{Binding SyncSource.IsCutomized}" Text="{Binding TimeSyncServerIp}"/>
+                <Label Grid.Row="5" Grid.Column="0" Content="Порт" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Style="{StaticResource TextBoxStyle}" IsEnabled="{Binding SyncSource.IsCutomized}" Text="{Binding TimeSyncServerPort}"/>
             </Grid>
         </GroupBox >
-        <GroupBox Grid.Row="1" Grid.Column="4"  Header="Конфигурация будильников">
-            <ListView>
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="20">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Время" Width="50">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Длительность" Width="80">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Повтор" Width="80">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+        <GroupBox Grid.Row="2" Grid.Column="0" Header="Настройка таймера/секундомера">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Режим"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding CountdownTypes}" 
+                              DisplayMemberPath="Name" SelectedItem="{Binding CountdownType}" Style="{StaticResource ComboboxStyle}"/>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Стартовое значение"/>
+                    <TextBox Grid.Column="1" Style="{StaticResource TextBoxStyle}" Text="{Binding CountdownStart}"/>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <!--Template="{StaticResource buttonTemplate}-->
+                    <Button Grid.Row="0" Grid.Column="0" Content="Старт" Style="{StaticResource ButtonStyle}" />
+                    <Button Grid.Row="0" Grid.Column="1" Content="Стоп" Style="{StaticResource ButtonStyle}" />
+                    <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сброс к стартовому значению" Style="{StaticResource ButtonStyle}" />
+                    <Button Grid.Row="2" Grid.ColumnSpan="2" Content="СТОП (сброс в 00:00:00)" Style="{StaticResource ButtonStyle}" />
+                </Grid>
+            </Grid>
         </GroupBox>
 
     </Grid>

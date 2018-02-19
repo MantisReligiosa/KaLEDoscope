@@ -241,11 +241,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.AroundTheClock;
+                return _device.WorkSchedule.AroundTheClock;
             }
             set
             {
-                _device.Schedule.AroundTheClock = value;
+                _device.WorkSchedule.AroundTheClock = value;
                 OnPropertyChanged(nameof(ScheduleWorkAroundTheClock));
                 OnPropertyChanged(nameof(IsScheduledWork));
             }
@@ -263,7 +263,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.StartFrom.ToString(@"hh\:mm");
+                return _device.WorkSchedule.StartFrom.ToString(@"hh\:mm");
             }
             set
             {
@@ -272,7 +272,7 @@ namespace KaLEDoscope.ViewModel
                 {
                     timeSpan = new TimeSpan(0, 0, 0);
                 }
-                _device.Schedule.StartFrom = timeSpan;
+                _device.WorkSchedule.StartFrom = timeSpan;
                 OnPropertyChanged(nameof(ScheduledWorkStart));
             }
         }
@@ -281,7 +281,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.FinishTo.ToString(@"hh\:mm");
+                return _device.WorkSchedule.FinishTo.ToString(@"hh\:mm");
             }
             set
             {
@@ -290,7 +290,7 @@ namespace KaLEDoscope.ViewModel
                 {
                     timeSpan = new TimeSpan(0, 0, 0);
                 }
-                _device.Schedule.FinishTo = timeSpan;
+                _device.WorkSchedule.FinishTo = timeSpan;
                 OnPropertyChanged(nameof(ScheduledWorkEnd));
             }
         }
@@ -299,11 +299,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.AllWeek;
+                return _device.WorkSchedule.AllWeek;
             }
             set
             {
-                _device.Schedule.AllWeek = value;
+                _device.WorkSchedule.AllWeek = value;
                 OnPropertyChanged(nameof(RunAllWeek));
                 OnPropertyChanged(nameof(RunByDaysOfWeek));
             }
@@ -321,11 +321,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.RunInSun;
+                return _device.WorkSchedule.RunInSun;
             }
             set
             {
-                _device.Schedule.RunInSun = value;
+                _device.WorkSchedule.RunInSun = value;
                 OnPropertyChanged(nameof(RunInSun));
             }
         }
@@ -334,11 +334,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.RunInMon;
+                return _device.WorkSchedule.RunInMon;
             }
             set
             {
-                _device.Schedule.RunInMon = value;
+                _device.WorkSchedule.RunInMon = value;
                 OnPropertyChanged(nameof(RunInMon));
             }
         }
@@ -347,11 +347,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.RunInTue;
+                return _device.WorkSchedule.RunInTue;
             }
             set
             {
-                _device.Schedule.RunInTue = value;
+                _device.WorkSchedule.RunInTue = value;
                 OnPropertyChanged(nameof(RunInTue));
             }
         }
@@ -360,11 +360,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.RunInWed;
+                return _device.WorkSchedule.RunInWed;
             }
             set
             {
-                _device.Schedule.RunInWed = value;
+                _device.WorkSchedule.RunInWed = value;
                 OnPropertyChanged(nameof(RunInWed));
             }
         }
@@ -373,11 +373,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.RunInThu;
+                return _device.WorkSchedule.RunInThu;
             }
             set
             {
-                _device.Schedule.RunInThu = value;
+                _device.WorkSchedule.RunInThu = value;
                 OnPropertyChanged(nameof(RunInThu));
             }
         }
@@ -386,11 +386,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.RunInFri;
+                return _device.WorkSchedule.RunInFri;
             }
             set
             {
-                _device.Schedule.RunInFri = value;
+                _device.WorkSchedule.RunInFri = value;
                 OnPropertyChanged(nameof(RunInFri));
             }
         }
@@ -399,11 +399,11 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Schedule.RunInSat;
+                return _device.WorkSchedule.RunInSat;
             }
             set
             {
-                _device.Schedule.RunInSat = value;
+                _device.WorkSchedule.RunInSat = value;
                 OnPropertyChanged(nameof(RunInSat));
             }
         }

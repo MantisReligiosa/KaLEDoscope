@@ -87,9 +87,11 @@
     <Compile Include="ApplicationInfrastructure.cs" />
     <Compile Include="POCO\Timer\BaseClass.cs" />
     <Compile Include="POCO\Timer\CountdownType.cs" />
+    <Compile Include="POCO\Timer\DisplayFrame.cs" />
     <Compile Include="POCO\Timer\DisplayType.cs" />
     <Compile Include="POCO\Timer\DisplayFormat.cs" />
     <Compile Include="POCO\Timer\FontType.cs" />
+    <Compile Include="POCO\Timer\SyncSource.cs" />
     <Compile Include="ViewModel\TimerDeviceViewModel.cs" />
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>

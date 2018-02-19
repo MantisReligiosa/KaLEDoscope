@@ -6,7 +6,7 @@
         xmlns:self="clr-namespace:KaLEDoscope"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
-        Title="MainWindow">
+        Title="MainWindow" d:DesignWidth="780" d:DesignHeight="540">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"></RowDefinition>
@@ -27,7 +27,7 @@
                 <RowDefinition Height="1*"></RowDefinition>
                 <RowDefinition Height="auto"></RowDefinition>
             </Grid.RowDefinitions>
-            <TreeView x:Name="trvMenu" Grid.Row="0"  ItemsSource="{Binding Path=ProtocolNodes}">
+            <TreeView x:Name="trvMenu" Grid.Row="0" ItemsSource="{Binding Path=ProtocolNodes}" Style="{StaticResource TreeViewStyle}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseDoubleClick">
                         <i:InvokeCommandAction Command="{Binding Path=ShowDevicePlugin}"
@@ -52,13 +52,13 @@
                     </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
-            <Button Grid.Row="1" Content="Сканировать" Command="{Binding ScanDevices}"/>
+            <Button Grid.Row="1" Content="Сканировать" Command="{Binding ScanDevices}" Style="{StaticResource ButtonStyle}"/>
         </Grid>
 
 
-        <ListBox Name="lbLog" Grid.Column="2" Grid.Row="2" ItemsSource="{Binding Path=LogItems}">
+        <TextBox Name="lbLog" Grid.Column="2" Grid.Row="2" Text="{Binding Log}" IsReadOnly="True">
 
-        </ListBox>
+        </TextBox>
         <TabControl 
                 x:Name="tabControl" 
                 Grid.Column="2" 

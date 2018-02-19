@@ -66,7 +66,7 @@ namespace CommandProcessing
                         }
                     }
                 };
-                device.Schedule = new Schedule
+                device.WorkSchedule = new WorkSchedule
                 {
                     AroundTheClock = true,
                     FinishTo = new TimeSpan(17, 0, 0),
@@ -91,7 +91,7 @@ namespace CommandProcessing
                         Mode = Mode.Manual,
                         BrightnessPeriods = new List<BrightnessPeriod>()
                     },
-                    Schedule = new Schedule
+                    WorkSchedule = new WorkSchedule
                     {
                         AroundTheClock = true,
                         FinishTo = new TimeSpan(17, 0, 0),
