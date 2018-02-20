@@ -12,14 +12,14 @@ namespace NetworkConsole
     public class TcpProvider : IProvider
     {
         public event EventHandler<BytesRecievedEventArgs> OnBytesRecieved;
-        const int READ_BUFFER_SIZE = 1024;
-        private byte[] _readBuffer = new byte[READ_BUFFER_SIZE];
 
         private TcpClient _tcpClient;
+        private TcpListener _tcpListener;
 
         public void Close()
         {
             _tcpClient?.Close();
+            _tcpListener?.Stop();
         }
 
         public void Connect(IPEndPoint ipEndpoint)
@@ -36,30 +36,43 @@ namespace NetworkConsole
 
         public void StartListen(IPEndPoint endPoint)
         {
-            //TcpListener listener = new TcpListener(endPoint);
-            _tcpClient = new TcpClient(endPoint);
-            _tcpClient.Connect(endPoint);
-            _tcpClient.GetStream().BeginRead(this._readBuffer, 0, READ_BUFFER_SIZE, new AsyncCallback(DoRead), null);
+            _tcpListener = new TcpListener(endPoint);
+            var s = new TcpState();
+            s.e = endPoint;
+            s.l = _tcpListener;
+            _tcpListener.Start();
+            _tcpListener.BeginAcceptSocket(new AsyncCallback(DoAcceptSocketCallback), s);
         }
 
-        private void DoRead(IAsyncResult ar)
+        public void DoAcceptSocketCallback(IAsyncResult ar)
         {
-            int BytesRead;
-
-            BytesRead = this._tcpClient.GetStream().EndRead(ar);
-
-            if (BytesRead < 1)
+            try
             {
-                return;
+                TcpListener listener = ((TcpState)(ar.AsyncState)).l;
+                IPEndPoint e = ((TcpState)(ar.AsyncState)).e;
+
+                var client = listener.EndAcceptTcpClient(ar);
+                var stream = client.GetStream();
+                var data = new byte[1024];
+                var recievedBytesAmount = stream.Read(data, 0, data.Length);
+                var recievedBytes = new byte[recievedBytesAmount];
+                Array.Copy(data, recievedBytes, recievedBytesAmount);
+                OnBytesRecieved?.Invoke(this, new BytesRecievedEventArgs
+                {
+                    Bytes = recievedBytes,
+                    SenderAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString()
+                });
+
+                var s = new TcpState();
+                s.e = e;
+                s.l = listener;
+                _tcpListener.BeginAcceptSocket(new AsyncCallback(DoAcceptSocketCallback), s);
             }
-
-            OnBytesRecieved?.Invoke(this, new BytesRecievedEventArgs
+            catch (ObjectDisposedException) { }
+            catch (Exception ex)
             {
-                Bytes = _readBuffer,
-                SenderAddress = _tcpClient.Client.RemoteEndPoint.ToString()
-            });
-
-            _tcpClient.GetStream().BeginRead(this._readBuffer, 0, READ_BUFFER_SIZE, new AsyncCallback(DoRead), null);
+                throw new Exception("TCP error", ex);
+            }
         }
     }
 }

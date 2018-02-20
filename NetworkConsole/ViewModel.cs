@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Input = System.Windows.Input;
 
@@ -15,6 +16,7 @@ namespace NetworkConsole
     {
         private int _port = 30000;
         private IProvider _provider;
+        private string _providerName;
         public int Port
         {
             get
@@ -127,10 +129,17 @@ namespace NetworkConsole
             }
         }
 
+        public ObservableCollection<Exchange> Exchanges { get; set; } = new ObservableCollection<Exchange>();
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ViewModel()
         {
+            Exchanges.Add(new Exchange
+            {
+                Request = "@@@",
+                Responce = "XXX"
+            });
             logMessage("Запуск");
             ProviderItem = ProviderItems.First();
             StartListen();
@@ -144,9 +153,10 @@ namespace NetworkConsole
         private void StartListen()
         {
             _provider = _providerItem.GetProvider();
+            _providerName = _providerItem.Name;
             var endpoint = new IPEndPoint(IPAddress.Any, _port);
 
-            logMessage($"Начинаю слушать порт {_port} по {_providerItem.Name}");
+            logMessage($"Начинаю слушать порт {_port} по {_providerName}");
             _provider.OnBytesRecieved += OnBytesRecieved;
             _provider.StartListen(endpoint);
         }
@@ -154,12 +164,20 @@ namespace NetworkConsole
         private void OnBytesRecieved(object sender, BytesRecievedEventArgs e)
         {
             var receiveString = Encoding.UTF8.GetString(e.Bytes);
-            logMessage($"Получено: {receiveString} от {e.SenderAddress} по {_providerItem.Name}");
+            logMessage($"Получено: {receiveString} от {e.SenderAddress} по {_providerName}");
+            var exchange = Exchanges.FirstOrDefault(ex => ex.Request.Equals(receiveString));
+            if (exchange != null)
+            {
+                logMessage("Тайм-аут 500мс");
+                Thread.Sleep(500);
+                logMessage("АВТООТВЕТ");
+                Send(false, e.SenderAddress, _port, exchange.Responce);
+            }
         }
 
         private void Close()
         {
-            logMessage($"Закрываю текущее подключение по {_providerItem.Name}");
+            logMessage($"Закрываю текущее подключение по {_providerName}");
             _provider.OnBytesRecieved -= OnBytesRecieved;
             _provider.Close();
         }
@@ -187,6 +205,23 @@ namespace NetworkConsole
             }
         }
 
+        private DelegateCommand _addExchange;
+        public Input.ICommand AddExchange
+        {
+            get
+            {
+                if (_addExchange == null)
+                {
+                    _addExchange = new DelegateCommand((o) =>
+                    {
+                        Exchanges.Add(new Exchange());
+                    });
+                }
+                return _addExchange;
+            }
+        }
+
+
         private DelegateCommand _sendMessage;
         public Input.ICommand SendMessage
         {
@@ -196,30 +231,35 @@ namespace NetworkConsole
                 {
                     _sendMessage = new DelegateCommand((o) =>
                     {
-                        Close();
-                        string message = "Отправка ";
-                        IPEndPoint _ipEndpoint;
-                        if (_sendBroadcast)
-                        {
-                            _ipEndpoint = new IPEndPoint(IPAddress.Broadcast, _port);
-                            message += $"широковещательного сообщения на порт {_port} по {_providerItem.Name}";
-                        }
-                        else
-                        {
-                            _ipEndpoint = new IPEndPoint(IPAddress.Parse(_address), _port);
-                            message += $"сообщения на адрес {_address}:{_port} по {_providerItem.Name}";
-                        }
-                        message += $": {_message}";
-                        logMessage(message);
-                        _provider.Connect(_ipEndpoint);
-                        var bytes = Encoding.UTF8.GetBytes(_message);
-                        _provider.Send(bytes, bytes.Length);
-                        Close();
-                        StartListen();
+                        Send(_sendBroadcast, _address, _port, _message);
                     });
                 }
                 return _sendMessage;
             }
+        }
+
+        private void Send(bool isBroadcast, string address, int port, string msg)
+        {
+            Close();
+            string message = "Отправка ";
+            IPEndPoint ipEndpoint;
+            if (isBroadcast)
+            {
+                ipEndpoint = new IPEndPoint(IPAddress.Broadcast, port);
+                message += $"широковещательного сообщения на порт {port} по {_providerItem.Name}";
+            }
+            else
+            {
+                ipEndpoint = new IPEndPoint(IPAddress.Parse(_address), port);
+                message += $"сообщения на адрес {address}:{port} по {_providerItem.Name}";
+            }
+            message += $": {msg}";
+            logMessage(message);
+            _provider.Connect(ipEndpoint);
+            var bytes = Encoding.UTF8.GetBytes(msg);
+            _provider.Send(bytes, bytes.Length);
+            Close();
+            StartListen();
         }
     }
 }

@@ -61,6 +61,7 @@
     <Compile Include="IProvider.cs" />
     <Compile Include="ProviderItem.cs" />
     <Compile Include="TcpProvider.cs" />
+    <Compile Include="TcpState.cs" />
     <Compile Include="UdpProvider.cs" />
     <Compile Include="UdpState.cs" />
     <Compile Include="ViewModel.cs" />
