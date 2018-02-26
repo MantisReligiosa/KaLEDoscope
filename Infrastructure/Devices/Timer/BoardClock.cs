@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Timer
 {
-    public class TimerDevice : Device
+    public class BoardClock : Device
     {
         public List<Alarm> AlarmSchedule { get; set; }
         public int BoardTypeId { get; set; }

@@ -168,7 +168,6 @@ namespace NetworkConsole
             var exchange = Exchanges.FirstOrDefault(ex => ex.Request.Equals(receiveString));
             if (exchange != null)
             {
-                logMessage("Тайм-аут 500мс");
                 Thread.Sleep(500);
                 logMessage("АВТООТВЕТ");
                 Send(false, e.SenderAddress, _port, exchange.Responce);

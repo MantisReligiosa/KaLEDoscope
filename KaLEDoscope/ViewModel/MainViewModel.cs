@@ -1,5 +1,4 @@
 ﻿using CommandProcessing;
-using DirectConnect;
 using DomainData;
 using KaLEDoscope.ViewModel;
 using KaLEDoscope.Views;
@@ -12,9 +11,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using Timer;
 using Input = System.Windows.Input;
 
@@ -23,6 +22,8 @@ namespace KaLEDoscope
     public class MainViewModel : INotifyPropertyChanged
     {
         private ILogger _logger { get; set; }
+        private ProtocolNode _directConnect;
+        private readonly Dispatcher _dispatcher;
 
         public ObservableCollection<ProtocolNode> ProtocolNodes { get; set; } = new ObservableCollection<ProtocolNode>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
@@ -30,7 +31,7 @@ namespace KaLEDoscope
         private readonly Dictionary<Func<Device, bool>, Func<Device, ILogger, UserControl>> _customDevicesControls
             = new Dictionary<Func<Device, bool>, Func<Device, ILogger, UserControl>>
         {
-            {d=> d is TimerDevice,
+            {d=> d is BoardClock,
              (d,l)=>   new TimerControl
                 {
                     HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -67,6 +68,20 @@ namespace KaLEDoscope
             }
         }
 
+        private bool _isScanEnabled;
+        public bool IsScanEnabled
+        {
+            get
+            {
+                return _isScanEnabled;
+            }
+            set
+            {
+                _isScanEnabled = value;
+                OnPropertyChanged(nameof(IsScanEnabled));
+            }
+        }
+
         public Dictionary<Func<DeviceNode>, Func<CustomDeviceControl>> CustomControls { get; set; }
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -77,61 +92,64 @@ namespace KaLEDoscope
             _logger.DebugRaised += (sender, message) => logMessage($"{sender}: Debug: {message}");
             _logger.WarnRaised += (sender, message) => logMessage($"{sender}: Warn: {message}");
             _logger.ErrorRaised += (sender, message) => logMessage($"{sender}: Error: {message}");
+            _dispatcher = Dispatcher.CurrentDispatcher;
+            IsScanEnabled = true;
         }
 
         public void MakeNodes()
         {
-            var directConnectDeviceScanner = new DeviceScanner<DirectConnection>(_logger);
-            directConnectDeviceScanner.DeviceDictionary.Add(1, () => new TimerDevice
+            var directConnectDeviceScanner = new UdpDeviceScanner(_logger);
+            directConnectDeviceScanner.DeviceFactory.AddTransformation("boardClock", (d) =>
             {
-                Name = "Семисегментные часы",
-                BoardTypeId = 1,
-                CountdownTypeId = 1,
-                CountdownStartValue = new TimeSpan(0, 0, 10),
-                DisplayFormatId = 1,
-                FontTypeId = 1,
-                SyncSourceId = 1,
-                TimeZoneId = "Russian Standard Time",
-                TimeSyncPeriod = new TimeSpan(3, 0, 0),
-                TimeSyncServerIp = "192.168.0.100",
-                TimeSyncServerPort = 220,
-                AlarmSchedule = new List<Alarm>
+                BoardClock device = new BoardClock
                 {
-                    new Alarm
+                    AlarmSchedule = new List<Alarm>(),
+                    Model = d.Model,
+                    Network = d.Network,
+                    Brightness = new Brightness
                     {
-                        IsActive = true,
-                        StartTimeSpan = new TimeSpan(9,0,0),
-                        Period = new TimeSpan()
+                        BrightnessPeriods = new List<BrightnessPeriod>(),
+                        Mode = Mode.Auto
                     },
-                    new Alarm
+                    WorkSchedule = new WorkSchedule
                     {
-                        IsActive = false,
-                        StartTimeSpan = new TimeSpan(6,30,0),
-                        Period = new TimeSpan(0,5,0)
+
                     }
-                }
+                };
+                device.Name = "Семисегментные часы";
+                return device;
             });
 
-            var devices = directConnectDeviceScanner.Search();
+            directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
+            directConnectDeviceScanner.StartSearch();
+            IsScanEnabled = false;
 
             var mqtt = new ProtocolNode
             {
                 Name = "MQTT",
             };
-            var directConnect = new ProtocolNode
+            _directConnect = new ProtocolNode
             {
                 Name = "DirectConnect",
             };
 
-            foreach (var device in devices)
-            {
-                directConnect.Members.Add(new DeviceNode
-                {
-                    Device = device,
-                });
-            }
             ProtocolNodes.Add(mqtt);
-            ProtocolNodes.Add(directConnect);
+            ProtocolNodes.Add(_directConnect);
+        }
+
+        private void DirectConnectDeviceScanner_OnScanCompleted(List<Device> devices)
+        {
+            _dispatcher.Invoke(() =>
+            {
+                foreach (var device in devices)
+                {
+                    _directConnect.Members.Add(new DeviceNode
+                    {
+                        Device = device,
+                    });
+                }
+            });
+            IsScanEnabled = true;
         }
 
         public void ClearNodes()
@@ -167,7 +185,7 @@ namespace KaLEDoscope
 
                             baseTabItem.Content = new BaseDeviceControl
                             {
-                                HorizontalAlignment = System.Windows.HorizontalAlignment.Stretch,
+                                HorizontalAlignment = HorizontalAlignment.Stretch,
                                 VerticalAlignment = System.Windows.VerticalAlignment.Stretch,
                                 DataContext = new BaseDeviceViewModel(deviceNode.Device, _logger)
                             };
@@ -176,9 +194,9 @@ namespace KaLEDoscope
                             tabControl.TabStripPlacement = Dock.Left;
                             var toolbar = new ToolBar();
                             toolbar.Items.Add(new Button
-                            { Content = "Синхронизировать" });
+                            { Content = "Синхронизировать", DataContext = deviceNode.Device });
                             toolbar.Items.Add(new Button
-                            { Content = "Применить конфигурацию" });
+                            { Content = "Применить конфигурацию", DataContext = deviceNode.Device });
                             toolbar.Items.Add(new Button
                             { Content = "Экспортировать настройки как скрипт" });
                             toolbar.Items.Add(new Button
@@ -189,7 +207,7 @@ namespace KaLEDoscope
                             Grid.SetRow(toolbar, 0);
                             var newTabItem = new ClosableTab
                             {
-                                Title = $"{deviceNode.Device.Name} id:{deviceNode.Device.Id}",
+                                Title = $"{deviceNode.Device.Name} id:{deviceNode.Device.Model}",
                                 Content = grid,
                                 DataContext = deviceNode.Device
                             };

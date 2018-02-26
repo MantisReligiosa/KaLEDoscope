@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timer", "Infrastructure\Dev
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkConsole", "NetworkConsole\NetworkConsole.csproj", "{F750C8E3-326C-4FF1-B4A9-4B58FB296C7C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceFactory", "DeviceFactory\DeviceFactory.csproj", "{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{F750C8E3-326C-4FF1-B4A9-4B58FB296C7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F750C8E3-326C-4FF1-B4A9-4B58FB296C7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F750C8E3-326C-4FF1-B4A9-4B58FB296C7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,5 +88,6 @@ Global
 		{F5C748BA-65E1-430D-8385-CFD198FE850E} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
 		{86379913-F85B-4466-A82D-0FCAA3D65501} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
 		{96D808B9-C3F8-4604-BE96-2C85074EC088} = {86379913-F85B-4466-A82D-0FCAA3D65501}
+		{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3} = {86379913-F85B-4466-A82D-0FCAA3D65501}
 	EndGlobalSection
 EndGlobal

@@ -2,15 +2,16 @@
 
 namespace ServiceInterfaces
 {
-    public abstract class Command<TDevice, TProtocol> : ICommand
+    public abstract class Command<TDevice> : ICommand
         where TDevice : Device
-        where TProtocol : IProtocol
     {
-        internal readonly TDevice _device;
-        internal readonly IProtocol _protocol;
-        public Command(TDevice device)
+        protected readonly TDevice _device;
+        protected readonly IProtocol _protocol;
+        protected ILogger _logger;
+        protected Command(TDevice device, ILogger logger)
         {
             _device = device;
+            _logger = logger;
         }
         public abstract void Execute();
     }

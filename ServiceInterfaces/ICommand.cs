@@ -1,4 +1,6 @@
-﻿namespace ServiceInterfaces
+﻿using System.Threading.Tasks;
+
+namespace ServiceInterfaces
 {
     public interface ICommand
     {

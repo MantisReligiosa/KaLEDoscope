@@ -15,7 +15,7 @@ namespace KaLEDoscope.ViewModel
 {
     public class TimerDeviceViewModel : INotifyPropertyChanged
     {
-        private readonly TimerDevice _device;
+        private readonly BoardClock _device;
         private readonly ILogger _logger;
 
         private readonly List<DisplayType> _displayTypes = new List<DisplayType>
@@ -440,7 +440,7 @@ namespace KaLEDoscope.ViewModel
 
         public TimerDeviceViewModel(Device device, ILogger logger)
         {
-            _device = (TimerDevice)device;
+            _device = (BoardClock)device;
             _logger = logger;
             DisplayTypes = new ObservableCollection<DisplayType>(_displayTypes);
             DisplayType = _displayTypes.FirstOrDefault(d => d.Id == _device.BoardTypeId);
