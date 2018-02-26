@@ -24,6 +24,7 @@ namespace KaLEDoscope
         private ILogger _logger { get; set; }
         private ProtocolNode _directConnect;
         private readonly Dispatcher _dispatcher;
+        private readonly DeviceFactory.DeviceFactory _deviceFactory;
 
         public ObservableCollection<ProtocolNode> ProtocolNodes { get; set; } = new ObservableCollection<ProtocolNode>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
@@ -94,12 +95,8 @@ namespace KaLEDoscope
             _logger.ErrorRaised += (sender, message) => logMessage($"{sender}: Error: {message}");
             _dispatcher = Dispatcher.CurrentDispatcher;
             IsScanEnabled = true;
-        }
-
-        public void MakeNodes()
-        {
-            var directConnectDeviceScanner = new UdpDeviceScanner(_logger);
-            directConnectDeviceScanner.DeviceFactory.AddTransformation("boardClock", (d) =>
+            _deviceFactory = new DeviceFactory.DeviceFactory(_logger);
+            _deviceFactory.AddTransformation("boardClock", (d) =>
             {
                 BoardClock device = new BoardClock
                 {
@@ -119,7 +116,11 @@ namespace KaLEDoscope
                 device.Name = "Семисегментные часы";
                 return device;
             });
+        }
 
+        public void MakeNodes()
+        {
+            var directConnectDeviceScanner = new UdpDeviceScanner(_logger, _deviceFactory);
             directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
             directConnectDeviceScanner.StartSearch();
             IsScanEnabled = false;
@@ -196,11 +197,26 @@ namespace KaLEDoscope
                             toolbar.Items.Add(new Button
                             { Content = "Синхронизировать", DataContext = deviceNode.Device });
                             toolbar.Items.Add(new Button
-                            { Content = "Применить конфигурацию", DataContext = deviceNode.Device });
+                            {
+                                Content = "Применить конфигурацию",
+                                DataContext = deviceNode.Device,
+                                Command = UploadSettings,
+                                CommandParameter = deviceNode.Device
+                            });
                             toolbar.Items.Add(new Button
-                            { Content = "Экспортировать настройки как скрипт" });
+                            {
+                                Content = "Сохранить конфигурацию в файл",
+                                DataContext = deviceNode.Device,
+                                Command = ExportSettings,
+                                CommandParameter = deviceNode.Device
+                            });
                             toolbar.Items.Add(new Button
-                            { Content = "Применить скрипт" });
+                            {
+                                Content = "Загрузить конфигурацию из файла",
+                                DataContext = deviceNode.Device,
+                                Command = ImportSettings,
+                                CommandParameter = deviceNode.Device
+                            });
                             grid.Children.Add(tabControl);
                             grid.Children.Add(toolbar);
                             Grid.SetRow(tabControl, 1);
@@ -242,79 +258,80 @@ namespace KaLEDoscope
             }
         }
 
-        private DelegateCommand scanDevices;
+        private DelegateCommand _scanDevices;
         public Input.ICommand ScanDevices
         {
             get
             {
-                if (scanDevices == null)
+                if (_scanDevices == null)
                 {
-                    scanDevices = new DelegateCommand((o) =>
+                    _scanDevices = new DelegateCommand((o) =>
                       {
                           ClearNodes();
                           MakeNodes();
                       });
                 }
-                return scanDevices;
+                return _scanDevices;
             }
         }
 
-        private DelegateCommand saveConfig;
-        public Input.ICommand SaveConfig
+        private DelegateCommand<Device> _uploadSettings;
+        public Input.ICommand UploadSettings
         {
             get
             {
-                if (saveConfig == null)
+                if (_uploadSettings == null)
                 {
-                    saveConfig = new DelegateCommand((o) =>
-                      {
-                          var dialog = new SaveFileDialog
-                          {
-                              FileName = "Config",
-                              DefaultExt = ".json",
-                              Filter = "JSON configuration (.json)|*.json"
-                          };
-                          if (dialog.ShowDialog() == true)
-                          {
-                              var fileName = dialog.FileName;
-                              var serialized = JsonConvert.SerializeObject(ProtocolNodes);
-                              System.IO.File.WriteAllText(fileName, serialized);
-                          }
-                      });
+                    _uploadSettings = new DelegateCommand<Device>((d) =>
+                    {
+                        var commandProcessor = new CommandProcessor(_logger, _deviceFactory);
+                        commandProcessor.UploadSettings(d);
+                    });
                 }
-                return saveConfig;
+                return _uploadSettings;
             }
         }
 
-        private Input.ICommand loadConfig;
-        public Input.ICommand LoadConfig
+        private DelegateCommand<Device> _exportSettings;
+        public Input.ICommand ExportSettings
         {
             get
             {
-                if (loadConfig == null)
+                if (_exportSettings == null)
                 {
-                    loadConfig = new DelegateCommand((o) =>
-                      {
-                          ClearNodes();
-                          var dialog = new OpenFileDialog
-                          {
-                              FileName = "Config",
-                              DefaultExt = ".json",
-                              Filter = "JSON configuration (.json)|*.json"
-                          };
-                          if (dialog.ShowDialog() == true)
-                          {
-                              var fileName = dialog.FileName;
-                              var serialized = System.IO.File.ReadAllText(fileName);
-                              var nodes = JsonConvert.DeserializeObject<List<ProtocolNode>>(serialized);
-                              foreach (var node in nodes)
-                              {
-                                  ProtocolNodes.Add(node);
-                              }
-                          }
-                      });
+                    _exportSettings = new DelegateCommand<Device>((d) =>
+                    {
+                        var dialog = new SaveFileDialog
+                        {
+                            FileName = d.Name,
+                            DefaultExt = ".json",
+                            Filter = "JSON configuration (.json)|*.json"
+                        };
+                        if (dialog.ShowDialog() == true)
+                        {
+                            var fileName = dialog.FileName;
+                            var serialized = JsonConvert.SerializeObject(d);
+                            System.IO.File.WriteAllText(fileName, serialized);
+                        }
+                    });
                 }
-                return loadConfig;
+                return _exportSettings;
+            }
+        }
+
+        private DelegateCommand<Device> _importSettings;
+        public Input.ICommand ImportSettings
+        {
+            get
+            {
+                if (_importSettings == null)
+                {
+                    _importSettings = new DelegateCommand<Device>((d) =>
+                    {
+                        MessageBox.Show("Ещё не написал");
+                    });
+                }
+                return _importSettings;
             }
         }
 

@@ -2,7 +2,7 @@
 
 namespace CommandProcessing.DTO
 {
-    public class ScanCommandRequest
+    public class ScanCommandResponce
     {
         [JsonProperty("network")]
         public NetworkParameters NetworkParameters { get; set; }

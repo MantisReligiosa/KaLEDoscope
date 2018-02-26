@@ -11,14 +11,14 @@ namespace CommandProcessing
         private readonly ILogger _logger;
         private readonly Invoker _invoker;
 
-        public DeviceFactory.DeviceFactory DeviceFactory { get; set; }
+        private DeviceFactory.DeviceFactory _deviceFactory { get; set; }
         public event Action<List<Device>> OnScanCompleted;
 
-        public UdpDeviceScanner(ILogger logger)
+        public UdpDeviceScanner(ILogger logger, DeviceFactory.DeviceFactory deviceFactory)
         {
             _logger = logger;
             _invoker = new Invoker();
-            DeviceFactory = new DeviceFactory.DeviceFactory(_logger);
+            _deviceFactory = deviceFactory;
         }
 
         public void StartSearch()
@@ -34,7 +34,7 @@ namespace CommandProcessing
         {
             _logger.Info(this, "Распознавание устройств");
             var findedDevices = devices ?? new List<Device>();
-            OnScanCompleted?.Invoke(findedDevices.Select(d => DeviceFactory.Customize(d)).ToList());
+            OnScanCompleted?.Invoke(findedDevices.Select(d => _deviceFactory.Customize(d)).ToList());
         }
     }
 }

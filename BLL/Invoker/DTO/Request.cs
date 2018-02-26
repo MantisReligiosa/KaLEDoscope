@@ -8,7 +8,10 @@ namespace CommandProcessing.DTO
         {
         }
 
-        [JsonProperty("scan")]
+        [JsonProperty("scan", NullValueHandling = NullValueHandling.Ignore)]
         public object Scan { get; set; }
+
+        [JsonProperty("configuration",NullValueHandling = NullValueHandling.Ignore)]
+        public object Device { get; set; }
     }
 }

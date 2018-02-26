@@ -44,8 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandProcessor.cs" />
     <Compile Include="DTO\Request.cs" />
-    <Compile Include="DTO\ScanCommandRequest.cs" />
+    <Compile Include="DTO\ScanCommandResponce.cs" />
     <Compile Include="UdpDeviceScanner.cs" />
     <Compile Include="DirectConnectScanComand.cs" />
     <Compile Include="Invoker.cs" />

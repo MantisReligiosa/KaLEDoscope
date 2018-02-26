@@ -82,16 +82,16 @@ namespace CommandProcessing
                 var receiveBytes = u.EndReceive(ar, ref e);
                 var receiveString = Encoding.UTF8.GetString(receiveBytes);
 
-                var request = JsonConvert.DeserializeObject<ScanCommandRequest>(receiveString);
+                var responce = JsonConvert.DeserializeObject<ScanCommandResponce>(receiveString);
                 _logger.Debug(this, $"Ответ: {receiveString}");
 
                 var device = new Device
                 {
-                    Model = request.DeviceParameters.Model,
+                    Model = responce.DeviceParameters.Model,
                     Network = new Network
                     {
-                        IpAddress = request.NetworkParameters.Address,
-                        Port = request.NetworkParameters.Port
+                        IpAddress = responce.NetworkParameters.Address,
+                        Port = responce.NetworkParameters.Port
                     }
                 };
                 _logger.Info(this, $"Ответ устройства {device.Model} IP {device.Network.IpAddress}:{device.Network.Port}");
