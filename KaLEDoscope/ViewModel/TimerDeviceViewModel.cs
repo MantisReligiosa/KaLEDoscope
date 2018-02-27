@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using KaLEDoscope.POCO.Timer;
 using System.ComponentModel;
 using System.Globalization;
+using Input = System.Windows.Input;
 
 namespace KaLEDoscope.ViewModel
 {
@@ -438,6 +439,20 @@ namespace KaLEDoscope.ViewModel
             }
         }
 
+        private Alarm _selectedAlarm;
+        public Alarm SelectedAlarm
+        {
+            get
+            {
+                return _selectedAlarm;
+            }
+            set
+            {
+                _selectedAlarm = value;
+                OnPropertyChanged(nameof(SelectedAlarm));
+            }
+        }
+
         public TimerDeviceViewModel(Device device, ILogger logger)
         {
             _device = (BoardClock)device;
@@ -460,6 +475,44 @@ namespace KaLEDoscope.ViewModel
             TimeSyncServerIp = _device.TimeSyncServerIp;
             TimeSyncServerPort = _device.TimeSyncServerPort;
             AlarmSchedule = new ObservableCollection<Alarm>(_device.AlarmSchedule);
+        }
+
+        private DelegateCommand _addAlarm;
+        public Input.ICommand AddAlarm
+        {
+            get
+            {
+                if (_addAlarm == null)
+                {
+                    _addAlarm = new DelegateCommand((o) =>
+                    {
+                        AlarmSchedule.Add(new Alarm
+                        {
+                            IsActive = true,
+                            Period = new TimeSpan(0, 0, 1),
+                            StartTimeSpan = new TimeSpan(8, 0, 0)
+                        });
+                    });
+                }
+                return _addAlarm;
+            }
+        }
+
+        private DelegateCommand _removeAlarm;
+        public Input.ICommand RemoveAlarm
+        {
+            get
+            {
+                if (_removeAlarm == null)
+                {
+                    _removeAlarm = new DelegateCommand((o) =>
+                    {
+                        AlarmSchedule.Remove(SelectedAlarm);
+                        SelectedAlarm = null;
+                    });
+                }
+                return _removeAlarm;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -47,7 +47,16 @@
                 </Grid>
             </GroupBox>
             <GroupBox Grid.Row="1" Header="Конфигурация будильников" HorizontalAlignment="Right" Width="252">
-                <ListView ItemsSource="{Binding AlarmSchedule}">
+                <ListView ItemsSource="{Binding AlarmSchedule}" SelectedItem="{Binding SelectedAlarm}">
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Добавить новый"
+                                      Command="{Binding AddAlarm}"/>
+                            <MenuItem Header="Удалить"
+                                      Command="{Binding RemoveAlarm}"/>
+
+                        </ContextMenu>
+                    </ListView.ContextMenu>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="30">

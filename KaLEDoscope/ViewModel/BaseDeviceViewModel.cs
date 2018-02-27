@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Input = System.Windows.Input;
 
 namespace KaLEDoscope.ViewModel
 {
@@ -15,6 +16,19 @@ namespace KaLEDoscope.ViewModel
         private readonly Device _device;
 
         private readonly ILogger _logger;
+
+        public int Id
+        {
+            get
+            {
+                return _device.Id;
+            }
+            set
+            {
+                _device.Id = value;
+                OnPropertyChanged(nameof(Id));
+            }
+        }
 
         public string IpAddress
         {
@@ -29,7 +43,34 @@ namespace KaLEDoscope.ViewModel
             }
         }
 
-        public ObservableCollection<BrightnessPeriod> BrightnessPeriods { get; set; } = new ObservableCollection<BrightnessPeriod>();
+        public int Port
+        {
+            get
+            {
+                return _device.Network.Port;
+            }
+            set
+            {
+                _device.Network.Port = value;
+                OnPropertyChanged(nameof(Port));
+            }
+        }
+
+        public ObservableCollection<BrightnessPeriod> BrightnessPeriods { get; set; }
+
+        private BrightnessPeriod _selectedBrightnessPeriod;
+        public BrightnessPeriod SelectedBrightnessPeriod
+        {
+            get
+            {
+                return _selectedBrightnessPeriod;
+            }
+            set
+            {
+                _selectedBrightnessPeriod = value;
+                OnPropertyChanged(nameof(SelectedBrightnessPeriod));
+            }
+        }
 
         private string _subnetMask;
         public string SubnetMask
@@ -431,6 +472,44 @@ namespace KaLEDoscope.ViewModel
             var byte4 = (mask & 0x000000ff);
             var result = $"{byte1}.{byte2}.{byte3}.{byte4}";
             return result;
+        }
+
+        private DelegateCommand _addBrightnessItem;
+        public Input.ICommand AddBrightnessItem
+        {
+            get
+            {
+                if (_addBrightnessItem == null)
+                {
+                    _addBrightnessItem = new DelegateCommand((o) =>
+                    {
+                        BrightnessPeriods.Add(new BrightnessPeriod
+                        {
+                            From = new TimeSpan(1, 0, 0),
+                            To = new TimeSpan(2, 0, 0),
+                            Value = 1
+                        });
+                    });
+                }
+                return _addBrightnessItem;
+            }
+        }
+
+        private DelegateCommand _removeBrightnessItem;
+        public Input.ICommand RemoveBrightnessItem
+        {
+            get
+            {
+                if (_removeBrightnessItem == null)
+                {
+                    _removeBrightnessItem = new DelegateCommand((o) =>
+                    {
+                        BrightnessPeriods.Remove(SelectedBrightnessPeriod);
+                        SelectedBrightnessPeriod = null;
+                    });
+                }
+                return _removeBrightnessItem;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
