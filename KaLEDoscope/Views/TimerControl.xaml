@@ -130,8 +130,8 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <ComboBox Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource ComboboxStyle}" ItemsSource="{Binding SyncSources}" DisplayMemberPath="Name" SelectedItem="{Binding SyncSource}"/>
-                <Label Grid.Row="1" Grid.Column="0" Content="Часовой пояс"/>
-                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboboxStyle}" ItemsSource="{Binding TimeZones}" DisplayMemberPath="DisplayName" SelectedItem="{Binding TimeZone}"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="Часовой пояс" IsEnabled="{Binding SyncSource.AllowTimezones}"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" Style="{StaticResource ComboboxStyle}" ItemsSource="{Binding TimeZones}" IsEnabled="{Binding SyncSource.AllowTimezones}" DisplayMemberPath="DisplayName" SelectedItem="{Binding TimeZone}"/>
                 <Label Grid.Row="2" Grid.ColumnSpan="2" Content="Параметры синхронизации" HorizontalContentAlignment="Center" IsEnabled="{Binding SyncSource.IsCutomized}"/>
                 <Label Grid.Row="3" Grid.Column="0" Content="Период синхронизации" IsEnabled="{Binding SyncSource.IsCutomized}"/>
                 <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding TimeSyncPeriod}" IsEnabled="{Binding SyncSource.IsCutomized}" Style="{StaticResource TextBoxStyle}"/>

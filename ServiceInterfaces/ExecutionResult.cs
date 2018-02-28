@@ -1,4 +1,4 @@
-﻿using DomainData;
+﻿using BaseDevice;
 
 namespace ServiceInterfaces
 {

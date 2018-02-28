@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DomainData;
 using ServiceInterfaces;
 using Timer;
 using System.Collections.ObjectModel;
@@ -11,6 +8,8 @@ using KaLEDoscope.POCO.Timer;
 using System.ComponentModel;
 using System.Globalization;
 using Input = System.Windows.Input;
+using System.Text.RegularExpressions;
+using BaseDevice;
 
 namespace KaLEDoscope.ViewModel
 {
@@ -34,7 +33,6 @@ namespace KaLEDoscope.ViewModel
                 IsFontEnabled = true
             }
         };
-
         private readonly List<FontType> _fontTypes = new List<FontType>
         {
             new FontType
@@ -48,7 +46,6 @@ namespace KaLEDoscope.ViewModel
                 Name = "1-Другой"
             }
         };
-
         private readonly List<DisplayFormat> _displayFormats = new List<DisplayFormat>
         {
             new DisplayFormat
@@ -76,7 +73,6 @@ namespace KaLEDoscope.ViewModel
                 Capacity = 9
             },
         };
-
         private readonly List<CountdownType> _countdownTypes = new List<CountdownType>
         {
             new CountdownType
@@ -90,7 +86,6 @@ namespace KaLEDoscope.ViewModel
                 Name = "Обратный отсчет"
             }
         };
-
         private readonly List<DisplayFrame> _displayFrames = new List<DisplayFrame>
         {
             new DisplayFrame
@@ -175,23 +170,30 @@ namespace KaLEDoscope.ViewModel
                 CharLenght = 5
             }
         };
-
         private readonly List<SyncSource> _syncSources = new List<SyncSource>
         {
             new SyncSource
             {
                 Id = 1,
                 IsCutomized = false,
-                Name = "Встроенный источник точного времени"
+                Name = "Встроенный источник точного времени",
+                AllowTimezones = false,
             },
             new SyncSource
             {
                 Id = 2,
                 IsCutomized = true,
+                AllowTimezones = true,
                 Name = "NTP сервер"
+            },
+            new SyncSource
+            {
+                Id = 3,
+                IsCutomized = true,
+                AllowTimezones = false,
+                Name = "Альтернативный источник"
             }
         };
-
         private readonly ReadOnlyCollection<TimeZoneInfo> _timeZones = TimeZoneInfo.GetSystemTimeZones();
 
         public ObservableCollection<DisplayType> DisplayTypes { get; set; }
@@ -213,7 +215,7 @@ namespace KaLEDoscope.ViewModel
             set
             {
                 _displayType = value;
-                _device.BoardTypeId = value?.Id ?? default(int);
+                _device.BoardType.TypeId = value?.Id ?? default(int);
                 OnPropertyChanged(nameof(DisplayType));
             }
         }
@@ -228,7 +230,7 @@ namespace KaLEDoscope.ViewModel
             set
             {
                 _fontType = value;
-                _device.FontTypeId = value?.Id ?? default(int);
+                _device.BoardType.FontTypeId = value?.Id ?? default(int);
                 OnPropertyChanged(nameof(FontType));
             }
         }
@@ -243,7 +245,7 @@ namespace KaLEDoscope.ViewModel
             set
             {
                 _displayFormat = value;
-                _device.DisplayFormatId = value?.Id ?? default(int);
+                _device.BoardType.DisplayFormatId = value?.Id ?? default(int);
                 if (value == null)
                 {
                     return;
@@ -274,7 +276,7 @@ namespace KaLEDoscope.ViewModel
             set
             {
                 _countdownType = value;
-                _device.CountdownTypeId = value?.Id ?? default(int);
+                _device.StopWatchParameters.CountdownTypeId = value?.Id ?? default(int);
                 OnPropertyChanged(nameof(CountdownType));
             }
         }
@@ -308,21 +310,19 @@ namespace KaLEDoscope.ViewModel
             }
         }
 
-        private TimeSpan _countdownStartValue;
         public TimeSpan CountdownStartValue
         {
             get
             {
-                return _device.CountdownStartValue;
+                return _device.StopWatchParameters.CountdownStartValue;
             }
             set
             {
-                if (_countdownStartValue == value)
+                if (_device.StopWatchParameters.CountdownStartValue == value)
                 {
                     return;
                 }
-                _countdownStartValue = value;
-                _device.CountdownStartValue = value;
+                _device.StopWatchParameters.CountdownStartValue = value;
                 CountdownStart = value.ToString(@"mm\:ss");
                 OnPropertyChanged(nameof(CountdownStartValue));
                 OnPropertyChanged(nameof(CountdownStart));
@@ -358,21 +358,19 @@ namespace KaLEDoscope.ViewModel
             }
         }
 
-        private TimeSpan _timeSyncPeriodValue;
         public TimeSpan TimeSyncPeriodValue
         {
             get
             {
-                return _device.TimeSyncPeriod;
+                return _device.TimeSyncParameters.SyncPeriod;
             }
             set
             {
-                if (_timeSyncPeriodValue == value)
+                if (_device.TimeSyncParameters.SyncPeriod == value)
                 {
                     return;
                 }
-                _timeSyncPeriodValue = value;
-                _device.TimeSyncPeriod = value;
+                _device.TimeSyncParameters.SyncPeriod = value;
                 TimeSyncPeriod = value.ToString(@"hh\:mm");
                 OnPropertyChanged(nameof(TimeSyncPeriodValue));
                 OnPropertyChanged(nameof(TimeSyncPeriod));
@@ -389,7 +387,7 @@ namespace KaLEDoscope.ViewModel
             set
             {
                 _syncSource = value;
-                _device.SyncSourceId = value?.Id ?? default(int);
+                _device.TimeSyncParameters.SourceId = value?.Id ?? default(int);
                 OnPropertyChanged(nameof(SyncSource));
             }
         }
@@ -404,37 +402,35 @@ namespace KaLEDoscope.ViewModel
             set
             {
                 _timeZone = value;
-                _device.TimeZoneId = value?.Id ?? string.Empty;
+                _device.TimeSyncParameters.ZoneId = value?.Id ?? string.Empty;
                 OnPropertyChanged(nameof(TimeZone));
             }
         }
 
-        private string _timeSyncServerIp;
         public string TimeSyncServerIp
         {
             get
             {
-                return _timeSyncServerIp;
+                return _device.TimeSyncParameters.ServerAddress;
             }
             set
             {
-                _timeSyncServerIp = value;
-                _device.TimeSyncServerIp = value;
+                _device.TimeSyncParameters.ServerAddress = value;
+                _device.TimeSyncParameters.IsIpAddress = 
+                    Regex.IsMatch(value, @"^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
                 OnPropertyChanged(nameof(TimeSyncServerIp));
             }
         }
 
-        private int _timeSyncServerPort;
         public int TimeSyncServerPort
         {
             get
             {
-                return _timeSyncServerPort;
+                return _device.TimeSyncParameters.ServerPort;
             }
             set
             {
-                _timeSyncServerPort = value;
-                _device.TimeSyncServerPort = value;
+                _device.TimeSyncParameters.ServerPort = value;
                 OnPropertyChanged(nameof(TimeSyncServerPort));
             }
         }
@@ -458,22 +454,22 @@ namespace KaLEDoscope.ViewModel
             _device = (BoardClock)device;
             _logger = logger;
             DisplayTypes = new ObservableCollection<DisplayType>(_displayTypes);
-            DisplayType = _displayTypes.FirstOrDefault(d => d.Id == _device.BoardTypeId);
+            DisplayType = _displayTypes.FirstOrDefault(d => d.Id == _device.BoardType?.TypeId);
             FontTypes = new ObservableCollection<FontType>(_fontTypes);
-            FontType = _fontTypes.FirstOrDefault(f => f.Id == _device.FontTypeId);
+            FontType = _fontTypes.FirstOrDefault(f => f.Id == _device.BoardType.FontTypeId);
             DisplayFrames = new ObservableCollection<DisplayFrame>(_displayFrames);
             DisplayFormats = new ObservableCollection<DisplayFormat>(_displayFormats);
-            DisplayFormat = _displayFormats.FirstOrDefault(d => d.Id == _device.DisplayFormatId);
+            DisplayFormat = _displayFormats.FirstOrDefault(d => d.Id == _device.BoardType.DisplayFormatId);
             CountdownTypes = new ObservableCollection<CountdownType>(_countdownTypes);
-            CountdownType = _countdownTypes.FirstOrDefault(c => c.Id == _device.CountdownTypeId);
-            CountdownStartValue = _device.CountdownStartValue;
+            CountdownType = _countdownTypes.FirstOrDefault(c => c.Id == _device.StopWatchParameters.CountdownTypeId);
+            CountdownStartValue = _device.StopWatchParameters.CountdownStartValue;
             SyncSources = new ObservableCollection<SyncSource>(_syncSources);
-            SyncSource = _syncSources.FirstOrDefault(s => s.Id == _device.SyncSourceId);
+            SyncSource = _syncSources.FirstOrDefault(s => s.Id == _device.TimeSyncParameters.SourceId);
             TimeZones = new ObservableCollection<TimeZoneInfo>(_timeZones);
-            TimeZone = _timeZones.FirstOrDefault(t => t.Id.Equals(_device.TimeZoneId));
-            TimeSyncPeriodValue = _device.TimeSyncPeriod;
-            TimeSyncServerIp = _device.TimeSyncServerIp;
-            TimeSyncServerPort = _device.TimeSyncServerPort;
+            TimeZone = _timeZones.FirstOrDefault(t => t.Id.Equals(_device.TimeSyncParameters.ZoneId));
+            TimeSyncPeriodValue = _device.TimeSyncParameters.SyncPeriod;
+            TimeSyncServerIp = _device.TimeSyncParameters.ServerAddress;
+            TimeSyncServerPort = _device.TimeSyncParameters.ServerPort;
             AlarmSchedule = new ObservableCollection<Alarm>(_device.AlarmSchedule);
         }
 
@@ -486,12 +482,14 @@ namespace KaLEDoscope.ViewModel
                 {
                     _addAlarm = new DelegateCommand((o) =>
                     {
-                        AlarmSchedule.Add(new Alarm
+                        var alarm = new Alarm
                         {
                             IsActive = true,
                             Period = new TimeSpan(0, 0, 1),
                             StartTimeSpan = new TimeSpan(8, 0, 0)
-                        });
+                        };
+                        AlarmSchedule.Add(alarm);
+                        _device.AlarmSchedule.Add(alarm);
                     });
                 }
                 return _addAlarm;

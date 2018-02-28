@@ -1,4 +1,4 @@
-﻿using DomainData;
+﻿using BaseDevice;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;

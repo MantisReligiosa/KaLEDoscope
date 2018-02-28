@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CommandProcessing</RootNamespace>
     <AssemblyName>CommandProcessing</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,13 +55,13 @@
     <Compile Include="UdpState.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\BaseDevice\BaseDevice.csproj">
+      <Project>{677B5FDE-5DA7-4065-B446-014822533CBC}</Project>
+      <Name>BaseDevice</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\DeviceFactory\DeviceFactory.csproj">
       <Project>{e2b6818f-68c8-40a1-8ac6-152bf9b48ea3}</Project>
       <Name>DeviceFactory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\DomainData\DomainData.csproj">
-      <Project>{7ED09EF5-1AFC-4955-8D77-3C3D61C4FB51}</Project>
-      <Name>DomainData</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\DirectConnect\DirectConnect.csproj">
       <Project>{FAA63C26-F283-466A-8486-8EECC976D515}</Project>

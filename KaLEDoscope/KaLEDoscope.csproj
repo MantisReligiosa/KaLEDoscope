@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>KaLEDoscope</RootNamespace>
     <AssemblyName>KaLEDoscope</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -31,6 +31,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -168,6 +169,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BaseDevice\BaseDevice.csproj">
+      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
+      <Name>BaseDevice</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BLL\Invoker\CommandProcessing.csproj">
       <Project>{A9C0A719-E20B-4C57-A443-8C994C70FDA9}</Project>
       <Name>CommandProcessing</Name>
@@ -175,10 +180,6 @@
     <ProjectReference Include="..\DeviceFactory\DeviceFactory.csproj">
       <Project>{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}</Project>
       <Name>DeviceFactory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DomainData\DomainData.csproj">
-      <Project>{7ED09EF5-1AFC-4955-8D77-3C3D61C4FB51}</Project>
-      <Name>DomainData</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Devices\Timer\Timer.csproj">
       <Project>{96D808B9-C3F8-4604-BE96-2C85074EC088}</Project>

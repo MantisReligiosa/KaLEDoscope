@@ -1,5 +1,5 @@
-﻿using CommandProcessing;
-using DomainData;
+﻿using BaseDevice;
+using CommandProcessing;
 using KaLEDoscope.ViewModel;
 using KaLEDoscope.Views;
 using Microsoft.Win32;
@@ -108,10 +108,10 @@ namespace KaLEDoscope
                         BrightnessPeriods = new List<BrightnessPeriod>(),
                         Mode = Mode.Auto
                     },
-                    WorkSchedule = new WorkSchedule
-                    {
-
-                    }
+                    WorkSchedule = new WorkSchedule(),
+                    BoardType = new BoardType(),
+                    StopWatchParameters = new StopWatchParameters(),
+                    TimeSyncParameters = new TimeSyncParameters()
                 };
                 device.Name = "Семисегментные часы";
                 return device;
@@ -195,27 +195,30 @@ namespace KaLEDoscope
                             tabControl.TabStripPlacement = Dock.Left;
                             var toolbar = new ToolBar();
                             toolbar.Items.Add(new Button
-                            { Content = "Синхронизировать", DataContext = deviceNode.Device });
+                            {
+                                Content = "Синхронизировать",
+                                Command = DownloadSettings,
+                                CommandParameter = deviceNode
+                            });
                             toolbar.Items.Add(new Button
                             {
                                 Content = "Применить конфигурацию",
-                                DataContext = deviceNode.Device,
                                 Command = UploadSettings,
-                                CommandParameter = deviceNode.Device
+                                CommandParameter = deviceNode,
+                                IsEnabled = deviceNode.AllowUpload
                             });
                             toolbar.Items.Add(new Button
                             {
                                 Content = "Сохранить конфигурацию в файл",
-                                DataContext = deviceNode.Device,
                                 Command = ExportSettings,
-                                CommandParameter = deviceNode.Device
+                                CommandParameter = deviceNode,
+                                IsEnabled = deviceNode.AllowUpload
                             });
                             toolbar.Items.Add(new Button
                             {
                                 Content = "Загрузить конфигурацию из файла",
-                                DataContext = deviceNode.Device,
                                 Command = ImportSettings,
-                                CommandParameter = deviceNode.Device
+                                CommandParameter = deviceNode
                             });
                             grid.Children.Add(tabControl);
                             grid.Children.Add(toolbar);
@@ -275,42 +278,42 @@ namespace KaLEDoscope
             }
         }
 
-        private DelegateCommand<Device> _uploadSettings;
+        private DelegateCommand<DeviceNode> _uploadSettings;
         public Input.ICommand UploadSettings
         {
             get
             {
                 if (_uploadSettings == null)
                 {
-                    _uploadSettings = new DelegateCommand<Device>((d) =>
+                    _uploadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
                         var commandProcessor = new CommandProcessor(_logger, _deviceFactory);
-                        commandProcessor.UploadSettings(d);
+                        commandProcessor.UploadSettings(d.Device);
                     });
                 }
                 return _uploadSettings;
             }
         }
 
-        private DelegateCommand<Device> _exportSettings;
+        private DelegateCommand<DeviceNode> _exportSettings;
         public Input.ICommand ExportSettings
         {
             get
             {
                 if (_exportSettings == null)
                 {
-                    _exportSettings = new DelegateCommand<Device>((d) =>
+                    _exportSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
                         var dialog = new SaveFileDialog
                         {
-                            FileName = d.Name,
+                            FileName = d.Device.Name,
                             DefaultExt = ".json",
                             Filter = "JSON configuration (.json)|*.json"
                         };
                         if (dialog.ShowDialog() == true)
                         {
                             var fileName = dialog.FileName;
-                            var serialized = JsonConvert.SerializeObject(d);
+                            var serialized = JsonConvert.SerializeObject(d.Device);
                             System.IO.File.WriteAllText(fileName, serialized);
                         }
                     });
@@ -319,15 +322,33 @@ namespace KaLEDoscope
             }
         }
 
-        private DelegateCommand<Device> _importSettings;
+        private DelegateCommand<DeviceNode> _downloadSettings;
+        public Input.ICommand DownloadSettings
+        {
+            get
+            {
+                if (_downloadSettings == null)
+                {
+                    _downloadSettings = new DelegateCommand<DeviceNode>((d) =>
+                    {
+                        d.AllowUpload = true;
+                        MessageBox.Show("Ещё не написал");
+                    });
+                }
+                return _downloadSettings;
+            }
+        }
+
+        private DelegateCommand<DeviceNode> _importSettings;
         public Input.ICommand ImportSettings
         {
             get
             {
                 if (_importSettings == null)
                 {
-                    _importSettings = new DelegateCommand<Device>((d) =>
+                    _importSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
+                        d.AllowUpload = true;
                         MessageBox.Show("Ещё не написал");
                     });
                 }

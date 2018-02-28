@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Timer</RootNamespace>
     <AssemblyName>Timer</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,12 +43,15 @@
   <ItemGroup>
     <Compile Include="Alarm.cs" />
     <Compile Include="BoardClock.cs" />
+    <Compile Include="BoardType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StopWatchParameters.cs" />
+    <Compile Include="TimeSyncParameters.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\DomainData\DomainData.csproj">
-      <Project>{7ed09ef5-1afc-4955-8d77-3c3d61c4fb51}</Project>
-      <Name>DomainData</Name>
+    <ProjectReference Include="..\..\..\BaseDevice\BaseDevice.csproj">
+      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
+      <Name>BaseDevice</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

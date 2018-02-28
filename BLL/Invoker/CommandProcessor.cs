@@ -1,9 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using DeviceFactory;
-using DomainData;
+using BaseDevice;
 using Newtonsoft.Json;
 using ServiceInterfaces;
 

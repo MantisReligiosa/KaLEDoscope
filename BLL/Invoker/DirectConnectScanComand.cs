@@ -1,17 +1,12 @@
-﻿using CommandProcessing.DTO;
-using DirectConnect;
-using DomainData;
+﻿using BaseDevice;
+using CommandProcessing.DTO;
 using Newtonsoft.Json;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
 
 namespace CommandProcessing
 {
