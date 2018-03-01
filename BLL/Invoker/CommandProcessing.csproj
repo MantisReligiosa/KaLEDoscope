@@ -45,11 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommandProcessor.cs" />
+    <Compile Include="DirectConnectDownloadSettingsCommand.cs" />
+    <Compile Include="DirectConnectUploadSettingsCommand.cs" />
     <Compile Include="DTO\Request.cs" />
     <Compile Include="DTO\ScanCommandResponce.cs" />
     <Compile Include="UdpDeviceScanner.cs" />
-    <Compile Include="DirectConnectScanComand.cs" />
+    <Compile Include="DirectConnectScanCommand.cs" />
     <Compile Include="Invoker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UdpState.cs" />

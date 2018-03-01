@@ -23,6 +23,9 @@ namespace DeviceFactory
             };
             _transformations[model] = safetyTransformation;
         }
+
+        public Device Customize(object device) => Customize(device as Device);
+
         public Device Customize(Device device)
         {
             Func<Device, Device> customize;

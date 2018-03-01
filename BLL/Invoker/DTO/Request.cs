@@ -13,5 +13,8 @@ namespace CommandProcessing.DTO
 
         [JsonProperty("configuration",NullValueHandling = NullValueHandling.Ignore)]
         public object Device { get; set; }
+
+        [JsonProperty("getConfig", NullValueHandling = NullValueHandling.Ignore)]
+        public object GetConfig { get; set; }
     }
 }

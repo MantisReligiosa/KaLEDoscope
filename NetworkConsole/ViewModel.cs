@@ -106,12 +106,14 @@ namespace NetworkConsole
                 new ProviderItem
                 {
                     Name = "UDP",
-                    GetProvider = ()=>new UdpProvider()
+                    GetProvider = ()=>new UdpProvider(),
+                    AllowBroadCast = true
                 },
                 new ProviderItem
                 {
                     Name="TCP",
-                    GetProvider = ()=>new TcpProvider()
+                    GetProvider = ()=>new TcpProvider(),
+                    AllowBroadCast= false
                 }
             });
 

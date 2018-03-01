@@ -28,7 +28,18 @@ namespace CommandProcessing
 
         public override void Execute()
         {
-            
+            //_devices.Add(new Device
+            //{
+            //    Model = "boardClock",
+            //    Network = new Network
+            //    {
+            //        IpAddress = "192.168.0.88",
+            //        Port = 500
+            //    }
+            //});
+
+
+
             _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
             var endPoint = new IPEndPoint(IPAddress.Broadcast, _port);
             var _udpClient = new UdpClient();
@@ -74,11 +85,11 @@ namespace CommandProcessing
                 UdpClient u = ((UdpState)(ar.AsyncState)).u;
                 IPEndPoint e = ((UdpState)(ar.AsyncState)).e;
 
-                var receiveBytes = u.EndReceive(ar, ref e);
-                var receiveString = Encoding.UTF8.GetString(receiveBytes);
+                var recieveBytes = u.EndReceive(ar, ref e);
+                var recieveString = Encoding.UTF8.GetString(recieveBytes);
 
-                var responce = JsonConvert.DeserializeObject<ScanCommandResponce>(receiveString);
-                _logger.Debug(this, $"Ответ: {receiveString}");
+                var responce = JsonConvert.DeserializeObject<ScanCommandResponce>(recieveString);
+                _logger.Debug(this, $"Ответ: {recieveString}");
 
                 var device = new Device
                 {

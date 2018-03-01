@@ -98,20 +98,24 @@ namespace KaLEDoscope
             _deviceFactory = new DeviceFactory.DeviceFactory(_logger);
             _deviceFactory.AddTransformation("boardClock", (d) =>
             {
-                BoardClock device = new BoardClock
+                var castedDevice = d as BoardClock;
+                var device = new BoardClock
                 {
-                    AlarmSchedule = new List<Alarm>(),
+                    AlarmSchedule = castedDevice?.AlarmSchedule ?? new List<Alarm>(),
                     Model = d.Model,
                     Network = d.Network,
-                    Brightness = new Brightness
+                    Brightness = castedDevice?.Brightness ?? new Brightness
                     {
                         BrightnessPeriods = new List<BrightnessPeriod>(),
                         Mode = Mode.Auto
                     },
-                    WorkSchedule = new WorkSchedule(),
-                    BoardType = new BoardType(),
-                    StopWatchParameters = new StopWatchParameters(),
-                    TimeSyncParameters = new TimeSyncParameters()
+                    WorkSchedule = castedDevice?.WorkSchedule ?? new WorkSchedule(),
+                    BoardType = castedDevice?.BoardType ?? new BoardType(),
+                    StopWatchParameters = castedDevice?.StopWatchParameters ?? new StopWatchParameters(),
+                    TimeSyncParameters = castedDevice?.TimeSyncParameters ?? new TimeSyncParameters
+                    {
+                        ServerAddress = string.Empty
+                    }
                 };
                 device.Name = "Семисегментные часы";
                 return device;
@@ -167,68 +171,18 @@ namespace KaLEDoscope
                 {
                     showDevicePlugin = new DelegateCommand((o) =>
                     {
+                        if (!(o is DeviceNode))
+                            return;
                         var deviceNode = (DeviceNode)o;
                         var existTab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == deviceNode.Device);
                         if (existTab == null)
                         {
-                            var tabControl = new TabControl();
-                            var baseTabItem = new TabItem();
-                            var grid = new Grid();
-                            grid.RowDefinitions.Add(new RowDefinition
-                            {
-                                Height = GridLength.Auto
-                            });
-                            grid.RowDefinitions.Add(new RowDefinition
-                            {
-                                Height = new GridLength(1, GridUnitType.Star)
-                            });
-
-
-                            baseTabItem.Content = new BaseDeviceControl
-                            {
-                                HorizontalAlignment = HorizontalAlignment.Stretch,
-                                VerticalAlignment = System.Windows.VerticalAlignment.Stretch,
-                                DataContext = new BaseDeviceViewModel(deviceNode.Device, _logger)
-                            };
-                            baseTabItem.Header = "Базовые настройки";
-                            tabControl.Items.Add(baseTabItem);
-                            tabControl.TabStripPlacement = Dock.Left;
-                            var toolbar = new ToolBar();
-                            toolbar.Items.Add(new Button
-                            {
-                                Content = "Синхронизировать",
-                                Command = DownloadSettings,
-                                CommandParameter = deviceNode
-                            });
-                            toolbar.Items.Add(new Button
-                            {
-                                Content = "Применить конфигурацию",
-                                Command = UploadSettings,
-                                CommandParameter = deviceNode,
-                                IsEnabled = deviceNode.AllowUpload
-                            });
-                            toolbar.Items.Add(new Button
-                            {
-                                Content = "Сохранить конфигурацию в файл",
-                                Command = ExportSettings,
-                                CommandParameter = deviceNode,
-                                IsEnabled = deviceNode.AllowUpload
-                            });
-                            toolbar.Items.Add(new Button
-                            {
-                                Content = "Загрузить конфигурацию из файла",
-                                Command = ImportSettings,
-                                CommandParameter = deviceNode
-                            });
-                            grid.Children.Add(tabControl);
-                            grid.Children.Add(toolbar);
-                            Grid.SetRow(tabControl, 1);
-                            Grid.SetRow(toolbar, 0);
+                            var grid = GetGrid(deviceNode);
                             var newTabItem = new ClosableTab
                             {
                                 Title = $"{deviceNode.Device.Name} id:{deviceNode.Device.Model}",
                                 Content = grid,
-                                DataContext = deviceNode.Device
+                                DataContext = deviceNode.Device,
                             };
 
                             newTabItem.OnTabCloseClick += (sender, arguments) =>
@@ -238,17 +192,7 @@ namespace KaLEDoscope
                             };
                             DeviceTabs.Add(newTabItem);
 
-                            foreach (var customDevicesControlsKeyValuePair in _customDevicesControls)
-                            {
-                                if (customDevicesControlsKeyValuePair.Key(deviceNode.Device))
-                                {
-                                    var customTabItem = new TabItem();
-                                    var customControl = customDevicesControlsKeyValuePair.Value(deviceNode.Device, _logger);
-                                    customTabItem.Content = customControl;
-                                    customTabItem.Header = "Специальные настройки";
-                                    tabControl.Items.Add(customTabItem);
-                                }
-                            }
+
                             SelectedTabItem = newTabItem;
                         }
                         else
@@ -259,6 +203,75 @@ namespace KaLEDoscope
                 }
                 return showDevicePlugin;
             }
+        }
+
+        private Grid GetGrid(DeviceNode deviceNode)
+        {
+            var tabControl = new TabControl();
+            var baseTabItem = new TabItem();
+            var grid = new Grid();
+            grid.RowDefinitions.Add(new RowDefinition
+            {
+                Height = GridLength.Auto
+            });
+            grid.RowDefinitions.Add(new RowDefinition
+            {
+                Height = new GridLength(1, GridUnitType.Star)
+            });
+
+
+            baseTabItem.Content = new BaseDeviceControl
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                DataContext = new BaseDeviceViewModel(deviceNode.Device, _logger)
+            };
+            baseTabItem.Header = "Базовые настройки";
+            tabControl.Items.Add(baseTabItem);
+            tabControl.TabStripPlacement = Dock.Left;
+            var toolbar = new ToolBar();
+            toolbar.Items.Add(new Button
+            {
+                Content = "Синхронизировать",
+                Command = DownloadSettings,
+                CommandParameter = deviceNode
+            });
+            toolbar.Items.Add(new Button
+            {
+                Content = "Применить конфигурацию",
+                Command = UploadSettings,
+                CommandParameter = deviceNode,
+                IsEnabled = deviceNode.AllowUpload
+            });
+            toolbar.Items.Add(new Button
+            {
+                Content = "Сохранить конфигурацию в файл",
+                Command = ExportSettings,
+                CommandParameter = deviceNode,
+                IsEnabled = deviceNode.AllowUpload
+            });
+            toolbar.Items.Add(new Button
+            {
+                Content = "Загрузить конфигурацию из файла",
+                Command = ImportSettings,
+                CommandParameter = deviceNode
+            });
+            grid.Children.Add(tabControl);
+            grid.Children.Add(toolbar);
+            Grid.SetRow(tabControl, 1);
+            Grid.SetRow(toolbar, 0);
+            foreach (var customDevicesControlsKeyValuePair in _customDevicesControls)
+            {
+                if (customDevicesControlsKeyValuePair.Key(deviceNode.Device))
+                {
+                    var customTabItem = new TabItem();
+                    var customControl = customDevicesControlsKeyValuePair.Value(deviceNode.Device, _logger);
+                    customTabItem.Content = customControl;
+                    customTabItem.Header = "Специальные настройки";
+                    tabControl.Items.Add(customTabItem);
+                }
+            }
+            return grid;
         }
 
         private DelegateCommand _scanDevices;
@@ -287,8 +300,8 @@ namespace KaLEDoscope
                 {
                     _uploadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
-                        var commandProcessor = new CommandProcessor(_logger, _deviceFactory);
-                        commandProcessor.UploadSettings(d.Device);
+                        var command = new DirectConnectUploadSettingsCommand(d.Device, _logger);
+                        command.Execute();
                     });
                 }
                 return _uploadSettings;
@@ -323,6 +336,8 @@ namespace KaLEDoscope
         }
 
         private DelegateCommand<DeviceNode> _downloadSettings;
+        private DeviceNode _updatedNode;
+        private TabItem _tabItem;
         public Input.ICommand DownloadSettings
         {
             get
@@ -332,11 +347,21 @@ namespace KaLEDoscope
                     _downloadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
                         d.AllowUpload = true;
-                        MessageBox.Show("Ещё не написал");
+                        _updatedNode = d;
+                        _tabItem = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == d.Device);
+                        var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceFactory, _logger);
+                        command.OnConfigurationDownloaded += Command_OnConfigurationDownloaded;
+                        command.Execute();
                     });
                 }
                 return _downloadSettings;
             }
+        }
+
+        private void Command_OnConfigurationDownloaded(Device obj)
+        {
+            _updatedNode.Device = obj;
+            _dispatcher.Invoke(() => _tabItem.Content = GetGrid(_updatedNode));
         }
 
         private DelegateCommand<DeviceNode> _importSettings;
@@ -349,7 +374,19 @@ namespace KaLEDoscope
                     _importSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
                         d.AllowUpload = true;
-                        MessageBox.Show("Ещё не написал");
+                        var dialog = new OpenFileDialog
+                        {
+                            DefaultExt = ".json",
+                            Filter = "JSON configuration (.json)|*.json"
+                        };
+                        if (dialog.ShowDialog() == true)
+                        {
+                            var fileName = dialog.FileName;
+                            var text = System.IO.File.ReadAllText(fileName);
+                            var device = JsonConvert.DeserializeObject(text, d.Device.GetType());
+                            d.Device = _deviceFactory.Customize(device);
+                            Command_OnConfigurationDownloaded(d.Device);
+                        }
                     });
                 }
                 return _importSettings;
