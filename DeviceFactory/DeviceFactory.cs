@@ -17,19 +17,17 @@ namespace DeviceFactory
 
         public void AddTransformation(string model, Func<Device, Device> transformation)
         {
-            Func<Device, Device> safetyTransformation = (device) =>
+            _transformations[model] = (Device device) =>
             {
                 return transformation(device ?? new Device());
             };
-            _transformations[model] = safetyTransformation;
         }
 
         public Device Customize(object device) => Customize(device as Device);
 
         public Device Customize(Device device)
         {
-            Func<Device, Device> customize;
-            if (_transformations.TryGetValue(device.Model, out customize))
+            if (_transformations.TryGetValue(device.Model, out Func<Device, Device> customize))
             {
                 device = customize(device);
             }

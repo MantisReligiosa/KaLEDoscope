@@ -1,27 +1,26 @@
 ﻿using BaseDevice;
 using CommandProcessing.DTO;
-using DeviceFactory;
+using devFactory = DeviceFactory;
 using Newtonsoft.Json;
 using ServiceInterfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using System.Timers;
 
 namespace CommandProcessing
 {
     public class DirectConnectDownloadSettingsCommand : Command<Device>
     {
-        private readonly DeviceFactory.DeviceFactory _deviceFactory;
+        private readonly devFactory.DeviceFactory _deviceFactory;
         private readonly int _timeout;
-        private System.Timers.Timer _timer;
+        private Timer _timer;
 
         public event Action<Device> OnConfigurationDownloaded;
 
-        public DirectConnectDownloadSettingsCommand(Device device, DeviceFactory.DeviceFactory deviceFactory, ILogger logger, int timeout = 10000) : base(device, logger)
+        public DirectConnectDownloadSettingsCommand(Device device, 
+            devFactory.DeviceFactory deviceFactory, ILogger logger, int timeout = 10000) : base(device, logger)
         {
             _deviceFactory = deviceFactory;
             _timeout = timeout;
@@ -30,40 +29,36 @@ namespace CommandProcessing
         public override void Execute()
         {
             _logger.Info(this, $"Запрос конфигурации от устройства {_device.Name}");
-
             var ipEndpoint = new IPEndPoint(IPAddress.Parse(_device.Network.IpAddress), _device.Network.Port);
-            var _tcpClient = new TcpClient();
-            _tcpClient.Connect(ipEndpoint);
+            var tcpClient = new TcpClient();
+            tcpClient.Connect(ipEndpoint);
             var requestString = JsonConvert.SerializeObject(new Request
             {
                 GetConfig = new object()
             });
             var bytes = Encoding.UTF8.GetBytes(requestString);
-
             _logger.Debug(this, $"Запрос к {_device.Network.IpAddress}:{_device.Network.Port}: {requestString}");
-            var stream = _tcpClient.GetStream();
+            var stream = tcpClient.GetStream();
             stream.Write(bytes, 0, bytes.Length);
-            _tcpClient.Close();
-
+            tcpClient.Close();
             _logger.Debug(this, $"Жду ответ {_timeout} мс");
-
-            var _tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, _device.Network.Port));
+            var tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, _device.Network.Port));
             var s = new TcpState
             {
-                e = ipEndpoint,
-                l = _tcpListener
+                Endpoint = ipEndpoint,
+                TcpListener = tcpListener
             };
-            _tcpListener.Start();
-            _tcpListener.BeginAcceptSocket(new AsyncCallback(DoAcceptSocketCallback), s);
+            tcpListener.Start();
+            tcpListener.BeginAcceptSocket(new AsyncCallback(DoAcceptSocketCallback), s);
 
-            _timer = new System.Timers.Timer()
+            _timer = new Timer()
             {
                 AutoReset = false,
                 Interval = _timeout
             };
             _timer.Elapsed += (o, e) =>
             {
-                EndCommand(_tcpListener);
+                EndCommand(tcpListener);
             };
             _timer.Start();
         }
@@ -77,22 +72,20 @@ namespace CommandProcessing
 
         public void DoAcceptSocketCallback(IAsyncResult ar)
         {
-            TcpListener listener = ((TcpState)(ar.AsyncState)).l;
+            var listener = ((TcpState)(ar.AsyncState)).TcpListener;
             try
             {
-                IPEndPoint e = ((TcpState)(ar.AsyncState)).e;
-
-                if (!e.Address.ToString().Equals(_device.Network.IpAddress))
+                var ipEndPoint = ((TcpState)(ar.AsyncState)).Endpoint;
+                if (!ipEndPoint.Address.ToString().Equals(_device.Network.IpAddress))
                 {
-                    var s = new TcpState
+                    var tcpState = new TcpState
                     {
-                        e = e,
-                        l = listener
+                        Endpoint = ipEndPoint,
+                        TcpListener = listener
                     };
-                    listener.BeginAcceptSocket(new AsyncCallback(DoAcceptSocketCallback), s);
+                    listener.BeginAcceptSocket(new AsyncCallback(DoAcceptSocketCallback), tcpState);
                     return;
                 }
-
                 var client = listener.EndAcceptTcpClient(ar);
                 var stream = client.GetStream();
                 var data = new byte[1024];
@@ -115,16 +108,6 @@ namespace CommandProcessing
                 _logger.Error(this, "Ошибка при получении ответа", ex);
                 _timer.Stop();
             }
-        }
-    }
-
-    class TcpState
-    {
-        internal IPEndPoint e;
-        internal TcpListener l;
-
-        public TcpState()
-        {
         }
     }
 }

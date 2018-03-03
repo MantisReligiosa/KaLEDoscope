@@ -83,8 +83,7 @@ namespace KaLEDoscope.ViewModel
                 {
                     return;
                 }
-                byte maskByte;
-                if (ParceSubnet(value, out maskByte))
+                if (ParceSubnet(value, out byte maskByte))
                 {
                     _subnetMask = value;
                     SubnetMaskByte = maskByte;
@@ -108,7 +107,7 @@ namespace KaLEDoscope.ViewModel
                 subnetMaskByte = 24;
             }
             var fullByte = (byte)0xff;
-            Dictionary<byte, byte> allowedBytes = new Dictionary<byte, byte>
+            var allowedBytes = new Dictionary<byte, byte>
                 {
                     {0,0 },
                     {1,128 },
@@ -119,11 +118,10 @@ namespace KaLEDoscope.ViewModel
                     {6,252 },
                     {7,254 }
                 };
-            List<byte> bytes = new List<byte>();
+            var bytes = new List<byte>();
             foreach (var byteStr in bytesStr)
             {
-                byte b;
-                if (byte.TryParse(byteStr, out b))
+                if (byte.TryParse(byteStr, out byte b))
                 {
                     bytes.Add(b);
                 }
@@ -306,8 +304,7 @@ namespace KaLEDoscope.ViewModel
             }
             set
             {
-                TimeSpan timeSpan;
-                if (!TimeSpan.TryParse(value, out timeSpan))
+                if (!TimeSpan.TryParse(value, out TimeSpan timeSpan))
                 {
                     timeSpan = new TimeSpan(0, 0, 0);
                 }
@@ -324,8 +321,7 @@ namespace KaLEDoscope.ViewModel
             }
             set
             {
-                TimeSpan timeSpan;
-                if (!TimeSpan.TryParse(value, out timeSpan))
+                if (!TimeSpan.TryParse(value, out TimeSpan timeSpan))
                 {
                     timeSpan = new TimeSpan(0, 0, 0);
                 }

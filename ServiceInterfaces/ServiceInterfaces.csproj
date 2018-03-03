@@ -42,13 +42,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command.cs" />
-    <Compile Include="ExecutionResult.cs" />
     <Compile Include="ICommand.cs" />
-    <Compile Include="IProtocol.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestArguments.cs" />
-    <Compile Include="ResponceArguments.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BaseDevice\BaseDevice.csproj">

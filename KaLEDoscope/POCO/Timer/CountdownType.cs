@@ -1,6 +1,6 @@
 ﻿namespace KaLEDoscope.POCO.Timer
 {
-    public class CountdownType:BaseClass
+    public class CountdownType : BaseClass
     {
     }
 }

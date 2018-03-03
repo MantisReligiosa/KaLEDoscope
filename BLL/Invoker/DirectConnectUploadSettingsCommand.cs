@@ -1,13 +1,9 @@
 ﻿using BaseDevice;
 using Newtonsoft.Json;
 using ServiceInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CommandProcessing
 {
@@ -25,15 +21,14 @@ namespace CommandProcessing
             {
                 Device = _device
             };
-            var endPoint = new IPEndPoint(IPAddress.Parse(_device.Network.IpAddress), _device.Network.Port);
-            var _tcpClient = new TcpClient();
-            _tcpClient.Connect(endPoint);
+            var tcpClient = new TcpClient();
+            tcpClient.Connect(new IPEndPoint(IPAddress.Parse(_device.Network.IpAddress), _device.Network.Port));
             var requestString = JsonConvert.SerializeObject(request);
             var bytes = Encoding.UTF8.GetBytes(requestString);
             _logger.Debug(this, $"Запрос к {_device.Network.IpAddress}:{_device.Network.Port} {requestString}");
-            var stream = _tcpClient.GetStream();
+            var stream = tcpClient.GetStream();
             stream.Write(bytes, 0, bytes.Length);
-            _tcpClient.Close();
+            tcpClient.Close();
         }
     }
 }

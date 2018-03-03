@@ -7,8 +7,6 @@ namespace KaLEDoscope
     {
         public string Name { get; set; }
 
-        public IProtocol Protocol{get;set;}
-
         public ObservableCollection<DeviceNode> Members { get; set; } = new ObservableCollection<DeviceNode>();
     }
 }

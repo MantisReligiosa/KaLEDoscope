@@ -33,12 +33,13 @@ namespace KaLEDoscope
             = new Dictionary<Func<Device, bool>, Func<Device, ILogger, UserControl>>
         {
             {d=> d is BoardClock,
-             (d,l)=>   new TimerControl
-                {
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    DataContext = new TimerDeviceViewModel(d, l)
-            }}
+                 (d,l)=>   new TimerControl
+                    {
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch,
+                        DataContext = new TimerDeviceViewModel(d, l)
+                    }
+            }
         };
 
         private TabItem _selectedTabItem;

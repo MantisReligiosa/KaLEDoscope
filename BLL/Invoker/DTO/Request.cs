@@ -4,10 +4,6 @@ namespace CommandProcessing.DTO
 {
     internal class Request
     {
-        public Request()
-        {
-        }
-
         [JsonProperty("scan", NullValueHandling = NullValueHandling.Ignore)]
         public object Scan { get; set; }
 

@@ -6,7 +6,6 @@ namespace ServiceInterfaces
         where TDevice : Device
     {
         protected TDevice _device;
-        protected readonly IProtocol _protocol;
         protected ILogger _logger;
         protected Command(TDevice device, ILogger logger)
         {

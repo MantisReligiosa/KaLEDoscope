@@ -49,9 +49,9 @@
     <Compile Include="DirectConnectUploadSettingsCommand.cs" />
     <Compile Include="DTO\Request.cs" />
     <Compile Include="DTO\ScanCommandResponce.cs" />
+    <Compile Include="TcpState.cs" />
     <Compile Include="UdpDeviceScanner.cs" />
     <Compile Include="DirectConnectScanCommand.cs" />
-    <Compile Include="Invoker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UdpState.cs" />
   </ItemGroup>
@@ -63,10 +63,6 @@
     <ProjectReference Include="..\..\DeviceFactory\DeviceFactory.csproj">
       <Project>{e2b6818f-68c8-40a1-8ac6-152bf9b48ea3}</Project>
       <Name>DeviceFactory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Infrastructure\DirectConnect\DirectConnect.csproj">
-      <Project>{FAA63C26-F283-466A-8486-8EECC976D515}</Project>
-      <Name>DirectConnect</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ServiceInterfaces\ServiceInterfaces.csproj">
       <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>

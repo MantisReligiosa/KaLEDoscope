@@ -5,11 +5,7 @@ namespace CommandProcessing
 {
     internal class UdpState
     {
-        public UdpState()
-        {
-        }
-
-        public IPEndPoint e { get; internal set; }
-        public UdpClient u { get; internal set; }
+        public IPEndPoint IpEndPoint { get; internal set; }
+        public UdpClient UdpClient { get; internal set; }
     }
 }
