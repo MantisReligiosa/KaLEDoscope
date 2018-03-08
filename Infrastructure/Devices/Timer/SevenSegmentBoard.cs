@@ -1,9 +1,9 @@
 ﻿using BaseDevice;
 using System.Collections.Generic;
 
-namespace Timer
+namespace SevenSegmentBoardDevice
 {
-    public class BoardClock : Device
+    public class SevenSegmentBoard : Device
     {
         public List<Alarm> AlarmSchedule { get; set; }
         public BoardType BoardType { get; set; }

@@ -181,9 +181,9 @@
       <Project>{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}</Project>
       <Name>DeviceFactory</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure\Devices\Timer\Timer.csproj">
+    <ProjectReference Include="..\Infrastructure\Devices\Timer\SevenSegmentBoardDevice.csproj">
       <Project>{96D808B9-C3F8-4604-BE96-2C85074EC088}</Project>
-      <Name>Timer</Name>
+      <Name>SevenSegmentBoardDevice</Name>
     </ProjectReference>
     <ProjectReference Include="..\Logger\Logger.csproj">
       <Project>{F5C748BA-65E1-430D-8385-CFD198FE850E}</Project>

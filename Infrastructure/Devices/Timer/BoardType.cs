@@ -1,4 +1,4 @@
-﻿namespace Timer
+﻿namespace SevenSegmentBoardDevice
 {
     public class BoardType
     {

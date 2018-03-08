@@ -1,4 +1,5 @@
-﻿using BaseDevice;
+﻿using System.Timers;
+using BaseDevice;
 using CommandProcessing;
 using KaLEDoscope.ViewModel;
 using KaLEDoscope.Views;
@@ -14,8 +15,8 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using Timer;
 using Input = System.Windows.Input;
+using SevenSegmentBoardDevice;
 
 namespace KaLEDoscope
 {
@@ -25,6 +26,7 @@ namespace KaLEDoscope
         private ProtocolNode _directConnect;
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory.DeviceFactory _deviceFactory;
+        private readonly Invoker _invoker;
 
         public ObservableCollection<ProtocolNode> ProtocolNodes { get; set; } = new ObservableCollection<ProtocolNode>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
@@ -32,7 +34,7 @@ namespace KaLEDoscope
         private readonly Dictionary<Func<Device, bool>, Func<Device, ILogger, UserControl>> _customDevicesControls
             = new Dictionary<Func<Device, bool>, Func<Device, ILogger, UserControl>>
         {
-            {d=> d is BoardClock,
+            {d=> d is SevenSegmentBoard,
                  (d,l)=>   new TimerControl
                     {
                         HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -90,17 +92,18 @@ namespace KaLEDoscope
         public MainViewModel(ILogger logger)
         {
             _logger = logger;
-            _logger.InfoRaised += (sender, message) => logMessage($"{sender}: Info: {message}");
-            _logger.DebugRaised += (sender, message) => logMessage($"{sender}: Debug: {message}");
-            _logger.WarnRaised += (sender, message) => logMessage($"{sender}: Warn: {message}");
-            _logger.ErrorRaised += (sender, message) => logMessage($"{sender}: Error: {message}");
+            _logger.InfoRaised += (sender, message) => LogMessage($"{sender}: Info: {message}");
+            _logger.DebugRaised += (sender, message) => LogMessage($"{sender}: Debug: {message}");
+            _logger.WarnRaised += (sender, message) => LogMessage($"{sender}: Warn: {message}");
+            _logger.ErrorRaised += (sender, message) => LogMessage($"{sender}: Error: {message}");
             _dispatcher = Dispatcher.CurrentDispatcher;
+            _invoker = new Invoker(_logger);
             IsScanEnabled = true;
             _deviceFactory = new DeviceFactory.DeviceFactory(_logger);
             _deviceFactory.AddTransformation("boardClock", (d) =>
             {
-                var castedDevice = d as BoardClock;
-                var device = new BoardClock
+                var castedDevice = d as SevenSegmentBoard;
+                var device = new SevenSegmentBoard
                 {
                     AlarmSchedule = castedDevice?.AlarmSchedule ?? new List<Alarm>(),
                     Model = d.Model,
@@ -152,6 +155,7 @@ namespace KaLEDoscope
                     _directConnect.Members.Add(new DeviceNode
                     {
                         Device = device,
+                        Name = device.Name
                     });
                 }
             });
@@ -185,15 +189,12 @@ namespace KaLEDoscope
                                 Content = grid,
                                 DataContext = deviceNode.Device,
                             };
-
                             newTabItem.OnTabCloseClick += (sender, arguments) =>
                             {
                                 var tab = (ClosableTab)sender;
                                 DeviceTabs.Remove(tab);
                             };
                             DeviceTabs.Add(newTabItem);
-
-
                             SelectedTabItem = newTabItem;
                         }
                         else
@@ -220,12 +221,13 @@ namespace KaLEDoscope
                 Height = new GridLength(1, GridUnitType.Star)
             });
 
-
+            var baseDeviceViewModel = new BaseDeviceViewModel(deviceNode.Device, _logger);
+            baseDeviceViewModel.OnRenamed += ((device) => deviceNode.Name = device.Name);
             baseTabItem.Content = new BaseDeviceControl
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
-                DataContext = new BaseDeviceViewModel(deviceNode.Device, _logger)
+                DataContext = baseDeviceViewModel
             };
             baseTabItem.Header = "Базовые настройки";
             tabControl.Items.Add(baseTabItem);
@@ -302,7 +304,7 @@ namespace KaLEDoscope
                     _uploadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
                         var command = new DirectConnectUploadSettingsCommand(d.Device, _logger);
-                        command.Execute();
+                        _invoker.Invoke(command);
                     });
                 }
                 return _uploadSettings;
@@ -352,7 +354,7 @@ namespace KaLEDoscope
                         _tabItem = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == d.Device);
                         var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceFactory, _logger);
                         command.OnConfigurationDownloaded += Command_OnConfigurationDownloaded;
-                        command.Execute();
+                        _invoker.Invoke(command);
                     });
                 }
                 return _downloadSettings;
@@ -394,7 +396,7 @@ namespace KaLEDoscope
             }
         }
 
-        private void logMessage(string Message)
+        private void LogMessage(string Message)
         {
             _log.AppendLine(Message);
             OnPropertyChanged(nameof(Log));

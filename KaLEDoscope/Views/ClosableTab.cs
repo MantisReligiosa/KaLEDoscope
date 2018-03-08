@@ -34,9 +34,13 @@ namespace KaLEDoscope.Views
 
         public string Title
         {
+            get
+            {
+                return (Header as CloseableHeader).label_TabTitle.Content as string;
+            }
             set
             {
-                ((CloseableHeader)this.Header).label_TabTitle.Content = value;
+                (Header as CloseableHeader).label_TabTitle.Content = value;
             }
         }
 

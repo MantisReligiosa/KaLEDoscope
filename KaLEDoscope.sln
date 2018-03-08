@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logger", "Logger\Logger.csp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Devices", "Devices", "{86379913-F85B-4466-A82D-0FCAA3D65501}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Timer", "Infrastructure\Devices\Timer\Timer.csproj", "{96D808B9-C3F8-4604-BE96-2C85074EC088}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SevenSegmentBoardDevice", "Infrastructure\Devices\Timer\SevenSegmentBoardDevice.csproj", "{96D808B9-C3F8-4604-BE96-2C85074EC088}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkConsole", "NetworkConsole\NetworkConsole.csproj", "{F750C8E3-326C-4FF1-B4A9-4B58FB296C7C}"
 EndProject

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Timer
+namespace SevenSegmentBoardDevice
 {
     public class TimeSyncParameters
     {

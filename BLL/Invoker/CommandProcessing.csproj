@@ -49,7 +49,13 @@
     <Compile Include="DirectConnectUploadSettingsCommand.cs" />
     <Compile Include="DTO\Request.cs" />
     <Compile Include="DTO\ScanCommandResponce.cs" />
+    <Compile Include="DTO\SevenSegmentBoardDeviceRequest.cs" />
+    <Compile Include="Invoker.cs" />
     <Compile Include="TcpState.cs" />
+    <Compile Include="TimerCommands\DirectConnectStopResetTimer.cs" />
+    <Compile Include="TimerCommands\DirectConnectResetTimer.cs" />
+    <Compile Include="TimerCommands\DirectConnectPauseTimer.cs" />
+    <Compile Include="TimerCommands\DirectConnectStartTimer.cs" />
     <Compile Include="UdpDeviceScanner.cs" />
     <Compile Include="DirectConnectScanCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -64,6 +70,10 @@
       <Project>{e2b6818f-68c8-40a1-8ac6-152bf9b48ea3}</Project>
       <Name>DeviceFactory</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\Devices\Timer\SevenSegmentBoardDevice.csproj">
+      <Project>{96D808B9-C3F8-4604-BE96-2C85074EC088}</Project>
+      <Name>SevenSegmentBoardDevice</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ServiceInterfaces\ServiceInterfaces.csproj">
       <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>
       <Name>ServiceInterfaces</Name>
@@ -71,6 +81,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

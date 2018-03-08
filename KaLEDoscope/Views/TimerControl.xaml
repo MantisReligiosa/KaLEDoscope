@@ -175,11 +175,10 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <!--Template="{StaticResource buttonTemplate}-->
-                    <Button Grid.Row="0" Grid.Column="0" Content="Старт" Style="{StaticResource ButtonStyle}" />
-                    <Button Grid.Row="0" Grid.Column="1" Content="Стоп" Style="{StaticResource ButtonStyle}" />
-                    <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сброс к стартовому значению" Style="{StaticResource ButtonStyle}" />
-                    <Button Grid.Row="2" Grid.ColumnSpan="2" Content="СТОП (сброс в 00:00:00)" Style="{StaticResource ButtonStyle}" />
+                    <Button Grid.Row="0" Grid.Column="0" Content="Старт" Style="{StaticResource ButtonStyle}" Command="{Binding StartTimer}" />
+                    <Button Grid.Row="0" Grid.Column="1" Content="Пауза" Style="{StaticResource ButtonStyle}" Command="{Binding PauseTimer}"/>
+                    <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сброс к стартовому значению" Style="{StaticResource ButtonStyle}" Command="{Binding ResetTimer}"/>
+                    <Button Grid.Row="2" Grid.ColumnSpan="2" Content="СТОП (сброс в 00:00:00)" Style="{StaticResource ButtonStyle}" Command="{Binding StopResetTimer}"/>
                 </Grid>
             </Grid>
         </GroupBox>

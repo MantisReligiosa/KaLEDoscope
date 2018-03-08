@@ -17,8 +17,10 @@ namespace CommandProcessing
         private readonly int _timeout;
         private readonly List<Device> _devices;
         private event Action<Device> _deviceRecieved;
+        private UdpClient _udpClient;
 
         public event Action<List<Device>> OnScanCompleted;
+        public override string Name => "Сканирование";
 
         public DirectConnectScanCommand(ILogger logger, int port = 30000, int timeout = 10000) : base(null, logger)
         {
@@ -38,13 +40,23 @@ namespace CommandProcessing
                     IpAddress = "192.168.0.88",
                     Port = 500
                 },
-                Name = "Фейковое устройство!!!!"
+                Name = "Часы 1"
+            });
+            _devices.Add(new Device
+            {
+                Model = "boardClock",
+                Network = new Network
+                {
+                    IpAddress = "192.168.0.77",
+                    Port = 500
+                },
+                Name = "Часы 2"
             });
 #endif
             _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
             var endPoint = new IPEndPoint(IPAddress.Broadcast, _port);
-            var udpClient = new UdpClient();
-            udpClient.Connect(endPoint);
+           _udpClient = new UdpClient();
+            _udpClient.Connect(endPoint);
             var request = new Request
             {
                 Scan = new object()
@@ -52,17 +64,17 @@ namespace CommandProcessing
             var requestString = JsonConvert.SerializeObject(request);
             var bytes = Encoding.UTF8.GetBytes(requestString);
             _logger.Debug(this, $"Широковещательный запрос: {requestString}");
-            udpClient.Send(bytes, bytes.Length);
-            udpClient.Close();
+            _udpClient.Send(bytes, bytes.Length);
+            _udpClient.Close();
             endPoint = new IPEndPoint(IPAddress.Any, _port);
-            udpClient = new UdpClient(endPoint);
+            _udpClient = new UdpClient(endPoint);
             var udpState = new UdpState
             {
                 IpEndPoint = endPoint,
-                UdpClient = udpClient
+                UdpClient = _udpClient
             };
             _logger.Debug(this, $"Жду ответы {_timeout} мс");
-            udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpState);
+            _udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpState);
             _deviceRecieved += (d) => _devices.Add(d);
 
             var timer = new Timer()
@@ -72,11 +84,16 @@ namespace CommandProcessing
             };
             timer.Elapsed += (o, e) =>
             {
-                udpClient.Close();
+                _udpClient.Close();
                 _logger.Debug(this, $"Завершение сканирования");
                 OnScanCompleted?.Invoke(_devices);
             };
             timer.Start();
+        }
+
+        public override void Finally()
+        {
+            _udpClient.Close();
         }
 
         private void ReceiveCallback(IAsyncResult ar)

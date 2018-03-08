@@ -7,6 +7,20 @@ namespace KaLEDoscope
     {
         public Device Device { get; set; }
 
+        private string _name;
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                _name = value;
+                OnPropertyChanged(nameof(Name));
+            }
+        }
+
         private bool _allowUpload;
         public bool AllowUpload
         {

@@ -46,13 +46,17 @@
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type self:DeviceNode}">
                         <StackPanel Orientation="Horizontal">
-                            <!--<Image Source="/WpfTutorialSamples;component/Images/user.png" Margin="0,0,5,0" />-->
-                            <TextBlock Text="{Binding Path=Device.Name}" />
+                            <TextBlock Text="{Binding Path=Name}" />
                         </StackPanel>
                     </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
-            <Button Grid.Row="1" Content="Сканировать" Command="{Binding ScanDevices}" Style="{StaticResource ButtonStyle}" IsEnabled="{Binding IsScanEnabled}"/>
+            <Button Grid.Row="1" 
+                    Content="Сканировать" 
+                    Command="{Binding ScanDevices}" 
+                    Style="{StaticResource ButtonStyle}" 
+                    IsEnabled="{Binding IsScanEnabled}">
+            </Button>
         </Grid>
 
 

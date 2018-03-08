@@ -15,6 +15,8 @@ namespace KaLEDoscope.ViewModel
 
         private readonly ILogger _logger;
 
+        public event Action<Device> OnRenamed;
+
         public int Id
         {
             get
@@ -25,6 +27,20 @@ namespace KaLEDoscope.ViewModel
             {
                 _device.Id = value;
                 OnPropertyChanged(nameof(Id));
+            }
+        }
+
+        public string Name
+        {
+            get
+            {
+                return _device.Name;
+            }
+            set
+            {
+                _device.Name = value;
+                OnPropertyChanged(nameof(Name));
+                OnRenamed?.Invoke(_device);
             }
         }
 

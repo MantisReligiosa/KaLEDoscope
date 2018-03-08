@@ -17,6 +17,8 @@ namespace CommandProcessing
         private readonly int _timeout;
         private Timer _timer;
 
+        public override string Name => "Запрос конфигурации";
+
         public event Action<Device> OnConfigurationDownloaded;
 
         public DirectConnectDownloadSettingsCommand(Device device, 
@@ -26,21 +28,22 @@ namespace CommandProcessing
             _timeout = timeout;
         }
 
+        private TcpClient _tcpClient;
+
         public override void Execute()
         {
-            _logger.Info(this, $"Запрос конфигурации от устройства {_device.Name}");
             var ipEndpoint = new IPEndPoint(IPAddress.Parse(_device.Network.IpAddress), _device.Network.Port);
-            var tcpClient = new TcpClient();
-            tcpClient.Connect(ipEndpoint);
+            _tcpClient = new TcpClient();
+            _tcpClient.Connect(ipEndpoint);
             var requestString = JsonConvert.SerializeObject(new Request
             {
                 GetConfig = new object()
             });
             var bytes = Encoding.UTF8.GetBytes(requestString);
             _logger.Debug(this, $"Запрос к {_device.Network.IpAddress}:{_device.Network.Port}: {requestString}");
-            var stream = tcpClient.GetStream();
+            var stream = _tcpClient.GetStream();
             stream.Write(bytes, 0, bytes.Length);
-            tcpClient.Close();
+            _tcpClient.Close();
             _logger.Debug(this, $"Жду ответ {_timeout} мс");
             var tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, _device.Network.Port));
             var s = new TcpState
@@ -108,6 +111,11 @@ namespace CommandProcessing
                 _logger.Error(this, "Ошибка при получении ответа", ex);
                 _timer.Stop();
             }
+        }
+
+        public override void Finally()
+        {
+            _tcpClient.Close();
         }
     }
 }
