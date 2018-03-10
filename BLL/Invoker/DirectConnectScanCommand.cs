@@ -54,6 +54,16 @@ namespace CommandProcessing
                 },
                 Name = "Часы 2"
             });
+            _devices.Add(new Device
+            {
+                Model = "strange",
+                Id = 13,
+                Network = new Network
+                {
+                    IpAddress = "192.168.0.13",
+                    Port = 500
+                }
+            });
 #endif
             _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
             var endPoint = new IPEndPoint(IPAddress.Broadcast, _port);

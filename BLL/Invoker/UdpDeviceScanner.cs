@@ -35,6 +35,14 @@ namespace CommandProcessing
                 var deviceBuilder = _deviceBuilders.FirstOrDefault(builder => builder.Model.Equals(d.Model));
                 if (deviceBuilder == null)
                 {
+                    d.Name = "Неизвестное устройство";
+                    d.Brightness = new Brightness
+                    {
+                        BrightnessPeriods = new List<BrightnessPeriod>()
+                    };
+                    d.WorkSchedule = new WorkSchedule
+                    {
+                    };
                     return d;
                 }
                 else
