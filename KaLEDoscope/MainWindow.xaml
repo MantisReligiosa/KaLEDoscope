@@ -7,6 +7,47 @@
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         Title="MainWindow" d:DesignWidth="780" d:DesignHeight="540">
+    <Window.Resources>
+        <Style x:Key="{x:Type ToolTip}" TargetType="ToolTip">
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="HasDropShadow" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToolTip">
+                        <Border CornerRadius="7" HorizontalAlignment="Center" VerticalAlignment="Top" Padding="5" BorderThickness="3,3,3,3" >
+                            <Border.Background>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#CF181818" Offset="0"/>
+                                    <GradientStop Color="#BE1C1C1C" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Border.BorderBrush>
+                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                    <GradientStop Color="#80FFFFFF" Offset="0"/>
+                                    <GradientStop Color="#7FFFFFFF" Offset="1"/>
+                                    <GradientStop Color="#FFFFF18D" Offset="0.344"/>
+                                    <GradientStop Color="#FFFFF4AB" Offset="0.647"/>
+                                </LinearGradientBrush>
+                            </Border.BorderBrush>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="0.1*" />
+                                    <ColumnDefinition Width="0.9*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <!--<Image Source="images/nfo_icon.png" Grid.Row="0" Grid.RowSpan="2" Grid.Column="0" Margin="3" />-->
+                                <TextBlock FontFamily="Tahoma" Grid.Row="0" Grid.Column="1" FontSize="13" Text="{TemplateBinding Content}" Foreground="#5095D6" />
+                                <!--<TextBlock FontFamily="Tahoma" Grid.Row="1" Grid.Column="1" FontSize="11" Text="To expediate your process please click here" Foreground="#FFFFFFFF" />-->
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"></RowDefinition>
@@ -55,7 +96,8 @@
                     Content="Сканировать" 
                     Command="{Binding ScanDevices}" 
                     Style="{StaticResource ButtonStyle}" 
-                    IsEnabled="{Binding IsScanEnabled}">
+                    IsEnabled="{Binding IsScanEnabled}"
+                    ToolTip="Начните работу с поиска устройств">
             </Button>
         </Grid>
 
