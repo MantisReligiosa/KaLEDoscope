@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 
-namespace CommandProcessing
+namespace UdpExcange
 {
     internal class UdpState
     {

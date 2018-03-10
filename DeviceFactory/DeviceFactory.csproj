@@ -49,6 +49,10 @@
       <Project>{677B5FDE-5DA7-4065-B446-014822533CBC}</Project>
       <Name>BaseDevice</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeviceBuilding\DeviceBuilding.csproj">
+      <Project>{2D60FBB1-2869-4354-939B-7F72D9B314B3}</Project>
+      <Name>DeviceBuilding</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ServiceInterfaces\ServiceInterfaces.csproj">
       <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>
       <Name>ServiceInterfaces</Name>

@@ -166,10 +166,6 @@
       <Project>{2D60FBB1-2869-4354-939B-7F72D9B314B3}</Project>
       <Name>DeviceBuilding</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DeviceFactory\DeviceFactory.csproj">
-      <Project>{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}</Project>
-      <Name>DeviceFactory</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Domain\Abstractions\Abstractions\Abstractions.csproj">
       <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
       <Name>Abstractions</Name>

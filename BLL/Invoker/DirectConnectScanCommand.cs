@@ -4,23 +4,19 @@ using Newtonsoft.Json;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 using System.Timers;
+using UdpExcange;
 
 namespace CommandProcessing
 {
-    public class DirectConnectScanCommand : Command<Device>
+    public class DirectConnectScanCommand : Command<Device, UdpAgent>
     {
         private readonly int _port;
         private readonly int _timeout;
         private readonly List<Device> _devices;
-        private event Action<Device> _deviceRecieved;
-        private UdpClient _udpClient;
 
         public event Action<List<Device>> OnScanCompleted;
-        public override string Name => "Сканирование";
+        public override string Name => "Распознавание устройств";
 
         public DirectConnectScanCommand(ILogger logger, int port = 30000, int timeout = 10000) : base(null, logger)
         {
@@ -66,29 +62,30 @@ namespace CommandProcessing
             });
 #endif
             _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
-            var endPoint = new IPEndPoint(IPAddress.Broadcast, _port);
-            _udpClient = new UdpClient();
-            _udpClient.Connect(endPoint);
             var request = new Request
             {
                 Scan = new object()
             };
             var requestString = JsonConvert.SerializeObject(request);
-            var bytes = Encoding.UTF8.GetBytes(requestString);
             _logger.Debug(this, $"Широковещательный запрос: {requestString}");
-            _udpClient.Send(bytes, bytes.Length);
-            _udpClient.Close();
-            endPoint = new IPEndPoint(IPAddress.Any, _port);
-            _udpClient = new UdpClient(endPoint);
-            var udpState = new UdpState
-            {
-                IpEndPoint = endPoint,
-                UdpClient = _udpClient
-            };
+            _networkAgent.SendBroadcast(_port, requestString);
             _logger.Debug(this, $"Жду ответы {_timeout} мс");
-            _udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpState);
-            _deviceRecieved += (d) => _devices.Add(d);
 
+            _networkAgent.Listen(_port, (recieveString) =>
+                {
+                    var responce = JsonConvert.DeserializeObject<ScanCommandResponce>(recieveString);
+                    _logger.Debug(this, $"Ответ: {recieveString}");
+                    var device = new Device
+                    {
+                        Model = responce.DeviceParameters.Model,
+                        Network = new Network
+                        {
+                            IpAddress = responce.NetworkParameters.Address,
+                            Port = responce.NetworkParameters.Port
+                        }
+                    };
+                    _devices.Add(device);
+                });
             var timer = new Timer()
             {
                 AutoReset = false,
@@ -96,7 +93,7 @@ namespace CommandProcessing
             };
             timer.Elapsed += (o, e) =>
             {
-                _udpClient.Close();
+                _networkAgent.Close();
                 _logger.Debug(this, $"Завершение сканирования");
                 OnScanCompleted?.Invoke(_devices);
             };
@@ -105,42 +102,7 @@ namespace CommandProcessing
 
         public override void Finally()
         {
-            _udpClient.Close();
-        }
-
-        private void ReceiveCallback(IAsyncResult ar)
-        {
-            try
-            {
-                var udpClient = ((UdpState)(ar.AsyncState)).UdpClient;
-                var ipEndPoint = ((UdpState)(ar.AsyncState)).IpEndPoint;
-                var recieveBytes = udpClient.EndReceive(ar, ref ipEndPoint);
-                var recieveString = Encoding.UTF8.GetString(recieveBytes);
-                var responce = JsonConvert.DeserializeObject<ScanCommandResponce>(recieveString);
-                _logger.Debug(this, $"Ответ: {recieveString}");
-                var device = new Device
-                {
-                    Model = responce.DeviceParameters.Model,
-                    Network = new Network
-                    {
-                        IpAddress = responce.NetworkParameters.Address,
-                        Port = responce.NetworkParameters.Port
-                    }
-                };
-                _logger.Info(this, $"Ответ устройства {device.Model} IP {device.Network.IpAddress}:{device.Network.Port}");
-                _deviceRecieved?.Invoke(device);
-                var udpState = new UdpState
-                {
-                    IpEndPoint = ipEndPoint,
-                    UdpClient = udpClient
-                };
-                udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpState);
-            }
-            catch (ObjectDisposedException) { }
-            catch (Exception ex)
-            {
-                _logger.Error(this, "UDP error", ex);
-            }
+            _networkAgent.Close();
         }
     }
 }

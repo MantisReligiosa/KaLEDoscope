@@ -21,12 +21,12 @@ using Abstractions;
 
 namespace KaLEDoscope
 {
-    public class MainViewModel :Notified
+    public class MainViewModel : Notified
     {
         private ILogger _logger { get; set; }
         private ProtocolNode _directConnect;
         private readonly Dispatcher _dispatcher;
-        private readonly List<IDeviceBuilder> _deviceBuilders;
+        private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
 
         public ObservableCollection<ProtocolNode> ProtocolNodes { get; set; } = new ObservableCollection<ProtocolNode>();
@@ -86,15 +86,13 @@ namespace KaLEDoscope
             _dispatcher = Dispatcher.CurrentDispatcher;
             _invoker = new Invoker(_logger);
             IsScanEnabled = true;
-            _deviceBuilders = new List<IDeviceBuilder>
-            {
-                new SevenSegmentDeviceBuilder()
-            };
+            _deviceFactory = new DeviceFactory(_logger);
+            _deviceFactory.AddBuilder(new SevenSegmentDeviceBuilder());
         }
 
         public void MakeNodes()
         {
-            var directConnectDeviceScanner = new UdpDeviceScanner(_logger, _deviceBuilders);
+            var directConnectDeviceScanner = new DeviceScanner(_logger, _deviceFactory);
             directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
             directConnectDeviceScanner.StartSearch();
             IsScanEnabled = false;
@@ -229,7 +227,8 @@ namespace KaLEDoscope
             grid.Children.Add(toolbar);
             Grid.SetRow(tabControl, 1);
             Grid.SetRow(toolbar, 0);
-            var deviceBuilder = _deviceBuilders.FirstOrDefault(d => d.Model.Equals(deviceNode.Device.Model));
+
+            var deviceBuilder = _deviceFactory.GetBuilder(deviceNode.Device.Model);
             if (deviceBuilder != null)
             {
                 foreach (var customDevicesControlsKeyValuePair in deviceBuilder.Controls)
@@ -319,7 +318,7 @@ namespace KaLEDoscope
                         d.AllowUpload = true;
                         _updatedNode = d;
                         _tabItem = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == d.Device);
-                        var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceBuilders, _logger);
+                        var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceFactory, _logger);
                         command.OnConfigurationDownloaded += Command_OnConfigurationDownloaded;
                         _invoker.Invoke(command);
                     });
@@ -353,12 +352,8 @@ namespace KaLEDoscope
                         {
                             var fileName = dialog.FileName;
                             var text = System.IO.File.ReadAllText(fileName);
-                            var device = (Device)(JsonConvert.DeserializeObject(text, d.Device.GetType()));
-                            var deviceBuilder = _deviceBuilders.FirstOrDefault(builder => builder.Model.Equals(device.Model));
-                            if (deviceBuilder != null)
-                            {
-                                d.Device = deviceBuilder.UpdateCustomSettings(device);
-                            }
+                            var device = JsonConvert.DeserializeObject(text, d.Device.GetType());
+                            d.Device = _deviceFactory.Customize(device);
                             Command_OnConfigurationDownloaded(d.Device);
                         }
                     });

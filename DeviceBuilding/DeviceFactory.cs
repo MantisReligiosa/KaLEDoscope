@@ -3,8 +3,9 @@ using BaseDevice;
 using DeviceBuilding;
 using ServiceInterfaces;
 using System.Collections.Generic;
+using System;
 
-namespace DeviceFactory
+namespace DeviceBuilding
 {
     public class DeviceFactory
     {
@@ -33,9 +34,21 @@ namespace DeviceFactory
             else
             {
                 device.Name = "Неизвестное устройство";
+                device.Brightness = new Brightness
+                {
+                    BrightnessPeriods = new List<BrightnessPeriod>()
+                };
+                device.WorkSchedule = new WorkSchedule
+                {
+                };
             }
             _logger.Info(this, $"Устройство IP {device.Network.IpAddress} модель {device.Model} распознано как {device.Name}");
             return device;
+        }
+
+        public IDeviceBuilder GetBuilder(string deviceModel)
+        {
+            return _builders.FirstOrDefault(b => b.Model.Equals(deviceModel));
         }
     }
 }

@@ -1,17 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</ProjectGuid>
+    <ProjectGuid>{82374D01-1F4E-4792-A413-B02E462C96C2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ServiceInterfaces</RootNamespace>
-    <AssemblyName>ServiceInterfaces</AssemblyName>
+    <RootNamespace>TcpExcange</RootNamespace>
+    <AssemblyName>TcpExcange</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -41,24 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command.cs" />
-    <Compile Include="ICommand.cs" />
-    <Compile Include="ILogger.cs" />
-    <Compile Include="INetworkAgent.cs" />
+    <Compile Include="TcpAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TcpState.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaseDevice\BaseDevice.csproj">
-      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
-      <Name>BaseDevice</Name>
+    <ProjectReference Include="..\ServiceInterfaces\ServiceInterfaces.csproj">
+      <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>
+      <Name>ServiceInterfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>
