@@ -6,7 +6,7 @@
         xmlns:self="clr-namespace:KaLEDoscope"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
-        Title="MainWindow" d:DesignWidth="780" d:DesignHeight="540">
+        Title="MainWindow" d:DesignWidth="780" d:DesignHeight="540" WindowState="Maximized">
     <Window.Resources>
         <Style x:Key="{x:Type ToolTip}" TargetType="ToolTip">
             <Setter Property="OverridesDefaultStyle" Value="true"/>

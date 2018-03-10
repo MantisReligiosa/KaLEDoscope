@@ -43,6 +43,7 @@ namespace CommandProcessing
                 }
             }
             ).ToList());
+            _logger.Info(this, "Распознавание закончено");
         }
     }
 }
