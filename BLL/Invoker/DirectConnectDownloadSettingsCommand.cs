@@ -1,4 +1,6 @@
-﻿using BaseDevice;
+﻿using System.Linq;
+using DeviceBuilding;
+using BaseDevice;
 using CommandProcessing.DTO;
 using devFactory = DeviceFactory;
 using Newtonsoft.Json;
@@ -8,12 +10,13 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Timers;
+using System.Collections.Generic;
 
 namespace CommandProcessing
 {
     public class DirectConnectDownloadSettingsCommand : Command<Device>
     {
-        private readonly devFactory.DeviceFactory _deviceFactory;
+        private readonly List<IDeviceBuilder> _deviceBuilders;
         private readonly int _timeout;
         private Timer _timer;
 
@@ -21,10 +24,10 @@ namespace CommandProcessing
 
         public event Action<Device> OnConfigurationDownloaded;
 
-        public DirectConnectDownloadSettingsCommand(Device device, 
-            devFactory.DeviceFactory deviceFactory, ILogger logger, int timeout = 10000) : base(device, logger)
+        public DirectConnectDownloadSettingsCommand(Device device,
+            List<IDeviceBuilder> deviceBuilders, ILogger logger, int timeout = 10000) : base(device, logger)
         {
-            _deviceFactory = deviceFactory;
+            _deviceBuilders = deviceBuilders;
             _timeout = timeout;
         }
 
@@ -96,8 +99,13 @@ namespace CommandProcessing
                 var recievedBytes = new byte[recievedBytesAmount];
                 Array.Copy(data, recievedBytes, recievedBytesAmount);
                 var recieveString = Encoding.UTF8.GetString(recievedBytes);
-                var d = JsonConvert.DeserializeObject(recieveString, _device.GetType());
-                _device = _deviceFactory.Customize(d);
+                var d = (Device)JsonConvert.DeserializeObject(recieveString, _device.GetType());
+
+                var deviceBuilder = _deviceBuilders.FirstOrDefault(builder => builder.Model.Equals(d.Model));
+                if (deviceBuilder != null)
+                {
+                    _device = deviceBuilder.UpdateCustomSettings(d);
+                }
                 _timer.Stop();
                 EndCommand(listener);
             }

@@ -40,11 +40,13 @@ namespace CommandProcessing
                     IpAddress = "192.168.0.88",
                     Port = 500
                 },
+                Id = 1,
                 Name = "Часы 1"
             });
             _devices.Add(new Device
             {
                 Model = "boardClock",
+                Id = 2,
                 Network = new Network
                 {
                     IpAddress = "192.168.0.77",
@@ -55,7 +57,7 @@ namespace CommandProcessing
 #endif
             _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
             var endPoint = new IPEndPoint(IPAddress.Broadcast, _port);
-           _udpClient = new UdpClient();
+            _udpClient = new UdpClient();
             _udpClient.Connect(endPoint);
             var request = new Request
             {

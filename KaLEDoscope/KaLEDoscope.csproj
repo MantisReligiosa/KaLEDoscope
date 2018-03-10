@@ -86,14 +86,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ApplicationInfrastructure.cs" />
-    <Compile Include="POCO\Timer\BaseClass.cs" />
-    <Compile Include="POCO\Timer\CountdownType.cs" />
-    <Compile Include="POCO\Timer\DisplayFrame.cs" />
-    <Compile Include="POCO\Timer\DisplayType.cs" />
-    <Compile Include="POCO\Timer\DisplayFormat.cs" />
-    <Compile Include="POCO\Timer\FontType.cs" />
-    <Compile Include="POCO\Timer\SyncSource.cs" />
-    <Compile Include="ViewModel\TimerDeviceViewModel.cs" />
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>
     </Compile>
@@ -108,9 +100,6 @@
     <Compile Include="Models\ProtocolNode.cs" />
     <Compile Include="ViewModel\BaseDeviceViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="Views\TimerControl.xaml.cs">
-      <DependentUpon>TimerControl.xaml</DependentUpon>
-    </Compile>
     <Page Include="Views\BaseDeviceControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -132,10 +121,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ResourceDictionary.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\TimerControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -177,9 +162,17 @@
       <Project>{A9C0A719-E20B-4C57-A443-8C994C70FDA9}</Project>
       <Name>CommandProcessing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DeviceBuilding\DeviceBuilding.csproj">
+      <Project>{2D60FBB1-2869-4354-939B-7F72D9B314B3}</Project>
+      <Name>DeviceBuilding</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeviceFactory\DeviceFactory.csproj">
       <Project>{E2B6818F-68C8-40A1-8AC6-152BF9B48EA3}</Project>
       <Name>DeviceFactory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain\Abstractions\Abstractions\Abstractions.csproj">
+      <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
+      <Name>Abstractions</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Devices\Timer\SevenSegmentBoardDevice.csproj">
       <Project>{96D808B9-C3F8-4604-BE96-2C85074EC088}</Project>
