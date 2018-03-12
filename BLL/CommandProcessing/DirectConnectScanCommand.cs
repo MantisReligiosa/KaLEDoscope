@@ -41,14 +41,14 @@ namespace CommandProcessing
             });
             _devices.Add(new Device
             {
-                Model = "boardClock",
+                Model = "pixelBoard",
                 Id = 2,
                 Network = new Network
                 {
                     IpAddress = "192.168.0.77",
                     Port = 500
                 },
-                Name = "Часы 2"
+                Name = "Бегущая строка"
             });
             _devices.Add(new Device
             {

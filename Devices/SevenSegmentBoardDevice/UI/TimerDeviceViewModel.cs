@@ -297,8 +297,7 @@ namespace SevenSegmentBoardDevice.UI
                 {
                     return;
                 }
-                TimeSpan timeSpan;
-                if (TimeSpan.TryParseExact(value, @"mm\:ss", CultureInfo.CurrentCulture, out timeSpan))
+                if (TimeSpan.TryParseExact(value, @"mm\:ss", CultureInfo.CurrentCulture, out TimeSpan timeSpan))
                 {
                     _countdownStart = value;
                     CountdownStartValue = timeSpan;
@@ -345,8 +344,7 @@ namespace SevenSegmentBoardDevice.UI
                 {
                     return;
                 }
-                TimeSpan timeSpan;
-                if (TimeSpan.TryParseExact(value, @"hh\:mm", CultureInfo.CurrentCulture, out timeSpan))
+                if (TimeSpan.TryParseExact(value, @"hh\:mm", CultureInfo.CurrentCulture, out TimeSpan timeSpan))
                 {
                     _timeSyncPeriod = value;
                     TimeSyncPeriodValue = timeSpan;

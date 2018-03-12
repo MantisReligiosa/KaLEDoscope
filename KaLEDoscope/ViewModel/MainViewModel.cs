@@ -18,6 +18,7 @@ using Input = System.Windows.Input;
 using SevenSegmentBoardDevice;
 using DeviceBuilding;
 using Abstractions;
+using PixelBoardDevice;
 
 namespace KaLEDoscope
 {
@@ -88,6 +89,7 @@ namespace KaLEDoscope
             IsScanEnabled = true;
             _deviceFactory = new DeviceFactory(_logger);
             _deviceFactory.AddBuilder(new SevenSegmentDeviceBuilder());
+            _deviceFactory.AddBuilder(new PixelDeviceBuilder());
         }
 
         public void MakeNodes()

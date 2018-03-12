@@ -1,36 +1,35 @@
 ﻿using BaseDevice;
 using DeviceBuilding;
+using PixelBoardDevice.UI;
 using ServiceInterfaces;
-using SevenSegmentBoardDevice.UI;
 using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace SevenSegmentBoardDevice
+namespace PixelBoardDevice
 {
-    public class SevenSegmentDeviceBuilder : IDeviceBuilder
+    public class PixelDeviceBuilder : IDeviceBuilder
     {
-        public string Model => "boardClock";
+        public string Model => "pixelBoard";
 
         public Dictionary<string, Func<Device, ILogger, UserControl>> Controls => new Dictionary<string, Func<Device, ILogger, UserControl>>
-            {
-                {"Настройки часов",(d,l)=>   new TimerControl
+        {
+                {"Пиксельная плата",(d,l)=>   new PixelControl
                             {
                                 HorizontalAlignment = HorizontalAlignment.Stretch,
                                 VerticalAlignment = VerticalAlignment.Stretch,
-                                DataContext = new TimerDeviceViewModel(d, l)
+                                DataContext = new PixelDeviceViewModel(d, l)
                             }
                 }
         };
 
         public Device UpdateCustomSettings(Device device)
         {
-            var castedDevice = device as SevenSegmentBoard;
-            var sevenSegmentBoard = new SevenSegmentBoard
+            var castedDevice = device as PixelBoard;
+            var pixelBoard = new PixelBoard
             {
                 Id = device.Id,
-                AlarmSchedule = castedDevice?.AlarmSchedule ?? new List<Alarm>(),
                 Model = device.Model,
                 Network = device.Network,
                 Brightness = castedDevice?.Brightness ?? new Brightness
@@ -39,15 +38,9 @@ namespace SevenSegmentBoardDevice
                     Mode = Mode.Auto
                 },
                 WorkSchedule = castedDevice?.WorkSchedule ?? new WorkSchedule(),
-                BoardType = castedDevice?.BoardType ?? new BoardType(),
-                StopWatchParameters = castedDevice?.StopWatchParameters ?? new StopWatchParameters(),
-                TimeSyncParameters = castedDevice?.TimeSyncParameters ?? new TimeSyncParameters
-                {
-                    ServerAddress = string.Empty
-                }
             };
-            sevenSegmentBoard.Name = String.IsNullOrEmpty(device.Name) ? "Семисегментные часы" : device.Name;
-            return sevenSegmentBoard;
+            pixelBoard.Name = String.IsNullOrEmpty(device.Name) ? "Пиксельная плата" : device.Name;
+            return pixelBoard;
         }
     }
 }

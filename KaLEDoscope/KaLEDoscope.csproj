@@ -166,6 +166,10 @@
       <Project>{2D60FBB1-2869-4354-939B-7F72D9B314B3}</Project>
       <Name>DeviceBuilding</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Devices\PixelBoardDevice\PixelBoardDevice.csproj">
+      <Project>{F22FAA1E-1120-4B56-992B-7473F9DF1B45}</Project>
+      <Name>PixelBoardDevice</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Domain\Abstractions\Abstractions.csproj">
       <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
       <Name>Abstractions</Name>
