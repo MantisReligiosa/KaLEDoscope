@@ -48,7 +48,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaseDevice\BaseDevice.csproj">
+    <ProjectReference Include="..\BLL\BaseDevice\BaseDevice.csproj">
       <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
       <Name>BaseDevice</Name>
     </ProjectReference>

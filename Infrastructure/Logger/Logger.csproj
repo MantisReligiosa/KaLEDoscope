@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A9C0A719-E20B-4C57-A443-8C994C70FDA9}</ProjectGuid>
+    <ProjectGuid>{F5C748BA-65E1-430D-8385-CFD198FE850E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CommandProcessing</RootNamespace>
-    <AssemblyName>CommandProcessing</AssemblyName>
+    <RootNamespace>Logger</RootNamespace>
+    <AssemblyName>Logger</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -31,9 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NLog.4.4.13\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -45,42 +44,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirectConnectDownloadSettingsCommand.cs" />
-    <Compile Include="DirectConnectUploadSettingsCommand.cs" />
-    <Compile Include="DTO\Request.cs" />
-    <Compile Include="DTO\ScanCommandResponce.cs" />
-    <Compile Include="Invoker.cs" />
-    <Compile Include="DeviceScanner.cs" />
-    <Compile Include="DirectConnectScanCommand.cs" />
+    <Compile Include="SeviceLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BaseDevice\BaseDevice.csproj">
-      <Project>{677B5FDE-5DA7-4065-B446-014822533CBC}</Project>
-      <Name>BaseDevice</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\DeviceBuilding\DeviceBuilding.csproj">
-      <Project>{2D60FBB1-2869-4354-939B-7F72D9B314B3}</Project>
-      <Name>DeviceBuilding</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\ServiceInterfaces\ServiceInterfaces.csproj">
-      <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>
+      <Project>{be701549-33d0-4895-83d3-3a809cc0eaa6}</Project>
       <Name>ServiceInterfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\TcpExcange\TcpExcange.csproj">
-      <Project>{82374D01-1F4E-4792-A413-B02E462C96C2}</Project>
-      <Name>TcpExcange</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\UdpExcange\UdpExcange.csproj">
-      <Project>{23859558-2223-4EC2-A159-AD23733EA19D}</Project>
-      <Name>UdpExcange</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

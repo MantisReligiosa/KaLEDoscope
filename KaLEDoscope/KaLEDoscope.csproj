@@ -154,27 +154,27 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BaseDevice\BaseDevice.csproj">
+    <ProjectReference Include="..\BLL\BaseDevice\BaseDevice.csproj">
       <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
       <Name>BaseDevice</Name>
     </ProjectReference>
-    <ProjectReference Include="..\BLL\Invoker\CommandProcessing.csproj">
+    <ProjectReference Include="..\BLL\CommandProcessing\CommandProcessing.csproj">
       <Project>{A9C0A719-E20B-4C57-A443-8C994C70FDA9}</Project>
       <Name>CommandProcessing</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DeviceBuilding\DeviceBuilding.csproj">
+    <ProjectReference Include="..\BLL\DeviceBuilding\DeviceBuilding.csproj">
       <Project>{2D60FBB1-2869-4354-939B-7F72D9B314B3}</Project>
       <Name>DeviceBuilding</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Domain\Abstractions\Abstractions\Abstractions.csproj">
+    <ProjectReference Include="..\Domain\Abstractions\Abstractions.csproj">
       <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
       <Name>Abstractions</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure\Devices\Timer\SevenSegmentBoardDevice.csproj">
+    <ProjectReference Include="..\Devices\SevenSegmentBoardDevice\SevenSegmentBoardDevice.csproj">
       <Project>{96D808B9-C3F8-4604-BE96-2C85074EC088}</Project>
       <Name>SevenSegmentBoardDevice</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Logger\Logger.csproj">
+    <ProjectReference Include="..\Infrastructure\Logger\Logger.csproj">
       <Project>{F5C748BA-65E1-430D-8385-CFD198FE850E}</Project>
       <Name>Logger</Name>
     </ProjectReference>
