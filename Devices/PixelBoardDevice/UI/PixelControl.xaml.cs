@@ -24,5 +24,10 @@ namespace PixelBoardDevice.UI
         {
             InitializeComponent();
         }
+
+        public void OnNeedRedraw(object sender, EventArgs e)
+        {
+            var model = DataContext as PixelDeviceViewModel;
+        }
     }
 }
