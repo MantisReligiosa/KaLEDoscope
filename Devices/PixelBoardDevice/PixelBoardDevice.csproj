@@ -72,6 +72,10 @@
       <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
       <Name>Abstractions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\Resources\Resources.csproj">
+      <Project>{d00400bb-008f-4d07-90f8-5cefb1ffc585}</Project>
+      <Name>Resources</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\ServiceInterfaces\ServiceInterfaces.csproj">
       <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>
       <Name>ServiceInterfaces</Name>

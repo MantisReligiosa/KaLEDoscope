@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UdpExcange", "Infrastructur
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelBoardDevice", "Devices\PixelBoardDevice\PixelBoardDevice.csproj", "{F22FAA1E-1120-4B56-992B-7473F9DF1B45}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Resources", "Infrastructure\Resources\Resources.csproj", "{D00400BB-008F-4D07-90F8-5CEFB1FFC585}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,10 @@ Global
 		{F22FAA1E-1120-4B56-992B-7473F9DF1B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F22FAA1E-1120-4B56-992B-7473F9DF1B45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F22FAA1E-1120-4B56-992B-7473F9DF1B45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D00400BB-008F-4D07-90F8-5CEFB1FFC585}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D00400BB-008F-4D07-90F8-5CEFB1FFC585}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D00400BB-008F-4D07-90F8-5CEFB1FFC585}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D00400BB-008F-4D07-90F8-5CEFB1FFC585}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -106,6 +112,7 @@ Global
 		{82374D01-1F4E-4792-A413-B02E462C96C2} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
 		{23859558-2223-4EC2-A159-AD23733EA19D} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
 		{F22FAA1E-1120-4B56-992B-7473F9DF1B45} = {86379913-F85B-4466-A82D-0FCAA3D65501}
+		{D00400BB-008F-4D07-90F8-5CEFB1FFC585} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C0D49DF-1E93-42DA-A343-18EBC2062313}

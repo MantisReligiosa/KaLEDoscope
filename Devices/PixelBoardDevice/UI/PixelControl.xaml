@@ -4,18 +4,167 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:PixelBoardDevice.UI"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border BorderBrush="Black" BorderThickness='0,2,2,0'>
-            <Border BorderBrush="LightGray" BorderThickness='10,10,10,10'>
-                <Canvas Name="preview" Grid.Row="0" Background="Black" Height="{Binding DeviceHeight}" Width="{Binding DeviceWidth}">
-                </Canvas>
-            </Border>
-        </Border>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness='0,0,1,1'>
+                        <Border BorderBrush="White" BorderThickness='1,1,0,0'>
+                            <Border BorderBrush="#808080" BorderThickness='0,0,1,1'>
+                                <Border BorderBrush="#dfdfdf" BorderThickness='1,1,0,0'>
+                                    <Border BorderBrush="LightGray" BorderThickness='10,10,10,10'>
+                                        <Canvas Name="preview" Background="Black" Height="{Binding DeviceHeight}" Width="{Binding DeviceWidth}">
+                                        </Canvas>
+                                    </Border>
+                                </Border>
+                            </Border>
+                        </Border>
+                    </Border>
+                </Grid>
+            </Grid>
+            <Grid Grid.Row="1">
+
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <ListView Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Название">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding DisplayPeriod}" Width="100"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Период отображения, сек">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding DisplayPeriod}" Width="100" IsEnabled="{Binding IsEnabled}"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Порядок">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox Text="{Binding Order}" Width="100"/>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <ListBox Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2"></ListBox>
+            <Button Grid.Column="0" Grid.Row="1">Добавить экран</Button>
+            <Button Grid.Column="1" Grid.Row="1">Удалить экран</Button>
+            <Button Grid.Column="2" Grid.Row="1">Добавить зону</Button>
+            <Button Grid.Column="3" Grid.Row="1">Удалить зону</Button>
+            <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0">Тип:</Label>
+                            <ComboBox Grid.Column="1"></ComboBox>
+                        </Grid>
+
+                    </Grid>
+                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Расположение">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Grid.Row="0">Слева</Label>
+                            <TextBox Grid.Column="1" Grid.Row="0" />
+                            <Label Grid.Column="0" Grid.Row="1">Сверху</Label>
+                            <TextBox Grid.Column="1" Grid.Row="1" />
+                            <Label Grid.Column="0" Grid.Row="2">Высота</Label>
+                            <TextBox Grid.Column="1" Grid.Row="2" />
+                            <Label Grid.Column="0" Grid.Row="3">Ширина</Label>
+                            <TextBox Grid.Column="1" Grid.Row="3" />
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Row="1" Grid.Column="1" Header="Текст">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Row="0" Grid.Column="0"></ComboBox>
+                            <ComboBox Grid.Row="0" Grid.Column="1"></ComboBox>
+                            <ComboBox Grid.Row="0" Grid.Column="2"></ComboBox>
+                            <Button Grid.Row="0" Grid.Column="3">B</Button>
+                            <Button Grid.Row="0" Grid.Column="4">I</Button>
+                            <RichTextBox Grid.Row="1" Grid.ColumnSpan="100"></RichTextBox>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Grid.Column="0" Header="Анимация">
+                        <ComboBox Grid.Column="1"></ComboBox>
+                    </GroupBox>
+                    <GroupBox Grid.Row="2" Grid.Column="1" Header="Растр">
+                        <Button>Загрузить</Button>
+                    </GroupBox>
+                </Grid>
+            </Grid>
+        </Grid>
     </Grid>
 </UserControl>

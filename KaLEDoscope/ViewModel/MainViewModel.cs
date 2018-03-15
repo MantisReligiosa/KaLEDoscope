@@ -99,16 +99,16 @@ namespace KaLEDoscope
             directConnectDeviceScanner.StartSearch();
             IsScanEnabled = false;
 
-            var mqtt = new ProtocolNode
+            var standaloneConfiguration = new ProtocolNode
             {
-                Name = "MQTT",
+                Name = "Автономная конфигурация",
             };
             _directConnect = new ProtocolNode
             {
                 Name = "DirectConnect",
             };
 
-            ProtocolNodes.Add(mqtt);
+            ProtocolNodes.Add(standaloneConfiguration);
             ProtocolNodes.Add(_directConnect);
         }
 
