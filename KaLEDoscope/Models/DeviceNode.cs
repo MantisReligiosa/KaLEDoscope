@@ -28,10 +28,52 @@ namespace KaLEDoscope
             {
                 return _allowUpload;
             }
-                set
+            set
             {
                 _allowUpload = value;
                 OnPropertyChanged(nameof(AllowUpload));
+            }
+        }
+
+        private bool _allowDownload;
+        public bool AllowDownload
+        {
+            get
+            {
+                return _allowDownload;
+            }
+            set
+            {
+                _allowDownload = value;
+                OnPropertyChanged(nameof(AllowDownload));
+            }
+        }
+
+        private bool _allowSave;
+        public bool AllowSave
+        {
+            get
+            {
+                return _allowSave;
+            }
+            set
+            {
+                _allowSave = value;
+                OnPropertyChanged(nameof(AllowSave));
+            }
+        }
+
+        private bool _allowLoad;
+        public bool AllowLoad
+        {
+            get
+            {
+                return _allowLoad;
+            }
+            set
+            {
+                _allowLoad = value;
+                OnPropertyChanged(nameof(AllowLoad));
             }
         }
 

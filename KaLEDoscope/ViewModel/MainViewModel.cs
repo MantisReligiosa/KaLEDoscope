@@ -25,7 +25,7 @@ namespace KaLEDoscope
     public class MainViewModel : Notified
     {
         private ILogger _logger { get; set; }
-        private ProtocolNode _directConnect;
+        private readonly ProtocolNode _directConnect;
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
@@ -88,8 +88,36 @@ namespace KaLEDoscope
             _invoker = new Invoker(_logger);
             IsScanEnabled = true;
             _deviceFactory = new DeviceFactory(_logger);
-            _deviceFactory.AddBuilder(new SevenSegmentDeviceBuilder());
-            _deviceFactory.AddBuilder(new PixelDeviceBuilder());
+            _deviceFactory.Builders.Add(new SevenSegmentDeviceBuilder());
+            _deviceFactory.Builders.Add(new PixelDeviceBuilder());
+
+            var standaloneConfiguration = new ProtocolNode
+            {
+                Name = "Автономная конфигурация",
+            };
+            _directConnect = new ProtocolNode
+            {
+                Name = "Найденные устройства",
+            };
+
+            ProtocolNodes.Add(standaloneConfiguration);
+            ProtocolNodes.Add(_directConnect);
+            _deviceFactory.Builders.ForEach(builder =>
+            {
+                var device = builder.UpdateCustomSettings(new Device
+                {
+                    Model = builder.Model
+                });
+                standaloneConfiguration.Members.Add(new DeviceNode
+                {
+                    Device = device,
+                    Name = builder.GetControls(device, logger).FirstOrDefault().Key,
+                    AllowDownload = false,
+                    AllowLoad = true,
+                    AllowSave = true,
+                    AllowUpload = false
+                });
+            });
         }
 
         public void MakeNodes()
@@ -98,18 +126,6 @@ namespace KaLEDoscope
             directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
             directConnectDeviceScanner.StartSearch();
             IsScanEnabled = false;
-
-            var standaloneConfiguration = new ProtocolNode
-            {
-                Name = "Автономная конфигурация",
-            };
-            _directConnect = new ProtocolNode
-            {
-                Name = "DirectConnect",
-            };
-
-            ProtocolNodes.Add(standaloneConfiguration);
-            ProtocolNodes.Add(_directConnect);
         }
 
         private void DirectConnectDeviceScanner_OnScanCompleted(List<Device> devices)
@@ -121,16 +137,15 @@ namespace KaLEDoscope
                     _directConnect.Members.Add(new DeviceNode
                     {
                         Device = device,
-                        Name = device.Name
+                        Name = device.Name,
+                        AllowDownload = true,
+                        AllowLoad = true,
+                        AllowSave = true,
+                        AllowUpload = true
                     });
                 }
             });
             IsScanEnabled = true;
-        }
-
-        public void ClearNodes()
-        {
-            ProtocolNodes.Clear();
         }
 
         private DelegateCommand showDevicePlugin;
@@ -151,7 +166,7 @@ namespace KaLEDoscope
                             var grid = GetGrid(deviceNode);
                             var newTabItem = new ClosableTab
                             {
-                                Title = $"{deviceNode.Device.Name} id:{deviceNode.Device.Id}",
+                                Title = GetTabItemTitle(deviceNode),
                                 Content = grid,
                                 DataContext = deviceNode.Device,
                             };
@@ -173,6 +188,11 @@ namespace KaLEDoscope
             }
         }
 
+        private static string GetTabItemTitle(DeviceNode deviceNode)
+        {
+            return $"{deviceNode.Device.Name} id:{deviceNode.Device.Id}";
+        }
+
         private Grid GetGrid(DeviceNode deviceNode)
         {
             var tabControl = new TabControl();
@@ -188,7 +208,15 @@ namespace KaLEDoscope
             });
 
             var baseDeviceViewModel = new BaseDeviceViewModel(deviceNode.Device, _logger);
-            baseDeviceViewModel.OnRenamed += ((device) => deviceNode.Name = device.Name);
+            baseDeviceViewModel.OnRenamed += ((device) =>
+            {
+                deviceNode.Name = device.Name;
+                var tab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == deviceNode.Device);
+                if (tab != null)
+                {
+                    ((ClosableTab)tab).Title = GetTabItemTitle(deviceNode);
+                }
+            });
             baseTabItem.Content = new BaseDeviceControl
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -203,7 +231,8 @@ namespace KaLEDoscope
             {
                 Content = "Синхронизировать",
                 Command = DownloadSettings,
-                CommandParameter = deviceNode
+                CommandParameter = deviceNode,
+                IsEnabled = deviceNode.AllowDownload
             });
             toolbar.Items.Add(new Button
             {
@@ -217,26 +246,26 @@ namespace KaLEDoscope
                 Content = "Сохранить конфигурацию в файл",
                 Command = ExportSettings,
                 CommandParameter = deviceNode,
-                IsEnabled = deviceNode.AllowUpload
+                IsEnabled = deviceNode.AllowSave
             });
             toolbar.Items.Add(new Button
             {
                 Content = "Загрузить конфигурацию из файла",
                 Command = ImportSettings,
-                CommandParameter = deviceNode
+                CommandParameter = deviceNode,
+                IsEnabled = deviceNode.AllowLoad
             });
             grid.Children.Add(tabControl);
             grid.Children.Add(toolbar);
             Grid.SetRow(tabControl, 1);
             Grid.SetRow(toolbar, 0);
-
-            var deviceBuilder = _deviceFactory.GetBuilder(deviceNode.Device.Model);
+            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(deviceNode.Device.Model));
             if (deviceBuilder != null)
             {
-                foreach (var customDevicesControlsKeyValuePair in deviceBuilder.Controls)
+                foreach (var customDevicesControlsKeyValuePair in deviceBuilder.GetControls(deviceNode.Device, _logger))
                 {
                     var customTabItem = new TabItem();
-                    var customControl = customDevicesControlsKeyValuePair.Value(deviceNode.Device, _logger);
+                    var customControl = customDevicesControlsKeyValuePair.Value;
                     customTabItem.Content = customControl;
                     customTabItem.Header = customDevicesControlsKeyValuePair.Key;
                     tabControl.Items.Add(customTabItem);
@@ -254,7 +283,7 @@ namespace KaLEDoscope
                 {
                     _scanDevices = new DelegateCommand((o) =>
                       {
-                          ClearNodes();
+                          _directConnect.Members.Clear();
                           MakeNodes();
                       });
                 }

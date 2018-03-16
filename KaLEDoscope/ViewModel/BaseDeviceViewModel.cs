@@ -27,6 +27,7 @@ namespace KaLEDoscope.ViewModel
             {
                 _device.Id = value;
                 OnPropertyChanged(nameof(Id));
+                OnRenamed?.Invoke(_device);
             }
         }
 

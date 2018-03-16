@@ -4,9 +4,9 @@
     {
         public string Name { get; set; }
         public int Id { get; set; }
-        public WorkSchedule WorkSchedule { get; set; }
-        public Brightness Brightness { get; set; }
-        public Network Network { get; set; }
+        public WorkSchedule WorkSchedule { get; set; } = new WorkSchedule();
+        public Brightness Brightness { get; set; } = new Brightness();
+        public Network Network { get; set; } = new Network();
         public string Model { get; set; }
     }
 }

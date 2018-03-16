@@ -13,16 +13,20 @@ namespace SevenSegmentBoardDevice
     {
         public string Model => "boardClock";
 
-        public Dictionary<string, Func<Device, ILogger, UserControl>> Controls => new Dictionary<string, Func<Device, ILogger, UserControl>>
+        public Dictionary<string, UserControl> GetControls(Device device, ILogger logger)
+        {
+            var model = new TimerDeviceViewModel(device, logger);
+            var timerControl = new TimerControl
             {
-                {"Настройки часов",(d,l)=>   new TimerControl
-                            {
-                                HorizontalAlignment = HorizontalAlignment.Stretch,
-                                VerticalAlignment = VerticalAlignment.Stretch,
-                                DataContext = new TimerDeviceViewModel(d, l)
-                            }
-                }
-        };
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                DataContext = model
+            };
+            return new Dictionary<string, UserControl>
+            {
+                {"Настройки часов", timerControl}
+            };
+        }
 
         public Device UpdateCustomSettings(Device device)
         {

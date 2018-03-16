@@ -1,32 +1,26 @@
 ﻿using System.Linq;
 using BaseDevice;
-using DeviceBuilding;
 using ServiceInterfaces;
 using System.Collections.Generic;
-using System;
 
 namespace DeviceBuilding
 {
     public class DeviceFactory
     {
         private readonly ILogger _logger;
-        private readonly List<IDeviceBuilder> _builders = new List<IDeviceBuilder>();
 
         public DeviceFactory(ILogger logger)
         {
             _logger = logger;
         }
 
-        public void AddBuilder(IDeviceBuilder deviceBuilder)
-        {
-            _builders.Add(deviceBuilder);
-        }
+        public List<IDeviceBuilder> Builders { get; set; } = new List<IDeviceBuilder>();
 
         public Device Customize(object device) => Customize(device as Device);
 
         public Device Customize(Device device)
         {
-            var builder = _builders.FirstOrDefault(b => b.Model.Equals(device.Model));
+            var builder = Builders.FirstOrDefault(b => b.Model.Equals(device.Model));
             if (builder != null)
             {
                 device = builder.UpdateCustomSettings(device);
@@ -44,11 +38,6 @@ namespace DeviceBuilding
             }
             _logger.Info(this, $"Устройство IP {device.Network.IpAddress} модель {device.Model} распознано как {device.Name}");
             return device;
-        }
-
-        public IDeviceBuilder GetBuilder(string deviceModel)
-        {
-            return _builders.FirstOrDefault(b => b.Model.Equals(deviceModel));
         }
     }
 }

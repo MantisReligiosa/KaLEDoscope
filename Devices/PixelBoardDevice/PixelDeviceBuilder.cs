@@ -14,24 +14,23 @@ namespace PixelBoardDevice
     {
         public string Model => "pixelBoard";
 
-        public Dictionary<string, Func<Device, ILogger, UserControl>> Controls => new Dictionary<string, Func<Device, ILogger, UserControl>>
+        public Dictionary<string, UserControl> GetControls(Device device, ILogger logger)
         {
-                {"Пиксельная плата", (d,l) =>
-                    {
-                        var model = new PixelDeviceViewModel(d, l);
-                        var pixelControl=new PixelControl
-                        {
-                            HorizontalAlignment = HorizontalAlignment.Stretch,
-                            VerticalAlignment = VerticalAlignment.Stretch,
-                            DataContext = model
-                        };
-                        model.OnNeedRedraw += pixelControl.OnNeedRedraw;
-                        model.DeviceHeight = 100;
-                        model.DeviceWidth = 100;
-                        return pixelControl;
-                    }
-                }
-        };
+            var model = new PixelDeviceViewModel(device, logger);
+            var pixelControl = new PixelControl
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                DataContext = model
+            };
+            model.OnNeedRedraw += pixelControl.OnNeedRedraw;
+            model.DeviceHeight = 200;
+            model.DeviceWidth = 800;
+            return new Dictionary<string, UserControl>
+            {
+                { "Пиксельная плата",pixelControl }
+            };
+        }
 
         public Device UpdateCustomSettings(Device device)
         {
