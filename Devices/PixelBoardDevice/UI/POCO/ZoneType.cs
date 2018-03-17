@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PixelBoardDevice.UI.POCO
+﻿namespace PixelBoardDevice.UI.POCO
 {
     public class ZoneType
     {
@@ -14,5 +8,6 @@ namespace PixelBoardDevice.UI.POCO
         public bool AllowFont { get; set; }
         public bool AllowAnimation { get; set; }
         public bool AllowBitmap { get; set; }
+        public bool AllowMQTT { get; set; }
     }
 }

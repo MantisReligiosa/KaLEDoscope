@@ -59,7 +59,6 @@
     <Compile Include="DomainObjects\BoardType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DomainObjects\StopWatchParameters.cs" />
-    <Compile Include="UI\DelegateCommand.cs" />
     <Compile Include="UI\POCO\CountdownType.cs" />
     <Compile Include="UI\POCO\DisplayFormat.cs" />
     <Compile Include="UI\POCO\DisplayFrame.cs" />
@@ -92,6 +91,10 @@
     <ProjectReference Include="..\..\Infrastructure\Resources\Resources.csproj">
       <Project>{d00400bb-008f-4d07-90f8-5cefb1ffc585}</Project>
       <Name>Resources</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\UiCommands\UiCommands.csproj">
+      <Project>{b5dc8fec-81fa-42dd-b356-e58c95c0e48a}</Project>
+      <Name>UiCommands</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\ServiceInterfaces\ServiceInterfaces.csproj">
       <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>

@@ -24,8 +24,6 @@ namespace PixelBoardDevice
                 DataContext = model
             };
             model.OnNeedRedraw += pixelControl.OnNeedRedraw;
-            model.DeviceHeight = 200;
-            model.DeviceWidth = 800;
             return new Dictionary<string, UserControl>
             {
                 { "Пиксельная плата",pixelControl }
@@ -39,6 +37,7 @@ namespace PixelBoardDevice
             {
                 Id = device.Id,
                 Model = device.Model,
+                IsStandaloneConfiguration = device.IsStandaloneConfiguration,
                 Network = device.Network,
                 Brightness = castedDevice?.Brightness ?? new Brightness
                 {
@@ -48,8 +47,8 @@ namespace PixelBoardDevice
                 WorkSchedule = castedDevice?.WorkSchedule ?? new WorkSchedule(),
                 BoardSize = new BoardSize
                 {
-                    Height = 80,
-                    Width = 120
+                    Height = 16,
+                    Width = 160
                 },
                 Fonts = new List<BinaryFont>(),
                 Screens = new List<Screen>
@@ -58,7 +57,19 @@ namespace PixelBoardDevice
                     {
                         Order=1,
                         Period=10,
-                        Zones=new List<Zone>()
+                        Name="Экран1",
+                        Zones=new List<Zone>
+                        {
+                            new Ticker
+                            {
+                                Name="Бегущая трока"
+                            },
+                            new Sensor
+                            {
+                                Name="Датчик"
+                            }
+
+                        }
                     }
                 }
             };

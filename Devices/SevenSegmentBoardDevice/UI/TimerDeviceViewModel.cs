@@ -12,6 +12,7 @@ using BaseDevice;
 using CommandProcessing;
 using SevenSegmentBoardDevice.UI.POCO;
 using SevenSegmentBoardDevice.Commands;
+using UiCommands;
 
 namespace SevenSegmentBoardDevice.UI
 {

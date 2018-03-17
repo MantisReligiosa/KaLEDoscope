@@ -35,6 +35,7 @@ namespace SevenSegmentBoardDevice
             {
                 Id = device.Id,
                 AlarmSchedule = castedDevice?.AlarmSchedule ?? new List<Alarm>(),
+                IsStandaloneConfiguration=device.IsStandaloneConfiguration,
                 Model = device.Model,
                 Network = device.Network,
                 Brightness = castedDevice?.Brightness ?? new Brightness

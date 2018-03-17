@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:local="clr-namespace:PixelBoardDevice.UI"
              mc:Ignorable="d">
     <UserControl.Resources>
@@ -55,7 +56,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Header="Размеры табло">
+                <GroupBox Grid.Column="0" Header="Размеры табло" IsEnabled="{Binding AllowChangeBoardSize}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
@@ -67,9 +68,9 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <Label Grid.Column="0" Grid.Row="0">Ширина</Label>
-                        <TextBox Grid.Column="1" Grid.Row="0" />
+                        <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding DeviceWidth}"/>
                         <Label Grid.Column="0" Grid.Row="1">Высота</Label>
-                        <TextBox Grid.Column="1" Grid.Row="1" />
+                        <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding DeviceHeight}"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox Grid.Column="1" Header="Доступ к MQTT">
@@ -103,38 +104,46 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <ListView Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
+            <Grid.Resources>
+                <CollectionViewSource Source="{Binding Path=Screens}" x:Key="cvs">
+                    <CollectionViewSource.SortDescriptions>
+                        <scm:SortDescription PropertyName="Order" Direction="Ascending"/>
+                    </CollectionViewSource.SortDescriptions>
+                </CollectionViewSource>
+            </Grid.Resources>
+            <ListView Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding Source={StaticResource cvs}}" SelectedItem="{Binding SelectedScreen}">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Название">
+                        <GridViewColumn Header="Название" Width="60">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox Text="{Binding DisplayPeriod}" Width="100"/>
+                                    <TextBox Text="{Binding Name}" IsEnabled="{Binding IsEnabled}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Период отображения, сек">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox Text="{Binding DisplayPeriod}" Width="100" IsEnabled="{Binding IsEnabled}"/>
+                                    <TextBox Text="{Binding Period}" IsEnabled="{Binding IsEnabled}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                         <GridViewColumn Header="Порядок">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBox Text="{Binding Order}" Width="100"/>
+                                    <TextBox Text="{Binding Order}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
                     </GridView>
                 </ListView.View>
             </ListView>
-            <ListBox Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2"></ListBox>
-            <Button Grid.Column="0" Grid.Row="1">Добавить экран</Button>
-            <Button Grid.Column="1" Grid.Row="1">Удалить экран</Button>
-            <Button Grid.Column="2" Grid.Row="1">Добавить зону</Button>
-            <Button Grid.Column="3" Grid.Row="1">Удалить зону</Button>
+            <ListBox Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2" 
+                     ItemsSource="{Binding Zones}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedZone}"/>
+            <Button Grid.Column="0" Grid.Row="1" Command="{Binding AddScreen}" Content="Добавить экран"/>
+            <Button Grid.Column="1" Grid.Row="1" Command="{Binding DeleteScreen}" Content="Удалить экран"/>
+            <Button Grid.Column="2" Grid.Row="1" Command="{Binding AddZone}" Content="Добавить зону"/>
+            <Button Grid.Column="3" Grid.Row="1" Command="{Binding DeleteZone}" Content="Удалить зону"/>
             <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="2">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -209,7 +218,14 @@
                         <Button>Загрузить</Button>
                     </GroupBox>
                     <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="Тэг MQTT">
-                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0">Тэг</Label>
+                            <TextBox Grid.Column="1"></TextBox>
+                        </Grid>
                     </GroupBox>
                 </Grid>
             </Grid>

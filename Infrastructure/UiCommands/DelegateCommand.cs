@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Input;
 
-namespace SevenSegmentBoardDevice.UI
+namespace UiCommands
 {
     /// <summary>
     ///     This class allows delegating the commanding logic to methods passed as parameters,
@@ -331,7 +331,7 @@ namespace SevenSegmentBoardDevice.UI
     ///     This class contains methods for the CommandManager that help avoid memory leaks by
     ///     using weak references.
     /// </summary>
-    internal class CommandManagerHelper
+    public class CommandManagerHelper
     {
         internal static void CallWeakReferenceHandlers(List<WeakReference> handlers)
         {

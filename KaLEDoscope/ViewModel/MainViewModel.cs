@@ -106,7 +106,8 @@ namespace KaLEDoscope
             {
                 var device = builder.UpdateCustomSettings(new Device
                 {
-                    Model = builder.Model
+                    Model = builder.Model,
+                    IsStandaloneConfiguration = true
                 });
                 standaloneConfiguration.Members.Add(new DeviceNode
                 {

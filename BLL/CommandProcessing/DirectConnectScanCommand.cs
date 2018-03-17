@@ -27,40 +27,40 @@ namespace CommandProcessing
 
         public override void Execute()
         {
-#if DEBUG
-            _devices.Add(new Device
-            {
-                Model = "boardClock",
-                Network = new Network
-                {
-                    IpAddress = "192.168.0.88",
-                    Port = 500
-                },
-                Id = 1,
-                Name = "Часы 1"
-            });
-            _devices.Add(new Device
-            {
-                Model = "pixelBoard",
-                Id = 2,
-                Network = new Network
-                {
-                    IpAddress = "192.168.0.77",
-                    Port = 500
-                },
-                Name = "Бегущая строка"
-            });
-            _devices.Add(new Device
-            {
-                Model = "strange",
-                Id = 13,
-                Network = new Network
-                {
-                    IpAddress = "192.168.0.13",
-                    Port = 500
-                }
-            });
-#endif
+            //#if DEBUG
+            //            _devices.Add(new Device
+            //            {
+            //                Model = "boardClock",
+            //                Network = new Network
+            //                {
+            //                    IpAddress = "192.168.0.88",
+            //                    Port = 500
+            //                },
+            //                Id = 1,
+            //                Name = "Часы 1"
+            //            });
+            //            _devices.Add(new Device
+            //            {
+            //                Model = "pixelBoard",
+            //                Id = 2,
+            //                Network = new Network
+            //                {
+            //                    IpAddress = "192.168.0.77",
+            //                    Port = 500
+            //                },
+            //                Name = "Бегущая строка"
+            //            });
+            //            _devices.Add(new Device
+            //            {
+            //                Model = "strange",
+            //                Id = 13,
+            //                Network = new Network
+            //                {
+            //                    IpAddress = "192.168.0.13",
+            //                    Port = 500
+            //                }
+            //            });
+            //#endif
             _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
             var request = new Request
             {
@@ -78,6 +78,7 @@ namespace CommandProcessing
                     var device = new Device
                     {
                         Model = responce.DeviceParameters.Model,
+                        IsStandaloneConfiguration = false,
                         Network = new Network
                         {
                             IpAddress = responce.NetworkParameters.Address,
