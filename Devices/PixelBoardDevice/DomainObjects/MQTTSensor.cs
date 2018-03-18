@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace PixelBoardDevice.DomainObjects
 {
-    public class MQTTSensor : Sensor
+    public class MQTTSensor : Zone
     {
+        public override string Name => "Тэг MQTT";
+        public int FontId { get; set; }
+        public string Tag { get; set; }
     }
 }

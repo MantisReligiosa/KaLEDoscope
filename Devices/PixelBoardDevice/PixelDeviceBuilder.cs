@@ -62,13 +62,12 @@ namespace PixelBoardDevice
                         {
                             new Ticker
                             {
-                                Name="Бегущая трока"
+                                Id=1
                             },
                             new Sensor
                             {
-                                Name="Датчик"
+                                Id=2
                             }
-
                         }
                     }
                 }

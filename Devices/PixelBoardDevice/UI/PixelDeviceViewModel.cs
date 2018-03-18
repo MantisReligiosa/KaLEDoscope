@@ -9,6 +9,8 @@ using Input = System.Windows.Input;
 using UiCommands;
 using System.Linq;
 using PixelBoardDevice.DomainObjects;
+using System.Windows.Media;
+using System.Drawing.Text;
 
 namespace PixelBoardDevice.UI
 {
@@ -25,7 +27,9 @@ namespace PixelBoardDevice.UI
                 AllowAnimation = true,
                 AllowBitmap = false,
                 AllowFont = true,
-                AllowText = true
+                AllowText = true,
+                ZoneCondition = (z) => z is Ticker,
+                Customize = () => new Ticker()
             },
             new ZoneType
             {
@@ -35,22 +39,43 @@ namespace PixelBoardDevice.UI
                 AllowBitmap=false,
                 AllowFont=true,
                 AllowText=false,
+                ZoneCondition = (z) => z is Sensor,
+                Customize = () => new Sensor()
             },
             new ZoneType
             {
                 Id = 3,
                 Name = "Тэг MQTT",
+                AllowAnimation = false,
+                AllowBitmap = false,
+                AllowFont = true,
+                AllowText = false,
+                ZoneCondition = (z) => z is MQTTSensor,
+                Customize = () => new MQTTSensor()
+            },
+            new ZoneType
+            {
+                Id = 4,
+                Name = "Изображение",
                 AllowAnimation=false,
                 AllowBitmap=false,
                 AllowFont=true,
                 AllowText=false,
+                ZoneCondition = (z) => z is Picture,
+                Customize = () => new Picture()
             },
+        };
+        private readonly List<int> _fontSizes = new List<int>
+        {
+            8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72
         };
 
         public event EventHandler OnNeedRedraw;
         public ObservableCollection<ZoneType> ZoneTypes { get; set; }
         public ObservableCollection<Screen> Screens { get; set; }
         public ObservableCollection<Zone> Zones { get; set; }
+        public ObservableCollection<System.Drawing.FontFamily> Fonts { get; set; }
+        public ObservableCollection<int> FontSizes { get; set; }
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
         {
@@ -58,12 +83,45 @@ namespace PixelBoardDevice.UI
             _logger = l;
             ZoneTypes = new ObservableCollection<ZoneType>(_zoneTypes);
             Screens = new ObservableCollection<Screen>(_device.Screens);
+            Fonts = new ObservableCollection<System.Drawing.FontFamily>(new InstalledFontCollection().Families);
             Zones = new ObservableCollection<Zone>();
+            FontSizes = new ObservableCollection<int>(_fontSizes);
             AllowChangeBoardSize = allowChangeBoardSize;
             DeviceHeight = _device.BoardSize.Height;
             DeviceWidth = _device.BoardSize.Width;
             AllowChangeBoardSize = _device.IsStandaloneConfiguration;
         }
+
+        private System.Drawing.FontFamily _selectedFont;
+        public System.Drawing.FontFamily SelectedFont
+        {
+            get
+            {
+                return _selectedFont;
+            }
+            set
+            {
+                _selectedFont = value;
+                OnPropertyChanged(nameof(SelectedFont));
+#warning Провести изменения в UI
+#warning Провести изменения в устройстве
+            }
+        }
+
+        private int _selectedFontSize;
+        public int SelectedFontSize
+        {
+            get
+            {
+                return _selectedFontSize;
+            }
+            set
+            {
+                _selectedFontSize = value;
+                OnPropertyChanged(nameof(SelectedFontSize));
+            }
+        }
+
 
         private bool _allowChangeBoardSize;
         public bool AllowChangeBoardSize
@@ -76,6 +134,76 @@ namespace PixelBoardDevice.UI
             {
                 _allowChangeBoardSize = value;
                 OnPropertyChanged(nameof(AllowChangeBoardSize));
+            }
+        }
+
+        private bool _allowFont;
+        public bool AllowFont
+        {
+            get
+            {
+                return _allowFont;
+            }
+            set
+            {
+                _allowFont = value;
+                OnPropertyChanged(nameof(AllowFont));
+            }
+        }
+
+        private bool _allowAnimation;
+        public bool AllowAnimation
+        {
+            get
+            {
+                return _allowAnimation;
+            }
+            set
+            {
+                _allowAnimation = value;
+                OnPropertyChanged(nameof(AllowAnimation));
+            }
+        }
+
+        private bool _allowBitmap;
+        public bool AllowBitmap
+        {
+            get
+            {
+                return _allowBitmap;
+            }
+            set
+            {
+                _allowBitmap = value;
+                OnPropertyChanged(nameof(AllowBitmap));
+            }
+        }
+
+        private bool _allowMQTT;
+        public bool AllowMQTT
+        {
+            get
+            {
+                return _allowMQTT;
+            }
+            set
+            {
+                _allowMQTT = value;
+                OnPropertyChanged(nameof(AllowMQTT));
+            }
+        }
+
+        private bool _allowText;
+        public bool AllowText
+        {
+            get
+            {
+                return _allowText;
+            }
+            set
+            {
+                _allowText = value;
+                OnPropertyChanged(nameof(AllowText));
             }
         }
 
@@ -143,6 +271,17 @@ namespace PixelBoardDevice.UI
             {
                 _selectedZone = value;
                 OnPropertyChanged(nameof(SelectedZone));
+                var currentZoneType = ZoneTypes.FirstOrDefault(z => z.ZoneCondition(_selectedZone));
+                if (currentZoneType == null || CurrentZoneType == null || CurrentZoneType.Id != currentZoneType.Id)
+                {
+                    CurrentZoneType = currentZoneType;
+                    AllowAnimation = currentZoneType?.AllowAnimation ?? false;
+                    AllowBitmap = currentZoneType?.AllowBitmap ?? false;
+                    AllowFont = currentZoneType?.AllowFont ?? false;
+                    AllowMQTT = currentZoneType?.AllowMQTT ?? false;
+                    AllowText = currentZoneType?.AllowText ?? false;
+                    OnPropertyChanged(nameof(CurrentZoneType));
+                }
             }
         }
 
@@ -157,6 +296,44 @@ namespace PixelBoardDevice.UI
             {
                 _currentZoneType = value;
                 OnPropertyChanged(nameof(CurrentZoneType));
+
+                if (SelectedZone == null)
+                    return;
+                var newZone = value.Customize();
+                newZone.Id = SelectedZone.Id;
+                if (newZone.Name != SelectedZone.Name)
+                {
+                    var zones = Zones.ToList();
+                    Zones.Clear();
+                    foreach (var zone in zones)
+                    {
+                        if (zone.Id == newZone.Id)
+                        {
+                            Zones.Add(newZone);
+                        }
+                        else
+                        {
+                            Zones.Add(zone);
+                        }
+                    }
+                    SelectedZone = newZone;
+                    OnPropertyChanged(nameof(SelectedZone));
+                    OnPropertyChanged(nameof(Zones));
+                    var deviceScreen = _device.Screens.FirstOrDefault(s => s.Id == SelectedScreen.Id);
+                    var deviceScreenZones = new List<Zone>();
+                    foreach (var zone in deviceScreen.Zones)
+                    {
+                        if (zone.Id == newZone.Id)
+                        {
+                            deviceScreenZones.Add(newZone);
+                        }
+                        else
+                        {
+                            deviceScreenZones.Add(zone);
+                        }
+                    }
+                    deviceScreen.Zones = deviceScreenZones;
+                }
             }
         }
 
@@ -214,9 +391,11 @@ namespace PixelBoardDevice.UI
                 {
                     _addZone = new DelegateCommand((o) =>
                     {
+                        var nextId = Screens.Max(s => s.Zones.Max(z => z.Id)) + 1;
                         var zone = new Ticker
                         {
-                            Name = "Бегущая строка"
+                            Id = nextId
+
                         };
                         SelectedScreen.Zones.Add(zone);
                         Zones.Add(zone);

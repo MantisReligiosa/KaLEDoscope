@@ -73,7 +73,7 @@
                         <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding DeviceHeight}"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Grid.Column="1" Header="Доступ к MQTT">
+                <GroupBox Grid.Column="1" Header="Доступ к MQTT" BorderBrush="#FF79878F">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
@@ -163,7 +163,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0">Тип:</Label>
-                            <ComboBox Grid.Column="1"></ComboBox>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding ZoneTypes}" SelectedItem="{Binding CurrentZoneType}" DisplayMemberPath="Name"></ComboBox>
                         </Grid>
 
                     </Grid>
@@ -201,23 +201,21 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox Grid.Row="0" Grid.Column="0"></ComboBox>
-                            <ComboBox Grid.Row="0" Grid.Column="1"></ComboBox>
-                            <ComboBox Grid.Row="0" Grid.Column="2"></ComboBox>
-                            <Button Grid.Row="0" Grid.Column="3">B</Button>
-                            <Button Grid.Row="0" Grid.Column="4">I</Button>
-                            <RichTextBox Grid.Row="1" Grid.ColumnSpan="100"></RichTextBox>
+                            <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}" Width="200" DisplayMemberPath="Name" IsEnabled="{Binding AllowFont}"></ComboBox>
+                            <ComboBox Grid.Row="0" Grid.Column="1" IsEnabled="{Binding AllowFont}" ItemsSource="{Binding FontSizes}" Width="45" SelectedValue="{Binding SelectedFontSize}"/>
+                            <Button Grid.Row="0" Grid.Column="2" IsEnabled="{Binding AllowFont}">B</Button>
+                            <Button Grid.Row="0" Grid.Column="3" IsEnabled="{Binding AllowFont}">I</Button>
+                            <TextBox Grid.Row="1" Grid.ColumnSpan="100" IsEnabled="{Binding AllowText}" AcceptsReturn="True" TextWrapping="WrapWithOverflow"></TextBox>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.Column="0" Header="Анимация">
+                    <GroupBox Grid.Row="2" Grid.Column="0" Header="Анимация" IsEnabled="{Binding AllowAnimation}">
                         <ComboBox Grid.Column="1"></ComboBox>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.Column="1" Header="Растр">
+                    <GroupBox Grid.Row="2" Grid.Column="1" Header="Растр" IsEnabled="{Binding AllowBitmap}">
                         <Button>Загрузить</Button>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="Тэг MQTT">
+                    <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="Тэг MQTT" IsEnabled="{Binding AllowMQTT}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto"/>

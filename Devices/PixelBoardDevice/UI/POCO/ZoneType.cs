@@ -1,4 +1,6 @@
-﻿namespace PixelBoardDevice.UI.POCO
+﻿using System;
+
+namespace PixelBoardDevice.UI.POCO
 {
     public class ZoneType
     {
@@ -9,5 +11,7 @@
         public bool AllowAnimation { get; set; }
         public bool AllowBitmap { get; set; }
         public bool AllowMQTT { get; set; }
+        public Func<Zone,bool> ZoneCondition { get; set; }
+        public Func<Zone> Customize { get; set; }
     }
 }
