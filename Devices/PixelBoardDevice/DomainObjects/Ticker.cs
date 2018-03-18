@@ -1,6 +1,6 @@
 ﻿namespace PixelBoardDevice.DomainObjects
 {
-    public class Ticker : Zone
+    public class Ticker : Zone, IFonted
     {
         public override string Name => "Бегущая трока";
         public string Text { get; set; }

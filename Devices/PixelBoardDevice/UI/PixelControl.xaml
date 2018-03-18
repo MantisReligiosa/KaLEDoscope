@@ -202,11 +202,15 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}" Width="200" DisplayMemberPath="Name" IsEnabled="{Binding AllowFont}"></ComboBox>
+                            <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}" Width="200" DisplayMemberPath="Source" IsEnabled="{Binding AllowFont}"></ComboBox>
                             <ComboBox Grid.Row="0" Grid.Column="1" IsEnabled="{Binding AllowFont}" ItemsSource="{Binding FontSizes}" Width="45" SelectedValue="{Binding SelectedFontSize}"/>
                             <Button Grid.Row="0" Grid.Column="2" IsEnabled="{Binding AllowFont}">B</Button>
                             <Button Grid.Row="0" Grid.Column="3" IsEnabled="{Binding AllowFont}">I</Button>
-                            <TextBox Grid.Row="1" Grid.ColumnSpan="100" IsEnabled="{Binding AllowText}" AcceptsReturn="True" TextWrapping="WrapWithOverflow"></TextBox>
+                            <TextBox Grid.Row="1" Grid.ColumnSpan="100" IsEnabled="{Binding AllowText}" AcceptsReturn="True" 
+                                     TextWrapping="WrapWithOverflow"
+                                     FontFamily="{Binding SelectedFont}"
+                                     FontSize="{Binding SelectedFontSize}">
+                            </TextBox>
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="2" Grid.Column="0" Header="Анимация" IsEnabled="{Binding AllowAnimation}">

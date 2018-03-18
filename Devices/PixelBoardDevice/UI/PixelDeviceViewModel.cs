@@ -74,7 +74,7 @@ namespace PixelBoardDevice.UI
         public ObservableCollection<ZoneType> ZoneTypes { get; set; }
         public ObservableCollection<Screen> Screens { get; set; }
         public ObservableCollection<Zone> Zones { get; set; }
-        public ObservableCollection<System.Drawing.FontFamily> Fonts { get; set; }
+        public ObservableCollection<FontFamily> Fonts { get; set; }
         public ObservableCollection<int> FontSizes { get; set; }
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
@@ -83,7 +83,7 @@ namespace PixelBoardDevice.UI
             _logger = l;
             ZoneTypes = new ObservableCollection<ZoneType>(_zoneTypes);
             Screens = new ObservableCollection<Screen>(_device.Screens);
-            Fonts = new ObservableCollection<System.Drawing.FontFamily>(new InstalledFontCollection().Families);
+            Fonts = new ObservableCollection<FontFamily>(new InstalledFontCollection().Families.Select(f => new FontFamily(f.Name)));
             Zones = new ObservableCollection<Zone>();
             FontSizes = new ObservableCollection<int>(_fontSizes);
             AllowChangeBoardSize = allowChangeBoardSize;
@@ -92,8 +92,8 @@ namespace PixelBoardDevice.UI
             AllowChangeBoardSize = _device.IsStandaloneConfiguration;
         }
 
-        private System.Drawing.FontFamily _selectedFont;
-        public System.Drawing.FontFamily SelectedFont
+        private FontFamily _selectedFont;
+        public FontFamily SelectedFont
         {
             get
             {
@@ -101,11 +101,49 @@ namespace PixelBoardDevice.UI
             }
             set
             {
+                if (_selectedFont != null && SelectedFontSize != 0)
+                {
+                    UpdateZoneFont(SelectedScreen, SelectedZone, _selectedFont, SelectedFontSize, value, SelectedFontSize);
+                }
                 _selectedFont = value;
                 OnPropertyChanged(nameof(SelectedFont));
-#warning Провести изменения в UI
-#warning Провести изменения в устройстве
             }
+        }
+
+        private void UpdateZoneFont(Screen screen, Zone zone, FontFamily oldFont, int oldFontSize, FontFamily newFont, int newFontSize)
+        {
+            var deviceZone = _device.Screens.FirstOrDefault(s => s.Id == screen.Id).Zones.FirstOrDefault(z => z.Id == zone.Id) as IFonted;
+            if (deviceZone == null)
+            {
+                return;
+            }
+            var existBinaryFont = _device.Fonts.FirstOrDefault(bf => bf.Height == oldFontSize && bf.Source == oldFont.Source);
+            if (existBinaryFont != null)
+            {
+                var numberOfFontEntry = _device.Screens.Sum(s => s.Zones.OfType<IFonted>().Count(f => f.FontId == existBinaryFont.Id));
+                if (numberOfFontEntry <= 1)
+                {
+                    _device.Fonts.Remove(existBinaryFont);
+                }
+            }
+            var newBinaryFont = _device.Fonts.FirstOrDefault(bf => bf.Height == newFontSize && bf.Source == newFont.Source);
+            if (newBinaryFont == null)
+            {
+                var newBinaryFontId = _device.Fonts.Any() ? _device.Fonts.Max(f => f.Id) + 1 : 0;
+                newBinaryFont = new BinaryFont
+                {
+                    Height = newFontSize,
+                    Source = newFont.Source,
+                    Id = newBinaryFontId,
+                    Base64Bitmap = GenerateBas64Font(newFont, newFontSize)
+                };
+            }
+            deviceZone.FontId = newBinaryFont.Id;
+        }
+
+        private string GenerateBas64Font(FontFamily newFont, int newFontSize)
+        {
+#warning Дописать
         }
 
         private int _selectedFontSize;
@@ -281,6 +319,19 @@ namespace PixelBoardDevice.UI
                     AllowMQTT = currentZoneType?.AllowMQTT ?? false;
                     AllowText = currentZoneType?.AllowText ?? false;
                     OnPropertyChanged(nameof(CurrentZoneType));
+                }
+                if (_selectedZone is IFonted)
+                {
+                    var fontId = (_selectedZone as IFonted).FontId;
+                    var binaryFont = _device.Fonts.FirstOrDefault(bf => bf.Id == fontId);
+                    if (binaryFont == null)
+                    {
+                        SelectedFont = null;
+                    }
+                    else
+                    {
+                        SelectedFont = Fonts.FirstOrDefault(f => f.Source.Equals(binaryFont.Source));
+                    }
                 }
             }
         }

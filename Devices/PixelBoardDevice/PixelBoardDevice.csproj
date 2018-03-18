@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="DomainObjects\BinaryFont.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
+    <Compile Include="DomainObjects\IFonted.cs" />
     <Compile Include="DomainObjects\MQTTSensor.cs" />
     <Compile Include="DomainObjects\Picture.cs" />
     <Compile Include="DomainObjects\Sensor.cs" />

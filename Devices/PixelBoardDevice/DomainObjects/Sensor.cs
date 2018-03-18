@@ -1,6 +1,6 @@
 ﻿namespace PixelBoardDevice.DomainObjects
 {
-    public class Sensor : Zone
+    public class Sensor : Zone, IFonted
     {
         public int FontId { get; set; }
 
