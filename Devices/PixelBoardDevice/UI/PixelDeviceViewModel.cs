@@ -9,8 +9,15 @@ using Input = System.Windows.Input;
 using UiCommands;
 using System.Linq;
 using PixelBoardDevice.DomainObjects;
-using System.Windows.Media;
+using Font = System.Windows.Media;
 using System.Drawing.Text;
+using System.Runtime.InteropServices.ComTypes;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.IO;
+using System.Drawing.Imaging;
+using System.Net.Http;
+using System.Collections;
 
 namespace PixelBoardDevice.UI
 {
@@ -74,7 +81,7 @@ namespace PixelBoardDevice.UI
         public ObservableCollection<ZoneType> ZoneTypes { get; set; }
         public ObservableCollection<Screen> Screens { get; set; }
         public ObservableCollection<Zone> Zones { get; set; }
-        public ObservableCollection<FontFamily> Fonts { get; set; }
+        public ObservableCollection<Font.FontFamily> Fonts { get; set; }
         public ObservableCollection<int> FontSizes { get; set; }
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
@@ -83,7 +90,7 @@ namespace PixelBoardDevice.UI
             _logger = l;
             ZoneTypes = new ObservableCollection<ZoneType>(_zoneTypes);
             Screens = new ObservableCollection<Screen>(_device.Screens);
-            Fonts = new ObservableCollection<FontFamily>(new InstalledFontCollection().Families.Select(f => new FontFamily(f.Name)));
+            Fonts = new ObservableCollection<Font.FontFamily>(new InstalledFontCollection().Families.Select(f => new Font.FontFamily(f.Name)));
             Zones = new ObservableCollection<Zone>();
             FontSizes = new ObservableCollection<int>(_fontSizes);
             AllowChangeBoardSize = allowChangeBoardSize;
@@ -92,8 +99,8 @@ namespace PixelBoardDevice.UI
             AllowChangeBoardSize = _device.IsStandaloneConfiguration;
         }
 
-        private FontFamily _selectedFont;
-        public FontFamily SelectedFont
+        private Font.FontFamily _selectedFont;
+        public Font.FontFamily SelectedFont
         {
             get
             {
@@ -101,23 +108,23 @@ namespace PixelBoardDevice.UI
             }
             set
             {
+                _selectedFont = value;
                 if (_selectedFont != null && SelectedFontSize != 0)
                 {
-                    UpdateZoneFont(SelectedScreen, SelectedZone, _selectedFont, SelectedFontSize, value, SelectedFontSize);
+                    UpdateZoneFont(SelectedScreen, SelectedZone, value, SelectedFontSize);
                 }
-                _selectedFont = value;
                 OnPropertyChanged(nameof(SelectedFont));
             }
         }
 
-        private void UpdateZoneFont(Screen screen, Zone zone, FontFamily oldFont, int oldFontSize, FontFamily newFont, int newFontSize)
+        private void UpdateZoneFont(Screen screen, Zone zone, Font.FontFamily newFont, int newFontSize)
         {
             var deviceZone = _device.Screens.FirstOrDefault(s => s.Id == screen.Id).Zones.FirstOrDefault(z => z.Id == zone.Id) as IFonted;
             if (deviceZone == null)
             {
                 return;
             }
-            var existBinaryFont = _device.Fonts.FirstOrDefault(bf => bf.Height == oldFontSize && bf.Source == oldFont.Source);
+            var existBinaryFont = _device.Fonts.FirstOrDefault(bf => bf.Id == deviceZone.FontId);
             if (existBinaryFont != null)
             {
                 var numberOfFontEntry = _device.Screens.Sum(s => s.Zones.OfType<IFonted>().Count(f => f.FontId == existBinaryFont.Id));
@@ -135,15 +142,221 @@ namespace PixelBoardDevice.UI
                     Height = newFontSize,
                     Source = newFont.Source,
                     Id = newBinaryFontId,
-                    Base64Bitmap = GenerateBas64Font(newFont, newFontSize)
+                    Base64Bitmap = GenerateBase64FontMono(newFont, newFontSize)
                 };
             }
             deviceZone.FontId = newBinaryFont.Id;
         }
 
-        private string GenerateBas64Font(FontFamily newFont, int newFontSize)
+        private string GenerateBase64FontMono(Font.FontFamily newFont, int newFontSize)
         {
-#warning Дописать
+            var abc = _device.Alphabet;
+            List<bool[,]> bitmapChars = new List<bool[,]>();
+            foreach (var c in abc)
+            {
+                var font = new System.Drawing.Font(newFont.Source, (float)newFontSize, GraphicsUnit.Pixel);
+                var image = DrawTextImage(c.ToString(), font, Color.White, Color.Black, Size.Empty) as Bitmap;
+                var trimmedImage = image.Clone(new Rectangle(0, image.Height - newFontSize, image.Width, newFontSize), image.PixelFormat);
+                var bytes = BitmapToBoolMono(trimmedImage);
+                bitmapChars.Add(bytes);
+            }
+            var separatorLength = newFontSize * 3;
+            var separator = new bool[newFontSize * 3];
+            var indicator = 1;
+            for (int i = 0; i < separatorLength; i++)
+            {
+                separator[i] = (indicator > 0);
+                if (indicator == 2)
+                {
+                    indicator = 0;
+                }
+                else
+                {
+                    indicator++;
+                }
+            }
+            var bitList = new List<bool>();
+            foreach (var bitmapChar in bitmapChars)
+            {
+                var rows = bitmapChar.GetLength(0);
+                var columns = bitmapChar.GetLength(1);
+                for (int column = columns - 1; column >= 0; column--)
+                {
+                    for (int row = 0; row < rows; row++)
+                    {
+                        var value = bitmapChar[row, column];
+                        bitList.Add(value);
+                    }
+                }
+                bitList.AddRange(separator);
+            }
+            var needBytesForOctet = bitList.Count % 8;
+            for (int i = 0; i < needBytesForOctet; i++)
+            {
+                bitList.Add(false);
+            }
+            var bitArray = new BitArray(bitList.ToArray());
+            var bytesTotal = bitList.Count / 8;
+            var resultBytes = new byte[bytesTotal];
+            bitArray.CopyTo(resultBytes, 0);
+            var base64String = Convert.ToBase64String(resultBytes);
+            return base64String;
+        }
+
+        private unsafe static byte[,,] BitmapToByteRgb(Bitmap bmp)
+        {
+            int width = bmp.Width,
+                height = bmp.Height;
+            byte[,,] res = new byte[3, height, width];
+            byte[,] mono = new byte[height, width];
+            BitmapData bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
+                PixelFormat.Format24bppRgb);
+            try
+            {
+                byte* curpos;
+                fixed (byte* _res = res)
+                fixed (byte* _mono = mono)
+                {
+                    byte* _r = _res,
+                          _g = _res + width * height,
+                          _b = _res + 2 * width * height,
+                          _m = _mono;
+                    for (int h = 0; h < height; h++)
+                    {
+                        curpos = ((byte*)bd.Scan0) + h * bd.Stride;
+                        for (int w = 0; w < width; w++)
+                        {
+                            *_b = *(curpos++);
+                            *_g = *(curpos++);
+                            *_r = *(curpos++);
+                            *_m = (Byte)(0.3f * (float)(*_r) + 0.59f * (float)(*_g) + 0.11f * (float)(*_b));
+                            ++_b;
+                            ++_g;
+                            ++_r;
+                            ++_m;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                bmp.UnlockBits(bd);
+            }
+            return res;
+        }
+
+        private unsafe static byte[,] BitmapToByteGrayscale(Bitmap bmp)
+        {
+            int width = bmp.Width,
+                height = bmp.Height;
+            byte[,,] res = new byte[3, height, width];
+            byte[,] gray = new byte[height, width];
+            BitmapData bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
+                PixelFormat.Format24bppRgb);
+            try
+            {
+                byte* curpos;
+                fixed (byte* _res = res)
+                fixed (byte* _gray = gray)
+                {
+                    byte* _r = _res,
+                          _g = _res + width * height,
+                          _b = _res + 2 * width * height,
+                          _m = _gray;
+                    for (int h = 0; h < height; h++)
+                    {
+                        curpos = ((byte*)bd.Scan0) + h * bd.Stride;
+                        for (int w = 0; w < width; w++)
+                        {
+                            *_b = *(curpos++);
+                            *_g = *(curpos++);
+                            *_r = *(curpos++);
+                            *_m = (Byte)(0.3f * (float)(*_r) + 0.59f * (float)(*_g) + 0.11f * (float)(*_b));
+                            ++_b;
+                            ++_g;
+                            ++_r;
+                            ++_m;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                bmp.UnlockBits(bd);
+            }
+            return gray;
+        }
+
+        private unsafe static bool[,] BitmapToBoolMono(Bitmap bmp)
+        {
+            int width = bmp.Width,
+                height = bmp.Height;
+            byte[,,] res = new byte[3, height, width];
+            bool[,] mono = new bool[height, width];
+            BitmapData bd = bmp.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly,
+                PixelFormat.Format24bppRgb);
+            try
+            {
+                byte* curpos;
+                fixed (byte* _res = res)
+                fixed (bool* _mono = mono)
+                {
+                    byte* _r = _res,
+                          _g = _res + width * height,
+                          _b = _res + 2 * width * height;
+                    bool* _m = _mono;
+                    for (int h = 0; h < height; h++)
+                    {
+                        curpos = ((byte*)bd.Scan0) + h * bd.Stride;
+                        for (int w = 0; w < width; w++)
+                        {
+                            *_b = *(curpos++);
+                            *_g = *(curpos++);
+                            *_r = *(curpos++);
+                            *_m = (Byte)(0.3f * (float)(*_r) + 0.59f * (float)(*_g) + 0.11f * (float)(*_b)) > 128;
+                            ++_b;
+                            ++_g;
+                            ++_r;
+                            ++_m;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                bmp.UnlockBits(bd);
+            }
+            return mono;
+        }
+
+        private Image DrawTextImage(String currencyCode, System.Drawing.Font font, Color textColor, Color backColor, Size minSize)
+        {
+            //first, create a dummy bitmap just to get a graphics object
+            SizeF textSize;
+            using (Image img = new Bitmap(1, 1))
+            {
+                using (Graphics drawing = Graphics.FromImage(img))
+                {
+                    //measure the string to see how big the image needs to be
+                    textSize = drawing.MeasureString(currencyCode, font);
+                    if (!minSize.IsEmpty)
+                    {
+                        textSize.Width = textSize.Width > minSize.Width ? textSize.Width : minSize.Width;
+                        textSize.Height = textSize.Height > minSize.Height ? textSize.Height : minSize.Height;
+                    }
+                }
+            }
+            Image retImg = new Bitmap((int)textSize.Width, (int)textSize.Height);
+            using (var drawing = Graphics.FromImage(retImg))
+            {
+                drawing.Clear(backColor);
+                using (Brush textBrush = new SolidBrush(textColor))
+                {
+                    drawing.DrawString(currencyCode, font, textBrush, 0, 0);
+                    drawing.Save();
+                }
+            }
+            return retImg;
         }
 
         private int _selectedFontSize;
@@ -156,6 +369,10 @@ namespace PixelBoardDevice.UI
             set
             {
                 _selectedFontSize = value;
+                if (SelectedFont != null && _selectedFontSize != 0)
+                {
+                    UpdateZoneFont(SelectedScreen, SelectedZone, SelectedFont, value);
+                }
                 OnPropertyChanged(nameof(SelectedFontSize));
             }
         }
