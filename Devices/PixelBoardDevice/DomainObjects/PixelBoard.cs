@@ -11,7 +11,7 @@ namespace PixelBoardDevice
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
             "абвгдеёжзийклмнопрстуфхцчшщъыъэюя" +
             "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЮЬЭЮЯ" +
-            "`~!@#$%^&*()-_+=*:;\"',.<>/\\|";
+            "`~!@#$%^&*()-_+=*:;\"',.<>/\\| ";
         public List<BinaryFont> Fonts { get; set; }
         public BoardSize BoardSize { get; set; }
         public List<Screen> Screens { get; set; }

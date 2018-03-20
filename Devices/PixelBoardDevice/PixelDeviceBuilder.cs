@@ -55,24 +55,24 @@ namespace PixelBoardDevice
                 {
                     new Screen
                     {
-                        Order=1,
-                        Period=10,
-                        Name="Экран1",
-                        Zones=new List<Zone>
+                        Order = 1,
+                        Period = 10,
+                        Name = "Экран1",
+                        Zones = new List<Zone>
                         {
                             new Ticker
                             {
-                                Id=1
+                                Id = 1
                             },
                             new Sensor
                             {
-                                Id=2
+                                Id = 2
                             }
                         }
                     }
-                }
+                },
+                Name = String.IsNullOrEmpty(device.Name) ? "Пиксельная плата" : device.Name
             };
-            pixelBoard.Name = String.IsNullOrEmpty(device.Name) ? "Пиксельная плата" : device.Name;
             return pixelBoard;
         }
     }

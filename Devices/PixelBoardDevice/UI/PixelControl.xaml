@@ -181,7 +181,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Grid.Row="0">Слева</Label>
-                            <TextBox Grid.Column="1" Grid.Row="0" />
+                            <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding ZoneLeft}"/>
                             <Label Grid.Column="0" Grid.Row="1">Сверху</Label>
                             <TextBox Grid.Column="1" Grid.Row="1" />
                             <Label Grid.Column="0" Grid.Row="2">Высота</Label>
@@ -204,12 +204,15 @@
                             </Grid.ColumnDefinitions>
                             <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}" Width="200" DisplayMemberPath="Source" IsEnabled="{Binding AllowFont}"></ComboBox>
                             <ComboBox Grid.Row="0" Grid.Column="1" IsEnabled="{Binding AllowFont}" ItemsSource="{Binding FontSizes}" Width="45" SelectedValue="{Binding SelectedFontSize}"/>
-                            <Button Grid.Row="0" Grid.Column="2" IsEnabled="{Binding AllowFont}">B</Button>
-                            <Button Grid.Row="0" Grid.Column="3" IsEnabled="{Binding AllowFont}">I</Button>
+                            <ToggleButton Grid.Row="0" Grid.Column="2" IsEnabled="{Binding AllowFont}" IsChecked="{Binding IsBold}">B</ToggleButton>
+                            <ToggleButton Grid.Row="0" Grid.Column="3" IsEnabled="{Binding AllowFont}" IsChecked="{Binding IsItalic}" >I</ToggleButton>
                             <TextBox Grid.Row="1" Grid.ColumnSpan="100" IsEnabled="{Binding AllowText}" AcceptsReturn="True" 
                                      TextWrapping="WrapWithOverflow"
                                      FontFamily="{Binding SelectedFont}"
-                                     FontSize="{Binding SelectedFontSize}">
+                                     FontSize="{Binding SelectedFontSize}"
+                                     FontStyle="{Binding FontStyle}"
+                                     FontWeight="{Binding FontWeight}"
+                                     Text="{Binding Text}">
                             </TextBox>
                         </Grid>
                     </GroupBox>
