@@ -42,7 +42,8 @@ namespace BitmapProcessing
             {
                 var rows = bitmapChar.GetLength(0);
                 var columns = bitmapChar.GetLength(1);
-                for (var column = columns - 1; column >= 0; column--)
+                //for (var column = columns - 1; column >= 0; column--)
+                for (var column = 0; column <columns; column++)
                 {
                     for (var row = 0; row < rows; row++)
                     {
