@@ -17,10 +17,11 @@ namespace BitmapProcessing
             {
                 var font = new System.Drawing.Font(newFont.Source, (float)newFontSize, GraphicsUnit.Pixel);
                 var image = DrawTextImage(c.ToString(), font, Color.White, Color.Black, Size.Empty) as Bitmap;
-                var trimmedImage = image.Clone(new Rectangle(0, image.Height - newFontSize, image.Width, newFontSize),
+                var trimmedToHeightImage = image.Clone(new Rectangle(0, image.Height - newFontSize, image.Width, newFontSize),
                     image.PixelFormat);
-                var bytes = BitmapToMonochrome(trimmedImage);
-                bitmapChars.Add(bytes);
+                var bitmap = BitmapToMonochrome(trimmedToHeightImage);
+                var trimmedbitmap = TrimSpaces(bitmap);
+                bitmapChars.Add(trimmedbitmap);
             }
             var separatorLength = newFontSize * 2;
             var separator = new bool[separatorLength];
@@ -42,8 +43,7 @@ namespace BitmapProcessing
             {
                 var rows = bitmapChar.GetLength(0);
                 var columns = bitmapChar.GetLength(1);
-                //for (var column = columns - 1; column >= 0; column--)
-                for (var column = 0; column <columns; column++)
+                for (var column = 0; column < columns; column++)
                 {
                     for (var row = 0; row < rows; row++)
                     {
@@ -55,7 +55,7 @@ namespace BitmapProcessing
             }
 
             var bitsInIncompleteByte = bitList.Count % 8;
-            var needBytesForOctet = bitsInIncompleteByte==0?0:8-bitsInIncompleteByte;
+            var needBytesForOctet = bitsInIncompleteByte == 0 ? 0 : 8 - bitsInIncompleteByte;
             for (var i = 0; i < needBytesForOctet; i++)
             {
                 bitList.Add(false);
@@ -66,6 +66,51 @@ namespace BitmapProcessing
             bitArray.CopyTo(resultBytes, 0);
             var base64String = Convert.ToBase64String(resultBytes);
             return base64String;
+        }
+
+        private static bool[,] TrimSpaces(bool[,] bitmap)
+        {
+            var rows = bitmap.GetLength(0);
+            var columns = bitmap.GetLength(1);
+            int column;
+            for (column = 0; column < columns; column++)
+            {
+                var hasValue = false;
+                for (int row = 0; row < rows; row++)
+                {
+                    hasValue |= bitmap[row, column];
+                }
+                if (hasValue)
+                {
+                    break;
+                }
+            }
+            var firstNotEmptyColumn = (column == columns) ? 0 : column;
+            for (column = columns - 1; column > 0; column--)
+            {
+                var hasValue = false;
+                for (int row = 0; row < rows; row++)
+                {
+                    hasValue |= bitmap[row, column];
+                }
+                if (hasValue)
+                {
+                    break;
+                }
+            }
+            var lastNotEmptyColumn = (column == 0) ? (columns - 1) : column;
+            var notEmptyColumnsAmount = lastNotEmptyColumn - firstNotEmptyColumn + 1;
+            var trimmedBitmap = new bool[rows, notEmptyColumnsAmount];
+            for (int row = 0; row < rows; row++)
+            {
+                int destColumn = 0;
+                for (var sourceColumn = firstNotEmptyColumn; sourceColumn <= lastNotEmptyColumn; sourceColumn++)
+                {
+                    trimmedBitmap[row, destColumn] = bitmap[row, sourceColumn];
+                    destColumn++;
+                }
+            }
+            return trimmedBitmap;
         }
 
         private static unsafe void BitmapToByte(Bitmap bmp, out byte[,,] rgbBitmap, out byte[,] grayScaleBitmap, out bool[,] monochromeBitmap)
