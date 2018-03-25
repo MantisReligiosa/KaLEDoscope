@@ -23,7 +23,6 @@ namespace PixelBoardDevice
                 VerticalAlignment = VerticalAlignment.Stretch,
                 DataContext = model
             };
-            model.OnNeedRedraw += pixelControl.OnNeedRedraw;
             return new Dictionary<string, UserControl>
             {
                 { "Пиксельная плата",pixelControl }

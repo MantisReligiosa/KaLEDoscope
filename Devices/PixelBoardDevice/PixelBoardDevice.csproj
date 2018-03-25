@@ -36,6 +36,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -48,6 +49,7 @@
   <ItemGroup>
     <Compile Include="DomainObjects\BinaryFont.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
+    <Compile Include="DomainObjects\Clock.cs" />
     <Compile Include="DomainObjects\IFonted.cs" />
     <Compile Include="DomainObjects\MQTTSensor.cs" />
     <Compile Include="DomainObjects\Picture.cs" />
@@ -62,6 +64,7 @@
       <DependentUpon>PixelControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\PixelDeviceViewModel.cs" />
+    <Compile Include="UI\POCO\ClockType.cs" />
     <Compile Include="UI\POCO\ZoneType.cs" />
   </ItemGroup>
   <ItemGroup>

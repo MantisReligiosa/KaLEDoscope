@@ -23,11 +23,22 @@ namespace PixelBoardDevice.UI
         public PixelControl()
         {
             InitializeComponent();
+            preview.MouseWheel += Preview_MouseWheel;
         }
 
-        public void OnNeedRedraw(object sender, EventArgs e)
+        private void Preview_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var model = DataContext as PixelDeviceViewModel;
+            //Point p = e.MouseDevice.GetPosition(this.preview);
+            Matrix m = (this.preview).LayoutTransform.Value;
+            if (e.Delta > 0)
+            {
+                m.ScaleAtPrepend(1.1, 1.1, 0, 0);
+            }
+            else
+                m.ScaleAtPrepend(1 / 1.1, 1 / 1.1, 0, 0);
+
+            (this.preview).LayoutTransform = new MatrixTransform(m);
+            scroll.InvalidateScrollInfo();
         }
     }
 }

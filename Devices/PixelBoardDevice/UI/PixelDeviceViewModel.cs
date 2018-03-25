@@ -13,6 +13,7 @@ using Font = System.Windows.Media;
 using System.Drawing.Text;
 using BitmapProcessing;
 using System.Windows;
+using System.Drawing;
 
 namespace PixelBoardDevice.UI
 {
@@ -25,54 +26,99 @@ namespace PixelBoardDevice.UI
             new ZoneType
             {
                 Id = 1,
-                Name = "Текст",
+                Name = new Ticker().Name,
                 AllowAnimation = true,
                 AllowBitmap = false,
                 AllowFont = true,
                 AllowText = true,
                 ZoneCondition = (z) => z is Ticker,
-                Customize = () => new Ticker()
+                Customize = () => new Ticker
+                {
+                    IsValid=true
+                }
             },
             new ZoneType
             {
                 Id = 2,
-                Name = "Сенсор",
+                Name = new Sensor().Name,
                 AllowAnimation=false,
                 AllowBitmap=false,
                 AllowFont=true,
                 AllowText=false,
                 ZoneCondition = (z) => z is Sensor,
-                Customize = () => new Sensor()
+                Customize = () => new Sensor{
+                    IsValid=true
+                }
             },
             new ZoneType
             {
                 Id = 3,
-                Name = "Тэг MQTT",
+                Name = new MQTTSensor().Name,
                 AllowAnimation = false,
                 AllowBitmap = false,
                 AllowFont = true,
                 AllowText = false,
                 ZoneCondition = (z) => z is MQTTSensor,
-                Customize = () => new MQTTSensor()
+                Customize = () => new MQTTSensor{
+                    IsValid=true
+                }
             },
             new ZoneType
             {
                 Id = 4,
-                Name = "Изображение",
+                Name = new Picture().Name,
                 AllowAnimation=false,
                 AllowBitmap=false,
                 AllowFont=true,
                 AllowText=false,
                 ZoneCondition = (z) => z is Picture,
-                Customize = () => new Picture()
+                Customize = () => new Picture{
+                    IsValid=true
+                }
+            },
+            new ZoneType
+            {
+                Id = 4,
+                Name = new Clock().Name,
+                AllowAnimation=false,
+                AllowBitmap=false,
+                AllowFont=true,
+                AllowText=false,
+                ZoneCondition = (z) => z is Clock,
+                Customize = () => new Clock{
+                    IsValid=true
+                }
             },
         };
+        private readonly List<ClockType> _clockTypes = new List<ClockType>
+        {
+            new ClockType
+            {
+                Id=1,
+                Name="ЧЧ(24):ММ"
+            },
+            new ClockType
+            {
+                Id=2,
+                Name="ЧЧ(24):ММ:CC"
+            },
+                        new ClockType
+            {
+                Id=3,
+                Name="ЧЧ(12):ММ"
+            },
+            new ClockType
+            {
+                Id=4,
+                Name="ЧЧ(12):ММ:CC"
+            }
+        };
+
         private readonly List<int> _fontSizes = new List<int>
         {
             8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72
         };
 
-        public event EventHandler OnNeedRedraw;
         public ObservableCollection<ZoneType> ZoneTypes { get; set; }
         public ObservableCollection<Screen> Screens { get; set; }
         public ObservableCollection<Zone> Zones { get; set; }
@@ -81,17 +127,96 @@ namespace PixelBoardDevice.UI
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
         {
+            PropertyChanged += RedrawPreviewOnPropertyChanged;
             _device = (PixelBoard)d;
             _logger = l;
             ZoneTypes = new ObservableCollection<ZoneType>(_zoneTypes);
             Screens = new ObservableCollection<Screen>(_device.Screens);
             Fonts = new ObservableCollection<Font.FontFamily>(new InstalledFontCollection().Families.Select(f => new Font.FontFamily(f.Name)));
             Zones = new ObservableCollection<Zone>();
+            Zones.CollectionChanged += Zones_CollectionChanged;
             FontSizes = new ObservableCollection<int>(_fontSizes);
             AllowChangeBoardSize = allowChangeBoardSize;
             DeviceHeight = _device.BoardSize.Height;
             DeviceWidth = _device.BoardSize.Width;
             AllowChangeBoardSize = _device.IsStandaloneConfiguration;
+        }
+
+        private void Zones_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            ValidateZones();
+            RedrawPreview();
+        }
+
+        private void RedrawPreviewOnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(PreviewImage)))
+            {
+                return;
+            }
+            ValidateZones();
+            RedrawPreview();
+        }
+
+        private void RedrawPreview()
+        {
+            if (DeviceHeight == 0 || DeviceWidth == 0)
+            {
+                return;
+            }
+            int width = DeviceWidth;
+            int height = DeviceHeight;
+            var bitmap = new Bitmap(width, height);
+
+            using (var g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(Color.Black);
+                if (Zones?.Any() ?? false)
+                {
+                    foreach (var zone in Zones)
+                    {
+                        var pen = new Pen(Color.Yellow);
+                        if (zone.Id == (SelectedZone?.Id ?? int.MinValue))
+                        {
+                            pen = new Pen(Color.Green);
+                        }
+                        g.DrawRectangle(pen, zone.X, zone.Y, zone.Width, zone.Height);
+                        if (zone is Ticker)
+                        {
+                            System.Drawing.FontStyle style = System.Drawing.FontStyle.Regular;
+                            var ticker = zone as Ticker;
+                            var binaryFont = _device.Fonts.FirstOrDefault(f => f.Id == ticker.FontId);
+                            if (binaryFont != null)
+                            {
+                                if (binaryFont.Italic && binaryFont.Bold)
+                                {
+                                    style = System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Bold;
+                                }
+                                else if (binaryFont.Italic)
+                                {
+                                    style = System.Drawing.FontStyle.Italic;
+                                }
+                                else if (binaryFont.Bold)
+                                {
+                                    style = System.Drawing.FontStyle.Bold;
+                                }
+                                var font = new System.Drawing.Font(
+                                    binaryFont.Source, binaryFont.Height, style, GraphicsUnit.Pixel);
+                                g.DrawString(ticker.Text, font, new SolidBrush(Color.Red), new RectangleF(zone.X, zone.Y, zone.Width, zone.Height));
+                            }
+                        }
+                    }
+                }
+            }
+            var hBitmap = bitmap.GetHbitmap();
+            var bitSrc = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,
+                System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+            PreviewImage = bitSrc;
+        }
+
+        private void ValidateZones()
+        {
+#warning тут будет валидация
         }
 
         private int _zoneLeft;
@@ -107,6 +232,68 @@ namespace PixelBoardDevice.UI
                     deviceZone.X = value;
                 }
                 OnPropertyChanged(nameof(ZoneLeft));
+            }
+        }
+
+        private int _zoneTop;
+        public int ZoneTop
+        {
+            get => _zoneTop;
+            set
+            {
+                _zoneTop = value;
+                var deviceZone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                if (deviceZone != null)
+                {
+                    deviceZone.Y = value;
+                }
+                OnPropertyChanged(nameof(ZoneTop));
+            }
+        }
+
+        private int _zoneHeight;
+        public int ZoneHeight
+        {
+            get => _zoneHeight;
+            set
+            {
+                _zoneHeight = value;
+                var deviceZone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                if (deviceZone != null)
+                {
+                    deviceZone.Height = value;
+                }
+                OnPropertyChanged(nameof(ZoneHeight));
+            }
+        }
+
+        private int _zoneWidth;
+        public int ZoneWidth
+        {
+            get => _zoneWidth;
+            set
+            {
+                _zoneWidth = value;
+                var deviceZone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                if (deviceZone != null)
+                {
+                    deviceZone.Width = value;
+                }
+                OnPropertyChanged(nameof(ZoneWidth));
+            }
+        }
+
+        private object _previewImage;
+        public object PreviewImage
+        {
+            get
+            {
+                return _previewImage;
+            }
+            set
+            {
+                _previewImage = value;
+                OnPropertyChanged(nameof(PreviewImage));
             }
         }
 
@@ -153,7 +340,7 @@ namespace PixelBoardDevice.UI
                     Height = newFontSize,
                     Bold = bold,
                     Italic = italic,
-                    Base64Bitmap = BitmapProcessor.GenerateBase64FontMono(_device.Alphabet, newFont, newFontSize)
+                    Base64Bitmap = BitmapProcessor.GenerateBase64FontMono(_device.Alphabet, newFont, italic, bold, newFontSize)
                 };
                 _device.Fonts.Add(newBinaryFont);
             }
@@ -215,7 +402,7 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        public FontStyle FontStyle => IsItalic ? FontStyles.Italic : FontStyles.Normal;
+        public System.Windows.FontStyle FontStyle => IsItalic ? FontStyles.Italic : FontStyles.Normal;
 
         private bool _allowChangeBoardSize;
         public bool AllowChangeBoardSize
@@ -227,6 +414,8 @@ namespace PixelBoardDevice.UI
                 OnPropertyChanged(nameof(AllowChangeBoardSize));
             }
         }
+
+        public bool AllowZoneCoordinates => SelectedZone != null;
 
         private bool _allowFont;
         public bool AllowFont
@@ -292,7 +481,6 @@ namespace PixelBoardDevice.UI
                 _deviceHeight = value;
                 _device.BoardSize.Height = value;
                 OnPropertyChanged(nameof(DeviceHeight));
-                OnNeedRedraw?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -305,7 +493,6 @@ namespace PixelBoardDevice.UI
                 _deviceWidth = value;
                 _device.BoardSize.Width = value;
                 OnPropertyChanged(nameof(DeviceWidth));
-                OnNeedRedraw?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -337,8 +524,12 @@ namespace PixelBoardDevice.UI
                 if (_selectedZone != null)
                 {
                     ZoneLeft = _selectedZone.X;
+                    ZoneTop = _selectedZone.Y;
+                    ZoneHeight = _selectedZone.Height;
+                    ZoneWidth = _selectedZone.Width;
                 }
                 OnPropertyChanged(nameof(SelectedZone));
+                OnPropertyChanged(nameof(AllowZoneCoordinates));
                 var currentZoneType = ZoneTypes.FirstOrDefault(z => z.ZoneCondition(_selectedZone));
                 if (currentZoneType == null || CurrentZoneType == null || CurrentZoneType.Id != currentZoneType.Id)
                 {
@@ -362,6 +553,8 @@ namespace PixelBoardDevice.UI
                     {
                         SelectedFont = Fonts.FirstOrDefault(f => f.Source.Equals(binaryFont.Source));
                         SelectedFontSize = binaryFont.Height;
+                        IsItalic = binaryFont.Italic;
+                        IsBold = binaryFont.Bold;
                     }
                     if (_selectedZone is Ticker)
                     {

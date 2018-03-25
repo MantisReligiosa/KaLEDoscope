@@ -5,51 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:local="clr-namespace:PixelBoardDevice.UI"
+             xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
     </UserControl.Resources>
-    <Grid>
+    <Grid Name="grid">
         <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Row="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness='0,0,1,1'>
-                        <Border BorderBrush="White" BorderThickness='1,1,0,0'>
-                            <Border BorderBrush="#808080" BorderThickness='0,0,1,1'>
-                                <Border BorderBrush="#dfdfdf" BorderThickness='1,1,0,0'>
-                                    <Border BorderBrush="LightGray" BorderThickness='10,10,10,10'>
-                                        <Canvas Name="preview" Background="Black" Height="{Binding DeviceHeight}" Width="{Binding DeviceWidth}">
-                                        </Canvas>
-                                    </Border>
-                                </Border>
-                            </Border>
-                        </Border>
-                    </Border>
-                </Grid>
-            </Grid>
-            <Grid Grid.Row="1">
-
-            </Grid>
-        </Grid>
-        <Grid Grid.Row="1">
+        <ScrollViewer Name="scroll" Grid.Row="0" HorizontalScrollBarVisibility="Auto" CanContentScroll="True">
+            <Image Name="preview" 
+                           Source="{Binding PreviewImage}"
+                   SnapsToDevicePixels="True" UseLayoutRounding="False" RenderOptions.BitmapScalingMode="NearestNeighbor"        
+                           
+                           HorizontalAlignment="Left" VerticalAlignment="Top">
+            </Image>
+        </ScrollViewer>
+        <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
+        <Grid Grid.Row="2">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -92,7 +69,7 @@
                 </GroupBox>
             </Grid>
         </Grid>
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
@@ -163,11 +140,11 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0">Тип:</Label>
-                            <ComboBox Grid.Column="1" ItemsSource="{Binding ZoneTypes}" SelectedItem="{Binding CurrentZoneType}" DisplayMemberPath="Name"></ComboBox>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding ZoneTypes}" SelectedItem="{Binding CurrentZoneType}" DisplayMemberPath="Name" IsEnabled="{Binding AllowZoneCoordinates}"></ComboBox>
                         </Grid>
 
                     </Grid>
-                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Расположение">
+                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Расположение" IsEnabled="{Binding AllowZoneCoordinates}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
@@ -183,11 +160,11 @@
                             <Label Grid.Column="0" Grid.Row="0">Слева</Label>
                             <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding ZoneLeft}"/>
                             <Label Grid.Column="0" Grid.Row="1">Сверху</Label>
-                            <TextBox Grid.Column="1" Grid.Row="1" />
+                            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ZoneTop}" />
                             <Label Grid.Column="0" Grid.Row="2">Высота</Label>
-                            <TextBox Grid.Column="1" Grid.Row="2" />
+                            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding ZoneHeight}"/>
                             <Label Grid.Column="0" Grid.Row="3">Ширина</Label>
-                            <TextBox Grid.Column="1" Grid.Row="3" />
+                            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ZoneWidth}"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Grid.Column="1" Header="Текст">

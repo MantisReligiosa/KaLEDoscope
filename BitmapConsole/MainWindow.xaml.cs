@@ -28,8 +28,6 @@ namespace BitmapConsole
 
         private void Image_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            Point p = e.MouseDevice.GetPosition(this.Image);
-
             Matrix m = (this.Image).RenderTransform.Value;
             if (e.Delta > 0)
                 m.ScaleAtPrepend(1.1, 1.1, 0, 0);
