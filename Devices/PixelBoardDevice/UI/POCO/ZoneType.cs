@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PixelBoardDevice.DomainObjects;
+using System;
 
 namespace PixelBoardDevice.UI.POCO
 {

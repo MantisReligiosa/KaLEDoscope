@@ -1,4 +1,4 @@
-﻿namespace PixelBoardDevice
+﻿namespace PixelBoardDevice.DomainObjects
 {
     public class BoardSize
     {

@@ -44,30 +44,20 @@ namespace PixelBoardDevice
                     Mode = Mode.Auto
                 },
                 WorkSchedule = castedDevice?.WorkSchedule ?? new WorkSchedule(),
-                BoardSize = new BoardSize
+                BoardSize = castedDevice?.BoardSize ?? new BoardSize
                 {
                     Height = 16,
                     Width = 160
                 },
-                Fonts = new List<BinaryFont>(),
-                Screens = new List<Screen>
+                Fonts = castedDevice?.Fonts ?? new List<BinaryFont>(),
+                Screens = castedDevice?.Screens ?? new List<Screen>
                 {
                     new Screen
                     {
                         Order = 1,
                         Period = 10,
                         Name = "Экран1",
-                        Zones = new List<Zone>
-                        {
-                            new Ticker
-                            {
-                                Id = 1
-                            },
-                            new Sensor
-                            {
-                                Id = 2
-                            }
-                        }
+                        Zones = new List<Zone>()
                     }
                 },
                 Name = String.IsNullOrEmpty(device.Name) ? "Пиксельная плата" : device.Name

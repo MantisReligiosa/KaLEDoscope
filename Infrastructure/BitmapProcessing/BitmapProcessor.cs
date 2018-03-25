@@ -16,7 +16,7 @@ namespace BitmapProcessing
             foreach (var c in text)
             {
                 var style = System.Drawing.FontStyle.Regular;
-                if (itallic & bold)
+                if (itallic && bold)
                 {
                     style = System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Bold;
                 }

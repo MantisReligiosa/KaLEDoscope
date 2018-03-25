@@ -49,12 +49,6 @@
   <ItemGroup>
     <Compile Include="DomainObjects\BinaryFont.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
-    <Compile Include="DomainObjects\Clock.cs" />
-    <Compile Include="DomainObjects\IFonted.cs" />
-    <Compile Include="DomainObjects\MQTTSensor.cs" />
-    <Compile Include="DomainObjects\Picture.cs" />
-    <Compile Include="DomainObjects\Sensor.cs" />
-    <Compile Include="DomainObjects\Ticker.cs" />
     <Compile Include="DomainObjects\Screen.cs" />
     <Compile Include="DomainObjects\Zone.cs" />
     <Compile Include="PixelDeviceBuilder.cs" />

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using BaseDevice;
 
-namespace PixelBoardDevice
+namespace PixelBoardDevice.DomainObjects
 {
     public class PixelBoard : Device
     {

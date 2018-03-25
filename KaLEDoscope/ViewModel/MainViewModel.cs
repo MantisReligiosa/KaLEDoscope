@@ -102,10 +102,12 @@ namespace KaLEDoscope
 
             ProtocolNodes.Add(standaloneConfiguration);
             ProtocolNodes.Add(_directConnect);
+            var id = int.MaxValue;
             _deviceFactory.Builders.ForEach(builder =>
             {
                 var device = builder.UpdateCustomSettings(new Device
                 {
+                    Id = id--,
                     Model = builder.Model,
                     IsStandaloneConfiguration = true
                 });
@@ -374,6 +376,8 @@ namespace KaLEDoscope
                 {
                     _importSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
+                        _updatedNode = d;
+                        _tabItem = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == d.Device);
                         d.AllowUpload = true;
                         var dialog = new OpenFileDialog
                         {

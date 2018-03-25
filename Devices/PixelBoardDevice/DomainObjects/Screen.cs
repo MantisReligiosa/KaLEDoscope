@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PixelBoardDevice
+namespace PixelBoardDevice.DomainObjects
 {
     public class Screen
     {
