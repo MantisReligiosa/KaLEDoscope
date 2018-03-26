@@ -5,6 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:KaLEDoscope"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -17,7 +20,8 @@
         </Grid.RowDefinitions>
         <GroupBox Grid.Row="0" 
                   Grid.ColumnSpan="2"
-                  Header="Идентификация">
+                  Header="Идентификация"
+                  Style="{StaticResource GroupBoxStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -70,7 +74,8 @@
                   Grid.Column="0" 
                   Header="Сетевые параметры" 
                   HorizontalAlignment="Left" 
-                  VerticalAlignment="Top">
+                  VerticalAlignment="Top"
+                  Style="{StaticResource GroupBoxStyle}">
             <Grid >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -161,7 +166,10 @@
                                     />
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="1" Header="Управление яркостью">
+        <GroupBox Grid.Row="1" 
+                  Grid.Column="1" 
+                  Header="Управление яркостью"
+                  Style="{StaticResource GroupBoxStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -189,45 +197,61 @@
                             />
                 </Grid>
                 <RadioButton Grid.Row="3" Content="По расписанию" IsChecked="{Binding ScheduledBrightness}"/>
-                <ListView Grid.Row="4" IsEnabled="{Binding ScheduledBrightness}" ItemsSource="{Binding BrightnessPeriods}" SelectedItem="{Binding SelectedBrightnessPeriod}">
-                    <ListView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Добавить"
+                <Grid Grid.Row="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListView Grid.Row="0" Grid.ColumnSpan="2" IsEnabled="{Binding ScheduledBrightness}" ItemsSource="{Binding BrightnessPeriods}" SelectedItem="{Binding SelectedBrightnessPeriod}">
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Добавить"
                                       Command="{Binding AddBrightnessItem}"/>
-                            <MenuItem Header="Удалить"
+                                <MenuItem Header="Удалить"
                                       Command="{Binding RemoveBrightnessItem}"/>
 
-                        </ContextMenu>
-                    </ListView.ContextMenu>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="От" >
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding From}" Width="50"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="До" >
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding To}" Width="50"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Яркость">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Value}" Width="50"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="От" >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding From}" Width="50"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="До" >
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding To}" Width="50"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Яркость">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Value}" Width="50"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <Button Grid.Row="1" Grid.Column="0" Content="Добавить" Command="{Binding AddBrightnessItem}"/>
+                    <Button Grid.Row="1" Grid.Column="1" Content="Удалить" Command="{Binding RemoveBrightnessItem}"/>
+                </Grid>
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Header="Расписание работы">
+        <GroupBox Grid.Column="0" 
+                  Grid.Row="2" 
+                  Grid.ColumnSpan="2" 
+                  Header="Расписание работы"
+                  Style="{StaticResource GroupBoxStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="7*"></ColumnDefinition>

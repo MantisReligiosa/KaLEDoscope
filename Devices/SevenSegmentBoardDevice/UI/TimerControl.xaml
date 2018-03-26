@@ -50,46 +50,58 @@
                 </Grid>
             </GroupBox>
             <GroupBox Grid.Row="1" Header="Конфигурация будильников" HorizontalAlignment="Right" Width="252"  Style="{StaticResource GroupBoxStyle}">
-                <ListView ItemsSource="{Binding AlarmSchedule}" SelectedItem="{Binding SelectedAlarm}">
-                    <ListView.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Добавить новый"
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ListView Grid.ColumnSpan="2" Grid.Row="0" ItemsSource="{Binding AlarmSchedule}" SelectedItem="{Binding SelectedAlarm}">
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Добавить новый"
                                       Command="{Binding AddAlarm}"/>
-                            <MenuItem Header="Удалить"
+                                <MenuItem Header="Удалить"
                                       Command="{Binding RemoveAlarm}"/>
 
-                        </ContextMenu>
-                    </ListView.ContextMenu>
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Width="30">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsActive}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Время" Width="80">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding StartTimeSpan}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Длительность" Width="80">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Period}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Width="30">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding IsActive}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Время" Width="80">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding StartTimeSpan}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Длительность" Width="80">
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBox Text="{Binding Period}"/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+                    </ListView>
+                    <Button Grid.Column="0" Grid.Row="1" Content="Добавить" Command="{Binding AddAlarm}"/>
+                    <Button Grid.Column="1" Grid.Row="1" Content="Удалить" Command="{Binding RemoveAlarm}"/>
+                </Grid>
             </GroupBox>
         </Grid>
         <GroupBox Grid.Row="1" Grid.Column="1" Header="Отображаемая информация"  Style="{StaticResource GroupBoxStyle}">
-            <ListView ItemsSource="{Binding DisplayFrames}">
+            <ListView ItemsSource="{Binding DisplayFrames}" Grid.Row="0" Grid.ColumnSpan="2">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="30">
