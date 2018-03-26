@@ -31,6 +31,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <GroupBox Grid.Column="0" Header="Размеры табло" IsEnabled="{Binding AllowChangeBoardSize}" Style="{StaticResource GroupBoxStyle}">
@@ -51,6 +52,23 @@
                     </Grid>
                 </GroupBox>
                 <GroupBox Grid.Column="1" Header="Доступ к MQTT" Style="{StaticResource GroupBoxStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Column="0" Grid.Row="0">Адрес</Label>
+                        <TextBox Grid.Column="1" Grid.Row="0" />
+                        <Label Grid.Column="0" Grid.Row="1">Порт</Label>
+                        <TextBox Grid.Column="1" Grid.Row="1" />
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="2" Header="Доступ к OPC" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
@@ -128,6 +146,7 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
@@ -142,7 +161,6 @@
                             <Label Grid.Column="0">Тип:</Label>
                             <ComboBox Grid.Column="1" ItemsSource="{Binding ZoneTypes}" SelectedItem="{Binding CurrentZoneType}" DisplayMemberPath="Name" IsEnabled="{Binding AllowZoneCoordinates}"></ComboBox>
                         </Grid>
-
                     </Grid>
                     <GroupBox Grid.Row="1" Grid.Column="0" Header="Расположение" IsEnabled="{Binding AllowZoneCoordinates}" Style="{StaticResource GroupBoxStyle}">
                         <Grid>
@@ -193,20 +211,21 @@
                             </TextBox>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.Column="0" Header="Анимация" IsEnabled="{Binding AllowAnimation}" Style="{StaticResource GroupBoxStyle}">
+                    <GroupBox Grid.Row="2" Grid.ColumnSpan="2" Header="Анимация" Visibility="{Binding AnimationVisibility}" Style="{StaticResource GroupBoxStyle}">
                         <ComboBox Grid.Column="1"></ComboBox>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.Column="1" Header="Растр" IsEnabled="{Binding AllowBitmap}" Style="{StaticResource GroupBoxStyle}">
-                        <Button>Загрузить</Button>
+                    <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="Растр" Visibility="{Binding BitmapVisibility}" Style="{StaticResource GroupBoxStyle}">
+                        <Button Content="Загрузить" Command="{Binding LoadBitmap}"/>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="Тэг MQTT" IsEnabled="{Binding AllowMQTT}" Style="{StaticResource GroupBoxStyle}">
+                    <GroupBox Grid.Row="4" Grid.ColumnSpan="2" Header="Тэг сервера" Visibility="{Binding ExternalTagVisibility}" Style="{StaticResource GroupBoxStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="19*"/>
+                                <ColumnDefinition Width="93*"/>
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0">Тэг</Label>
-                            <TextBox Grid.Column="1" Text="{Binding MqttTag}"></TextBox>
+                            <TextBox Grid.Column="1" Text="{Binding ExternalSourceTag}" Grid.ColumnSpan="2"></TextBox>
                         </Grid>
                     </GroupBox>
                 </Grid>

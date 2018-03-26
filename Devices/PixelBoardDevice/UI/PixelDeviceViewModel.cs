@@ -57,7 +57,7 @@ namespace PixelBoardDevice.UI
             new ZoneType
             {
                 Id = 3,
-                Name = "Тэг MQTT",
+                Name = "Тэг внешнего сервера",
                 AllowAnimation = false,
                 AllowBitmap = false,
                 AllowFont = true,
@@ -67,7 +67,7 @@ namespace PixelBoardDevice.UI
                 Customize = () => new Zone{
                     ZoneType=(int)DomainObjects.ZoneTypes.MQTT,
                     IsValid =true,
-                    Name = "Тэг MQTT",
+                    Name = "Тэг внешнего сервера",
                 }
             },
             new ZoneType
@@ -472,36 +472,49 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        private bool _allowAnimation;
-        public bool AllowAnimation
+        private bool AllowAnimation
         {
-            get => _allowAnimation;
+            set => AnimationVisibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        private Visibility _allowVisibility;
+        public Visibility AnimationVisibility
+        {
+            get => _allowVisibility;
             set
             {
-                _allowAnimation = value;
-                OnPropertyChanged(nameof(AllowAnimation));
+                _allowVisibility = value;
+                OnPropertyChanged(nameof(AnimationVisibility));
             }
         }
 
-        private bool _allowBitmap;
-        public bool AllowBitmap
+        private bool AllowBitmap
+        {
+            set => BitmapVisibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+        private Visibility _allowBitmap;
+        public Visibility BitmapVisibility
         {
             get => _allowBitmap;
             set
             {
                 _allowBitmap = value;
-                OnPropertyChanged(nameof(AllowBitmap));
+                OnPropertyChanged(nameof(BitmapVisibility));
             }
         }
 
-        private bool _allowMQTT;
-        public bool AllowMQTT
+        private bool AllowExternalTag
         {
-            get => _allowMQTT;
+            set => ExternalTagVisibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+        private Visibility _externalTagVisibility;
+        public Visibility ExternalTagVisibility
+        {
+            get => _externalTagVisibility;
             set
             {
-                _allowMQTT = value;
-                OnPropertyChanged(nameof(AllowMQTT));
+                _externalTagVisibility = value;
+                OnPropertyChanged(nameof(ExternalTagVisibility));
             }
         }
 
@@ -581,7 +594,7 @@ namespace PixelBoardDevice.UI
                     AllowAnimation = currentZoneType?.AllowAnimation ?? false;
                     AllowBitmap = currentZoneType?.AllowBitmap ?? false;
                     AllowFont = currentZoneType?.AllowFont ?? false;
-                    AllowMQTT = currentZoneType?.AllowMQTT ?? false;
+                    AllowExternalTag = currentZoneType?.AllowMQTT ?? false;
                     AllowText = currentZoneType?.AllowText ?? false;
                     OnPropertyChanged(nameof(CurrentZoneType));
                 }
@@ -610,11 +623,11 @@ namespace PixelBoardDevice.UI
                     }
                     if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.MQTT)
                     {
-                        MqttTag = _selectedZone.MqttTag;
+                        ExternalSourceTag = _selectedZone.ExternalSourceTag;
                     }
                     else
                     {
-                        MqttTag = string.Empty;
+                        ExternalSourceTag = string.Empty;
                     }
                 }
             }
@@ -636,19 +649,19 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        private string _MqttTag;
-        public string MqttTag
+        private string _externalSourceTag;
+        public string ExternalSourceTag
         {
-            get => _MqttTag;
+            get => _externalSourceTag;
             set
             {
-                _MqttTag = value;
+                _externalSourceTag = value;
                 var zone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
                 if (zone.ZoneType == (int)DomainObjects.ZoneTypes.MQTT)
                 {
-                    zone.MqttTag = value;
+                    zone.ExternalSourceTag = value;
                 }
-                OnPropertyChanged(nameof(MqttTag));
+                OnPropertyChanged(nameof(ExternalSourceTag));
             }
         }
 
@@ -709,6 +722,22 @@ namespace PixelBoardDevice.UI
             }
         }
 
+        private DelegateCommand _loadBitmap;
+        public Input.ICommand LoadBitmap
+        {
+            get
+            {
+                if (_loadBitmap == null)
+                {
+                    _loadBitmap = new DelegateCommand((o) =>
+                      {
+#warning Дописать
+                      });
+                }
+                return _loadBitmap;
+            }
+        }
+
         private DelegateCommand _addScreen;
         public Input.ICommand AddScreen
         {
@@ -763,7 +792,7 @@ namespace PixelBoardDevice.UI
                 {
                     _addZone = new DelegateCommand((o) =>
                     {
-                        var nextId = Screens.Max(s => s.Zones.Max(z => z.Id)) + 1;
+                        var nextId = Screens.Max(s => s.Zones.Any() ? s.Zones.Max(z => z.Id) : 0) + 1;
                         var zone = new Zone
                         {
                             ZoneType = (int)DomainObjects.ZoneTypes.Text,

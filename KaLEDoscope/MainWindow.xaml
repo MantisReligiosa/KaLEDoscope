@@ -41,7 +41,7 @@
                     <MenuItem Header="_Применить конфигурацию..."/>
                 </MenuItem>
                 <MenuItem Header="_Настройка">
-                    <MenuItem Header="_Модиули..."/>
+                    <MenuItem Header="_Модули..."/>
                     <MenuItem Header="_Параметры..."/>
                 </MenuItem>
             </Menu>

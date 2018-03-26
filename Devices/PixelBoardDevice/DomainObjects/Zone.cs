@@ -22,7 +22,7 @@ namespace PixelBoardDevice.DomainObjects
             }
         }
 
-        public string MqttTag { get; set; }
+        public string ExternalSourceTag { get; set; }
     }
 
     public enum ZoneTypes
