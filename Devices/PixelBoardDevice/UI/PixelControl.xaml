@@ -33,7 +33,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Header="Размеры табло" IsEnabled="{Binding AllowChangeBoardSize}">
+                <GroupBox Grid.Column="0" Header="Размеры табло" IsEnabled="{Binding AllowChangeBoardSize}" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
@@ -50,7 +50,7 @@
                         <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding DeviceHeight}"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Grid.Column="1" Header="Доступ к MQTT" BorderBrush="#FF79878F">
+                <GroupBox Grid.Column="1" Header="Доступ к MQTT" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
@@ -144,7 +144,7 @@
                         </Grid>
 
                     </Grid>
-                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Расположение" IsEnabled="{Binding AllowZoneCoordinates}">
+                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Расположение" IsEnabled="{Binding AllowZoneCoordinates}" Style="{StaticResource GroupBoxStyle}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
@@ -167,7 +167,7 @@
                             <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ZoneWidth}"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" Grid.Column="1" Header="Текст">
+                    <GroupBox Grid.Row="1" Grid.Column="1" Header="Текст" Style="{StaticResource GroupBoxStyle}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
@@ -193,13 +193,13 @@
                             </TextBox>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.Column="0" Header="Анимация" IsEnabled="{Binding AllowAnimation}">
+                    <GroupBox Grid.Row="2" Grid.Column="0" Header="Анимация" IsEnabled="{Binding AllowAnimation}" Style="{StaticResource GroupBoxStyle}">
                         <ComboBox Grid.Column="1"></ComboBox>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.Column="1" Header="Растр" IsEnabled="{Binding AllowBitmap}">
+                    <GroupBox Grid.Row="2" Grid.Column="1" Header="Растр" IsEnabled="{Binding AllowBitmap}" Style="{StaticResource GroupBoxStyle}">
                         <Button>Загрузить</Button>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="Тэг MQTT" IsEnabled="{Binding AllowMQTT}">
+                    <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="Тэг MQTT" IsEnabled="{Binding AllowMQTT}" Style="{StaticResource GroupBoxStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto"/>

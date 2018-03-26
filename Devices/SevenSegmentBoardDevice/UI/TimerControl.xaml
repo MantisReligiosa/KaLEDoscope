@@ -5,6 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SevenSegmentBoardDevice.UI"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
@@ -16,14 +19,14 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Grid.ColumnSpan="4" Header="Предпросмотр">
+        <GroupBox Grid.Row="0" Grid.ColumnSpan="4" Header="Предпросмотр"  Style="{StaticResource GroupBoxStyle}">
         </GroupBox>
         <Grid Grid.Row="1" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <GroupBox Grid.Row="0" Header="Тип табло">
+            <GroupBox Grid.Row="0" Header="Тип табло"  Style="{StaticResource GroupBoxStyle}">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
@@ -46,7 +49,7 @@
                               DisplayMemberPath="Name" SelectedItem="{Binding DisplayFormat}"/>
                 </Grid>
             </GroupBox>
-            <GroupBox Grid.Row="1" Header="Конфигурация будильников" HorizontalAlignment="Right" Width="252">
+            <GroupBox Grid.Row="1" Header="Конфигурация будильников" HorizontalAlignment="Right" Width="252"  Style="{StaticResource GroupBoxStyle}">
                 <ListView ItemsSource="{Binding AlarmSchedule}" SelectedItem="{Binding SelectedAlarm}">
                     <ListView.ContextMenu>
                         <ContextMenu>
@@ -85,7 +88,7 @@
                 </ListView>
             </GroupBox>
         </Grid>
-        <GroupBox Grid.Row="1" Grid.Column="1" Header="Отображаемая информация">
+        <GroupBox Grid.Row="1" Grid.Column="1" Header="Отображаемая информация"  Style="{StaticResource GroupBoxStyle}">
             <ListView ItemsSource="{Binding DisplayFrames}">
                 <ListView.View>
                     <GridView>
@@ -114,7 +117,7 @@
                 </ListView.View>
             </ListView>
         </GroupBox>
-        <GroupBox Grid.Row="1" Grid.Column="2" Header="Источник времени">
+        <GroupBox Grid.Row="1" Grid.Column="2" Header="Источник времени"  Style="{StaticResource GroupBoxStyle}">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
@@ -141,7 +144,7 @@
                 <TextBox Grid.Row="5" Grid.Column="1" IsEnabled="{Binding SyncSource.IsCutomized}" Text="{Binding TimeSyncServerPort}"/>
             </Grid>
         </GroupBox >
-        <GroupBox Grid.Row="2" Grid.Column="0" Header="Настройка таймера/секундомера">
+        <GroupBox Visibility="Collapsed" Grid.Row="2" Grid.Column="0" Header="Настройка таймера/секундомера"  Style="{StaticResource GroupBoxStyle}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"/>
