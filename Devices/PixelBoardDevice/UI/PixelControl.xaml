@@ -93,6 +93,7 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -133,13 +134,13 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-            <ListBox Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2" 
+            <ListBox Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2" Width="170"
                      ItemsSource="{Binding Zones}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedZone}"/>
             <Button Grid.Column="0" Grid.Row="1" Command="{Binding AddScreen}" Content="Добавить экран"/>
             <Button Grid.Column="1" Grid.Row="1" Command="{Binding DeleteScreen}" Content="Удалить экран"/>
             <Button Grid.Column="2" Grid.Row="1" Command="{Binding AddZone}" Content="Добавить зону"/>
             <Button Grid.Column="3" Grid.Row="1" Command="{Binding DeleteZone}" Content="Удалить зону"/>
-            <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="2">
+            <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Width="275">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
@@ -147,12 +148,10 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                    <Grid Grid.Row="0">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto"/>
@@ -162,30 +161,29 @@
                             <ComboBox Grid.Column="1" ItemsSource="{Binding ZoneTypes}" SelectedItem="{Binding CurrentZoneType}" DisplayMemberPath="Name" IsEnabled="{Binding AllowZoneCoordinates}"></ComboBox>
                         </Grid>
                     </Grid>
-                    <GroupBox Grid.Row="1" Grid.Column="0" Header="Расположение" IsEnabled="{Binding AllowZoneCoordinates}" Style="{StaticResource GroupBoxStyle}">
+                    <GroupBox Grid.Row="1" Header="Расположение" IsEnabled="{Binding AllowZoneCoordinates}" Style="{StaticResource GroupBoxStyle}">
                         <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="auto"/>
-                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="auto"/>
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
                             <Label Grid.Column="0" Grid.Row="0">Слева</Label>
                             <TextBox Grid.Column="1" Grid.Row="0" Text="{Binding ZoneLeft}"/>
-                            <Label Grid.Column="0" Grid.Row="1">Сверху</Label>
-                            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ZoneTop}" />
-                            <Label Grid.Column="0" Grid.Row="2">Высота</Label>
-                            <TextBox Grid.Column="1" Grid.Row="2" Text="{Binding ZoneHeight}"/>
-                            <Label Grid.Column="0" Grid.Row="3">Ширина</Label>
-                            <TextBox Grid.Column="1" Grid.Row="3" Text="{Binding ZoneWidth}"/>
+                            <Label Grid.Column="2" Grid.Row="0">Сверху</Label>
+                            <TextBox Grid.Column="3" Grid.Row="0" Text="{Binding ZoneTop}" />
+                            <Label Grid.Column="0" Grid.Row="1">Высота</Label>
+                            <TextBox Grid.Column="1" Grid.Row="1" Text="{Binding ZoneHeight}"/>
+                            <Label Grid.Column="2" Grid.Row="1">Ширина</Label>
+                            <TextBox Grid.Column="3" Grid.Row="1" Text="{Binding ZoneWidth}"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" Grid.Column="1" Header="Текст" Style="{StaticResource GroupBoxStyle}">
+                    <GroupBox Grid.Row="2" Header="Текст" Style="{StaticResource GroupBoxStyle}" Visibility="{Binding TextVisibility}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
@@ -197,11 +195,12 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}" Width="200" DisplayMemberPath="Source" IsEnabled="{Binding AllowFont}"></ComboBox>
-                            <ComboBox Grid.Row="0" Grid.Column="1" IsEnabled="{Binding AllowFont}" ItemsSource="{Binding FontSizes}" Width="45" SelectedValue="{Binding SelectedFontSize}"/>
-                            <ToggleButton Grid.Row="0" Grid.Column="2" IsEnabled="{Binding AllowFont}" IsChecked="{Binding IsBold}">B</ToggleButton>
-                            <ToggleButton Grid.Row="0" Grid.Column="3" IsEnabled="{Binding AllowFont}" IsChecked="{Binding IsItalic}" >I</ToggleButton>
-                            <TextBox Grid.Row="1" Grid.ColumnSpan="100" IsEnabled="{Binding AllowText}" AcceptsReturn="True" 
+                            <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}" Width="200" DisplayMemberPath="Source"></ComboBox>
+                            <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding FontSizes}" Width="45" SelectedValue="{Binding SelectedFontSize}"/>
+                            <ToggleButton Grid.Row="0" Grid.Column="2" IsChecked="{Binding IsBold}" Width="22" FontWeight="Bold">B</ToggleButton>
+                            <ToggleButton Grid.Row="0" Grid.Column="3" IsChecked="{Binding IsItalic}" Width="22" FontStyle="Italic" >I</ToggleButton>
+                            <TextBox Grid.Row="1" Grid.ColumnSpan="100" AcceptsReturn="True" 
+                                     Height="100"
                                      TextWrapping="WrapWithOverflow"
                                      FontFamily="{Binding SelectedFont}"
                                      FontSize="{Binding SelectedFontSize}"
@@ -211,13 +210,13 @@
                             </TextBox>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Grid.ColumnSpan="2" Header="Анимация" Visibility="{Binding AnimationVisibility}" Style="{StaticResource GroupBoxStyle}">
+                    <GroupBox Grid.Row="3" Header="Анимация" Visibility="{Binding AnimationVisibility}" Style="{StaticResource GroupBoxStyle}">
                         <ComboBox Grid.Column="1"></ComboBox>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Grid.ColumnSpan="2" Header="Растр" Visibility="{Binding BitmapVisibility}" Style="{StaticResource GroupBoxStyle}">
+                    <GroupBox Grid.Row="4" Header="Растр" Visibility="{Binding BitmapVisibility}" Style="{StaticResource GroupBoxStyle}">
                         <Button Content="Загрузить" Command="{Binding LoadBitmap}"/>
                     </GroupBox>
-                    <GroupBox Grid.Row="4" Grid.ColumnSpan="2" Header="Тэг сервера" Visibility="{Binding ExternalTagVisibility}" Style="{StaticResource GroupBoxStyle}">
+                    <GroupBox Grid.Row="5" Header="Тэг сервера" Visibility="{Binding ExternalTagVisibility}" Style="{StaticResource GroupBoxStyle}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="auto"/>
@@ -226,6 +225,16 @@
                             </Grid.ColumnDefinitions>
                             <Label Grid.Column="0">Тэг</Label>
                             <TextBox Grid.Column="1" Text="{Binding ExternalSourceTag}" Grid.ColumnSpan="2"></TextBox>
+                        </Grid>
+                    </GroupBox>
+                    <GroupBox Grid.Row="6" Header="Часы" Visibility="{Binding ClockVisibility}" Style="{StaticResource GroupBoxStyle}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox Grid.Column="0" ItemsSource="{Binding ClockTypes}" SelectedItem="{Binding SelectedClockType}" DisplayMemberPath="Name"/>
+                            <ComboBox Grid.Column="1" IsEnabled="{Binding Path=SelectedClockType.AllowFormat}" ItemsSource="{Binding ClockFormats}" SelectedItem="{Binding SelectedClockFormat}" DisplayMemberPath="Name"/>
                         </Grid>
                     </GroupBox>
                 </Grid>

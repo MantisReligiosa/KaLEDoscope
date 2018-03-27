@@ -207,5 +207,34 @@ namespace BitmapProcessing
             }
             return retImg;
         }
+
+        public static string GenerateBase64ImageMono(Bitmap image)
+        {
+            var bits = BitmapToMonochrome(image);
+            var bitList = new List<bool>();
+            var rows = bits.GetLength(0);
+            var columns = bits.GetLength(1);
+            for (var column = 0; column < columns; column++)
+            {
+                for (var row = 0; row < rows; row++)
+                {
+                    var value = bits[row, column];
+                    bitList.Add(value);
+                }
+            }
+
+            var bitsInIncompleteByte = bitList.Count % 8;
+            var needBytesForOctet = bitsInIncompleteByte == 0 ? 0 : 8 - bitsInIncompleteByte;
+            for (var i = 0; i < needBytesForOctet; i++)
+            {
+                bitList.Add(false);
+            }
+            var bitArray = new BitArray(bitList.ToArray());
+            var bytesTotal = bitList.Count / 8;
+            var resultBytes = new byte[bytesTotal];
+            bitArray.CopyTo(resultBytes, 0);
+            var base64String = Convert.ToBase64String(resultBytes);
+            return base64String;
+        }
     }
 }

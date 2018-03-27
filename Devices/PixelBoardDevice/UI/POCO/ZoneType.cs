@@ -14,5 +14,6 @@ namespace PixelBoardDevice.UI.POCO
         public bool AllowMQTT { get; set; }
         public Func<Zone,bool> ZoneCondition { get; set; }
         public Func<Zone> Customize { get; set; }
+        public bool AllowClock { get; set; }
     }
 }

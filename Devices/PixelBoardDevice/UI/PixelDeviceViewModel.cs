@@ -14,6 +14,8 @@ using BitmapProcessing;
 using System.Windows;
 using System.Drawing;
 using PixelBoardDevice.DomainObjects;
+using Microsoft.Win32;
+using System.Collections;
 
 namespace PixelBoardDevice.UI
 {
@@ -31,10 +33,11 @@ namespace PixelBoardDevice.UI
                 AllowBitmap = false,
                 AllowFont = true,
                 AllowText = true,
+                AllowClock = false,
                 ZoneCondition = (z) => (z!=null) && z.ZoneType==(int)DomainObjects.ZoneTypes.Text,
                 Customize = () => new Zone
                 {
-                    ZoneType=(int)PixelBoardDevice.DomainObjects.ZoneTypes.Text,
+                    ZoneType=(int)DomainObjects.ZoneTypes.Text,
                     IsValid =true,
                     Name = "Текст",
                 }
@@ -47,6 +50,7 @@ namespace PixelBoardDevice.UI
                 AllowBitmap=false,
                 AllowFont=true,
                 AllowText=false,
+                AllowClock = false,
                 ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.Sensor,
                 Customize = () => new Zone{
                     ZoneType = (int)DomainObjects.ZoneTypes.Sensor,
@@ -63,6 +67,7 @@ namespace PixelBoardDevice.UI
                 AllowFont = true,
                 AllowText = false,
                 AllowMQTT = true,
+                AllowClock = false,
                 ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.MQTT,
                 Customize = () => new Zone{
                     ZoneType=(int)DomainObjects.ZoneTypes.MQTT,
@@ -78,6 +83,7 @@ namespace PixelBoardDevice.UI
                 AllowBitmap=true,
                 AllowFont=false,
                 AllowText=false,
+                AllowClock = false,
                 ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.Picture,
                 Customize = () => new Zone{
                     ZoneType=(int)DomainObjects.ZoneTypes.Picture,
@@ -87,12 +93,13 @@ namespace PixelBoardDevice.UI
             },
             new ZoneType
             {
-                Id = 4,
+                Id = 5,
                 Name = "Часы",
-                AllowAnimation=false,
-                AllowBitmap=false,
-                AllowFont=true,
-                AllowText=false,
+                AllowAnimation = false,
+                AllowBitmap = false,
+                AllowFont = true,
+                AllowText = false,
+                AllowClock = true,
                 ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.Clock,
                 Customize = () => new Zone{
                     IsValid=true,
@@ -105,29 +112,44 @@ namespace PixelBoardDevice.UI
         {
             new ClockType
             {
-                Id=1,
-                Name="ЧЧ(24):ММ"
+                Id = 1,
+                Name = "Текстовый",
+                AllowFormat = true
             },
             new ClockType
             {
-                Id=2,
-                Name="ЧЧ(24):ММ:CC"
-            },
-                        new ClockType
+                Id = 2,
+                Name = "Графический",
+                AllowFormat = false
+            }
+        };
+        private readonly List<ClockFormat> _clockFormats = new List<ClockFormat>
+        {
+            new ClockFormat
             {
-                Id=3,
-                Name="ЧЧ(12):ММ"
+                Id = 1,
+                Name = "ЧЧ(24):ММ"
             },
-            new ClockType
+            new ClockFormat
             {
-                Id=4,
-                Name="ЧЧ(12):ММ:CC"
+                Id = 2,
+                Name = "ЧЧ(24):ММ:CC"
+            },
+                        new ClockFormat
+            {
+                Id = 3,
+                Name = "ЧЧ(12):ММ"
+            },
+            new ClockFormat
+            {
+                Id = 4,
+                Name = "ЧЧ(12):ММ:CC"
             }
         };
 
         private readonly List<int> _fontSizes = new List<int>
         {
-            8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,72
+            8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
         };
 
         public ObservableCollection<ZoneType> ZoneTypes { get; set; }
@@ -135,6 +157,8 @@ namespace PixelBoardDevice.UI
         public ObservableCollection<Zone> Zones { get; set; }
         public ObservableCollection<Font.FontFamily> Fonts { get; set; }
         public ObservableCollection<int> FontSizes { get; set; }
+        public ObservableCollection<ClockFormat> ClockFormats { get; set; }
+        public ObservableCollection<ClockType> ClockTypes { get; set; }
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
         {
@@ -145,6 +169,8 @@ namespace PixelBoardDevice.UI
             Screens = new ObservableCollection<Screen>(_device.Screens);
             Fonts = new ObservableCollection<Font.FontFamily>(new InstalledFontCollection().Families.Select(f => new Font.FontFamily(f.Name)));
             Zones = new ObservableCollection<Zone>();
+            ClockFormats = new ObservableCollection<ClockFormat>(_clockFormats);
+            ClockTypes = new ObservableCollection<ClockType>(_clockTypes);
             Zones.CollectionChanged += Zones_CollectionChanged;
             SelectedScreen = Screens.FirstOrDefault();
             FontSizes = new ObservableCollection<int>(_fontSizes);
@@ -152,6 +178,11 @@ namespace PixelBoardDevice.UI
             DeviceHeight = _device.BoardSize.Height;
             DeviceWidth = _device.BoardSize.Width;
             AllowChangeBoardSize = _device.IsStandaloneConfiguration;
+            AllowAnimation(false);
+            AllowBitmap(false);
+            AllowFont = false;
+            AllowExternalTag(false);
+            AllowText(false);
         }
 
         private void Zones_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -193,8 +224,47 @@ namespace PixelBoardDevice.UI
                     {
                         RenderText(g, _device.Fonts.FirstOrDefault(f => f.Id == zone.FontId), "999", zone.X, zone.Y, zone.Width, zone.Height);
                     }
+                },
+                {
+                    (z) => z.ZoneType==(int)DomainObjects.ZoneTypes.Picture,
+                    (zone,_device,g)=>
+                    {
+                        RenderBitmap(g,zone);
+                    }
                 }
             };
+
+        private static void RenderBitmap(Graphics g, Zone zone)
+        {
+            var base64 = zone.BitmapBase64;
+            if (String.IsNullOrEmpty(base64))
+            {
+                return;
+            }
+            var bytes = Convert.FromBase64String(base64);
+            var bitArray = new BitArray(bytes);
+            var bitmapHeight = zone.BitmapHeight;
+            var bitmapWidth = bitArray.Length / bitmapHeight;
+            var x = 1;
+            var y = 1;
+            foreach (var bit in bitArray)
+            {
+                if ((bool)bit)
+                {
+                    g.FillRectangle(new SolidBrush(Color.Red), new Rectangle(zone.X + x, zone.Y + y, 1, 1));
+                }
+                y++;
+                if (y > bitmapHeight)
+                {
+                    y = 1;
+                    x++;
+                    if (x > bitmapWidth)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
 
         private static void RenderText(Graphics g, BinaryFont binaryFont, string text, int x, int y, int width, int height)
         {
@@ -260,6 +330,7 @@ namespace PixelBoardDevice.UI
 
         private void ValidateZones()
         {
+            //
 #warning тут будет валидация
         }
 
@@ -327,19 +398,7 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        private object _previewImage;
-        public object PreviewImage
-        {
-            get
-            {
-                return _previewImage;
-            }
-            set
-            {
-                _previewImage = value;
-                OnPropertyChanged(nameof(PreviewImage));
-            }
-        }
+        public object PreviewImage { get; set; }
 
         private Font.FontFamily _selectedFont;
         public Font.FontFamily SelectedFont
@@ -448,85 +507,43 @@ namespace PixelBoardDevice.UI
 
         public System.Windows.FontStyle FontStyle => IsItalic ? FontStyles.Italic : FontStyles.Normal;
 
-        private bool _allowChangeBoardSize;
-        public bool AllowChangeBoardSize
-        {
-            get => _allowChangeBoardSize;
-            set
-            {
-                _allowChangeBoardSize = value;
-                OnPropertyChanged(nameof(AllowChangeBoardSize));
-            }
-        }
+        public bool AllowChangeBoardSize { get; set; }
 
         public bool AllowZoneCoordinates => SelectedZone != null;
 
-        private bool _allowFont;
-        public bool AllowFont
+        public bool AllowFont { get; set; }
+
+        private void AllowAnimation(bool value)
         {
-            get => _allowFont;
-            set
-            {
-                _allowFont = value;
-                OnPropertyChanged(nameof(AllowFont));
-            }
+            AnimationVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private bool AllowAnimation
+        public Visibility AnimationVisibility { get; set; }
+
+        private void AllowBitmap(bool value)
         {
-            set => AnimationVisibility = value ? Visibility.Visible : Visibility.Collapsed;
+            BitmapVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private Visibility _allowVisibility;
-        public Visibility AnimationVisibility
+        public Visibility BitmapVisibility { get; set; }
+
+        private void AllowExternalTag(bool value)
         {
-            get => _allowVisibility;
-            set
-            {
-                _allowVisibility = value;
-                OnPropertyChanged(nameof(AnimationVisibility));
-            }
+            ExternalTagVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private bool AllowBitmap
+        public Visibility ExternalTagVisibility { get; set; }
+
+        public Visibility TextVisibility { get; set; }
+        public void AllowText(bool value)
         {
-            set => BitmapVisibility = value ? Visibility.Visible : Visibility.Collapsed;
-        }
-        private Visibility _allowBitmap;
-        public Visibility BitmapVisibility
-        {
-            get => _allowBitmap;
-            set
-            {
-                _allowBitmap = value;
-                OnPropertyChanged(nameof(BitmapVisibility));
-            }
+            TextVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        private bool AllowExternalTag
+        public Visibility ClockVisibility { get; set; }
+        public void AllowClock(bool value)
         {
-            set => ExternalTagVisibility = value ? Visibility.Visible : Visibility.Collapsed;
-        }
-        private Visibility _externalTagVisibility;
-        public Visibility ExternalTagVisibility
-        {
-            get => _externalTagVisibility;
-            set
-            {
-                _externalTagVisibility = value;
-                OnPropertyChanged(nameof(ExternalTagVisibility));
-            }
-        }
-
-        private bool _allowText;
-        public bool AllowText
-        {
-            get => _allowText;
-            set
-            {
-                _allowText = value;
-                OnPropertyChanged(nameof(AllowText));
-            }
+            ClockVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private int _deviceHeight;
@@ -591,11 +608,12 @@ namespace PixelBoardDevice.UI
                 if (currentZoneType == null || CurrentZoneType == null || CurrentZoneType.Id != currentZoneType.Id)
                 {
                     CurrentZoneType = currentZoneType;
-                    AllowAnimation = currentZoneType?.AllowAnimation ?? false;
-                    AllowBitmap = currentZoneType?.AllowBitmap ?? false;
+                    AllowAnimation(currentZoneType?.AllowAnimation ?? false);
+                    AllowBitmap(currentZoneType?.AllowBitmap ?? false);
                     AllowFont = currentZoneType?.AllowFont ?? false;
-                    AllowExternalTag = currentZoneType?.AllowMQTT ?? false;
-                    AllowText = currentZoneType?.AllowText ?? false;
+                    AllowExternalTag(currentZoneType?.AllowMQTT ?? false);
+                    AllowText(currentZoneType?.AllowText ?? false);
+                    AllowClock(currentZoneType?.AllowClock ?? false);
                     OnPropertyChanged(nameof(CurrentZoneType));
                 }
                 if (_selectedZone != null && _selectedZone.IsFonted)
@@ -621,14 +639,16 @@ namespace PixelBoardDevice.UI
                     {
                         Text = String.Empty;
                     }
-                    if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.MQTT)
+                    if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
                     {
-                        ExternalSourceTag = _selectedZone.ExternalSourceTag;
+                        SelectedClockType = _clockTypes.FirstOrDefault(ct => ct.Id == _selectedZone.ClockType);
+                        SelectedClockFormat = _clockFormats.FirstOrDefault(cf => cf.Id == _selectedZone.ClockFormat);
                     }
                     else
                     {
                         ExternalSourceTag = string.Empty;
                     }
+
                 }
             }
         }
@@ -646,6 +666,38 @@ namespace PixelBoardDevice.UI
                     ticker.Text = value;
                 }
                 OnPropertyChanged(nameof(Text));
+            }
+        }
+
+        private ClockType _selectedClockType;
+        public ClockType SelectedClockType
+        {
+            get => _selectedClockType;
+            set
+            {
+                _selectedClockType = value;
+                var zone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
+                {
+                    zone.ClockType = value?.Id ?? 0;
+                }
+                OnPropertyChanged(nameof(SelectedClockType));
+            }
+        }
+
+        private ClockFormat _selectedClockFormat;
+        public ClockFormat SelectedClockFormat
+        {
+            get => _selectedClockFormat;
+            set
+            {
+                _selectedClockFormat = value;
+                var zone = GetDeviceZone(SelectedZone.Id, SelectedZone.Id);
+                if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
+                {
+                    zone.ClockFormat = value?.Id ?? 0;
+                }
+                OnPropertyChanged(nameof(SelectedClockFormat));
             }
         }
 
@@ -731,11 +783,37 @@ namespace PixelBoardDevice.UI
                 {
                     _loadBitmap = new DelegateCommand((o) =>
                       {
-#warning Дописать
+                          var dialog = new OpenFileDialog
+                          {
+                              Filter = "Image Files(*.BMP;*.JPG;*.GIF;*.PNG)|*.BMP;*.JPG;*.GIF;*.PNG|All files (*.*)|*.*"
+                          };
+                          if (dialog.ShowDialog() != true)
+                          {
+                              return;
+                          }
+                          var image = Image.FromFile(dialog.FileName);
+                          UpdateZoneImage(SelectedScreen, SelectedZone, image);
                       });
                 }
                 return _loadBitmap;
             }
+        }
+
+        private void UpdateZoneImage(Screen screen, Zone zone, Image image)
+        {
+            if (zone.Width == 0 && zone.Height == 0)
+            {
+                return;
+            }
+            var deviceZone = GetDeviceZone(screen.Id, zone.Id);
+            var bitmap = new Bitmap(image);
+            var width = (bitmap.Width > zone.Width) ? zone.Width : bitmap.Width;
+            var height = (bitmap.Height > zone.Height) ? zone.Height : bitmap.Height;
+            var trimmedBitmap = bitmap.Clone(new Rectangle(0, 0, width, height), bitmap.PixelFormat);
+            var base64String = BitmapProcessor.GenerateBase64ImageMono(new Bitmap(trimmedBitmap));
+            deviceZone.BitmapHeight = height;
+            deviceZone.BitmapBase64 = base64String;
+            OnPropertyChanged("");
         }
 
         private DelegateCommand _addScreen;

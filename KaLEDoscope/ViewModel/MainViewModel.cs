@@ -61,19 +61,7 @@ namespace KaLEDoscope
             }
         }
 
-        private bool _isScanEnabled;
-        public bool IsScanEnabled
-        {
-            get
-            {
-                return _isScanEnabled;
-            }
-            set
-            {
-                _isScanEnabled = value;
-                OnPropertyChanged(nameof(IsScanEnabled));
-            }
-        }
+        public bool IsScanEnabled { get; set; }
 
         public Dictionary<Func<DeviceNode>, Func<CustomDeviceControl>> CustomControls { get; set; }
 

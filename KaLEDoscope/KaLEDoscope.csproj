@@ -61,6 +61,9 @@
       <HintPath>..\packages\Newtonsoft.Json.11.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PropertyChanged, Version=2.2.9.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
+      <HintPath>..\packages\PropertyChanged.Fody.2.2.9\lib\net452\PropertyChanged.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -166,13 +169,13 @@
       <Project>{F22FAA1E-1120-4B56-992B-7473F9DF1B45}</Project>
       <Name>PixelBoardDevice</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Domain\Abstractions\Abstractions.csproj">
-      <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
-      <Name>Abstractions</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Devices\SevenSegmentBoardDevice\SevenSegmentBoardDevice.csproj">
       <Project>{96D808B9-C3F8-4604-BE96-2C85074EC088}</Project>
       <Name>SevenSegmentBoardDevice</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain\Abstractions\Abstractions.csproj">
+      <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
+      <Name>Abstractions</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Logger\Logger.csproj">
       <Project>{F5C748BA-65E1-430D-8385-CFD198FE850E}</Project>
@@ -199,8 +202,17 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="FodyWeavers.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\Fody.2.4.4\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.4\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Fody.2.4.4\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.2.4.4\build\Fody.targets'))" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

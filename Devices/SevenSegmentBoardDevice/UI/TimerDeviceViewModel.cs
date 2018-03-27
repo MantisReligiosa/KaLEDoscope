@@ -437,19 +437,7 @@ namespace SevenSegmentBoardDevice.UI
             }
         }
 
-        private Alarm _selectedAlarm;
-        public Alarm SelectedAlarm
-        {
-            get
-            {
-                return _selectedAlarm;
-            }
-            set
-            {
-                _selectedAlarm = value;
-                OnPropertyChanged(nameof(SelectedAlarm));
-            }
-        }
+        public Alarm SelectedAlarm { get; set; }
 
         public TimerDeviceViewModel(Device device, ILogger logger)
         {

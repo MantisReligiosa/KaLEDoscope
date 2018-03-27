@@ -1,4 +1,5 @@
-﻿using BaseDevice;
+﻿using Abstractions;
+using BaseDevice;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using Input = System.Windows.Input;
 
 namespace KaLEDoscope.ViewModel
 {
-    public class BaseDeviceViewModel : INotifyPropertyChanged
+    public class BaseDeviceViewModel : Notified
     {
         private readonly Device _device;
 
@@ -73,19 +74,7 @@ namespace KaLEDoscope.ViewModel
 
         public ObservableCollection<BrightnessPeriod> BrightnessPeriods { get; set; }
 
-        private BrightnessPeriod _selectedBrightnessPeriod;
-        public BrightnessPeriod SelectedBrightnessPeriod
-        {
-            get
-            {
-                return _selectedBrightnessPeriod;
-            }
-            set
-            {
-                _selectedBrightnessPeriod = value;
-                OnPropertyChanged(nameof(SelectedBrightnessPeriod));
-            }
-        }
+        public BrightnessPeriod SelectedBrightnessPeriod { get; set; }
 
         private string _subnetMask;
         public string SubnetMask
@@ -522,13 +511,6 @@ namespace KaLEDoscope.ViewModel
                 }
                 return _removeBrightnessItem;
             }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

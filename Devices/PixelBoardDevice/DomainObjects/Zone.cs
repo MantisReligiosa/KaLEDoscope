@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using PixelBoardDevice.UI.POCO;
 
 namespace PixelBoardDevice.DomainObjects
 {
@@ -23,6 +24,10 @@ namespace PixelBoardDevice.DomainObjects
         }
 
         public string ExternalSourceTag { get; set; }
+        public int BitmapHeight { get; internal set; }
+        public string BitmapBase64 { get; internal set; }
+        public int ClockType { get; set; }
+        public int ClockFormat { get; internal set; }
     }
 
     public enum ZoneTypes
