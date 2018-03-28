@@ -33,6 +33,7 @@ namespace PixelBoardDevice.UI
                 AllowBitmap = false,
                 AllowFont = true,
                 AllowText = true,
+                AllowTextEditing=true,
                 AllowClock = false,
                 ZoneCondition = (z) => (z!=null) && z.ZoneType==(int)DomainObjects.ZoneTypes.Text,
                 Customize = () => new Zone
@@ -49,7 +50,9 @@ namespace PixelBoardDevice.UI
                 AllowAnimation=false,
                 AllowBitmap=false,
                 AllowFont=true,
-                AllowText=false,
+                AllowText=true,
+                AllowMQTT=false,
+                AllowTextEditing=false,
                 AllowClock = false,
                 ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.Sensor,
                 Customize = () => new Zone{
@@ -108,13 +111,22 @@ namespace PixelBoardDevice.UI
                 }
             },
         };
-        private readonly List<ClockType> _clockTypes = new List<ClockType>
+        private static readonly List<ClockType> _clockTypes = new List<ClockType>
         {
             new ClockType
             {
                 Id = 1,
                 Name = "Текстовый",
-                AllowFormat = true
+                AllowFormat = true,
+                Renderer = ( g,zone) =>
+                {
+                    var selectedClockFormat = _clockFormats.FirstOrDefault(cf=>cf.Id == zone.ClockFormat);
+                    if (selectedClockFormat == null)
+                    {
+                        return;
+                    }
+#warning дописать
+                }
             },
             new ClockType
             {
@@ -123,27 +135,31 @@ namespace PixelBoardDevice.UI
                 AllowFormat = false
             }
         };
-        private readonly List<ClockFormat> _clockFormats = new List<ClockFormat>
+        private static readonly List<ClockFormat> _clockFormats = new List<ClockFormat>
         {
             new ClockFormat
             {
                 Id = 1,
-                Name = "ЧЧ(24):ММ"
+                Name = "ЧЧ(24):ММ",
+                Sample="13:45"
             },
             new ClockFormat
             {
                 Id = 2,
-                Name = "ЧЧ(24):ММ:CC"
+                Name = "ЧЧ(24):ММ:CC",
+                Sample = "13:45:30"
             },
-                        new ClockFormat
+            new ClockFormat
             {
                 Id = 3,
-                Name = "ЧЧ(12):ММ"
+                Name = "ЧЧ(12):ММ",
+                Sample="1:45"
             },
             new ClockFormat
             {
                 Id = 4,
-                Name = "ЧЧ(12):ММ:CC"
+                Name = "ЧЧ(12):ММ:CC",
+                Sample="1:45:30"
             }
         };
 
@@ -231,8 +247,18 @@ namespace PixelBoardDevice.UI
                     {
                         RenderBitmap(g,zone);
                     }
+                },
+                {
+                    (z) => z.ZoneType==(int)DomainObjects.ZoneTypes.Clock,
+                    (zone,_device,g)=>
+                    {
+                        var clockType=_clockTypes.FirstOrDefault(c=>c.Id==zone.ClockType);
+                        clockType?.Renderer?.Invoke(g,zone);
+                    }
                 }
             };
+
+
 
         private static void RenderBitmap(Graphics g, Zone zone)
         {
@@ -512,6 +538,7 @@ namespace PixelBoardDevice.UI
         public bool AllowZoneCoordinates => SelectedZone != null;
 
         public bool AllowFont { get; set; }
+        public bool AllowTextEditing { get; set; }
 
         private void AllowAnimation(bool value)
         {
@@ -613,6 +640,7 @@ namespace PixelBoardDevice.UI
                     AllowFont = currentZoneType?.AllowFont ?? false;
                     AllowExternalTag(currentZoneType?.AllowMQTT ?? false);
                     AllowText(currentZoneType?.AllowText ?? false);
+                    AllowTextEditing = currentZoneType?.AllowTextEditing ?? false;
                     AllowClock(currentZoneType?.AllowClock ?? false);
                     OnPropertyChanged(nameof(CurrentZoneType));
                 }
@@ -682,6 +710,23 @@ namespace PixelBoardDevice.UI
                     zone.ClockType = value?.Id ?? 0;
                 }
                 OnPropertyChanged(nameof(SelectedClockType));
+                AllowClockFormat = value?.AllowFormat ?? false;
+            }
+        }
+
+        private bool _AllowClockFormat;
+        public bool AllowClockFormat
+        {
+            get
+            {
+                return _AllowClockFormat;
+            }
+            set
+            {
+                _AllowClockFormat = value;
+                AllowText(true);
+                AllowFont = value;
+                OnPropertyChanged(nameof(AllowClockFormat));
             }
         }
 
@@ -692,7 +737,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _selectedClockFormat = value;
-                var zone = GetDeviceZone(SelectedZone.Id, SelectedZone.Id);
+                var zone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
                 if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
                 {
                     zone.ClockFormat = value?.Id ?? 0;
@@ -825,8 +870,8 @@ namespace PixelBoardDevice.UI
                 {
                     _addScreen = new DelegateCommand((o) =>
                     {
-                        var nextOrderValue = _device.Screens.Max(s => s.Order) + 1;
-                        var nextId = _device.Screens.Max(x => x.Id) + 1;
+                        var nextOrderValue = (_device.Screens.Any()) ? _device.Screens.Max(s => s.Order) + 1 : 1;
+                        var nextId = (_device.Screens.Any()) ? _device.Screens.Max(x => x.Id) + 1 : 0;
                         var screen = new Screen
                         {
                             Order = nextOrderValue,
@@ -852,8 +897,8 @@ namespace PixelBoardDevice.UI
                 {
                     _deleteScreen = new DelegateCommand((o) =>
                     {
+                        _device.Screens.Remove(_device.Screens.FirstOrDefault(s => s.Id == SelectedScreen.Id));
                         Screens.Remove(SelectedScreen);
-                        _device.Screens.Remove(SelectedScreen);
                         SelectedScreen = null;
                     });
                 }

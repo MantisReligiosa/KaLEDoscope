@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PixelBoardDevice.DomainObjects;
+using System;
+using System.Drawing;
 
 namespace PixelBoardDevice.UI.POCO
 {
@@ -11,5 +9,6 @@ namespace PixelBoardDevice.UI.POCO
         public int Id { get; set; }
         public string Name { get; set; }
         public bool AllowFormat { get; set; }
+        public Action<Graphics, Zone> Renderer { get; set; }
     }
 }
