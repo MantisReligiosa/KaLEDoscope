@@ -118,21 +118,28 @@ namespace PixelBoardDevice.UI
                 Id = 1,
                 Name = "Текстовый",
                 AllowFormat = true,
-                Renderer = ( g,zone) =>
+                Renderer = ( g,zone,binaryFont) =>
                 {
                     var selectedClockFormat = _clockFormats.FirstOrDefault(cf=>cf.Id == zone.ClockFormat);
                     if (selectedClockFormat == null)
                     {
                         return;
                     }
-#warning дописать
+                    RenderText(g, binaryFont, selectedClockFormat.Sample, zone.X, zone.Y, zone.Width, zone.Height);
                 }
             },
             new ClockType
             {
                 Id = 2,
                 Name = "Графический",
-                AllowFormat = false
+                AllowFormat = false,
+                Renderer = ( g,zone,binaryFont) =>
+                {
+                    var diameter = ((zone.Width < zone.Height) ? zone.Width : zone.Height) - 3;
+                    g.DrawEllipse(new Pen(Color.Red), new RectangleF(zone.X + 1, zone.Y + 1, diameter, diameter));
+                    g.DrawLine(new Pen(Color.Red),zone.X+1+diameter/2,zone.Y+1+diameter/2,zone.X+1+diameter/2,zone.Y+1);
+                    g.DrawLine(new Pen(Color.Red),zone.X+1+diameter/2,zone.Y+1+diameter/2,zone.X+1+diameter,zone.Y+1+diameter/2);
+                }
             }
         };
         private static readonly List<ClockFormat> _clockFormats = new List<ClockFormat>
@@ -253,7 +260,7 @@ namespace PixelBoardDevice.UI
                     (zone,_device,g)=>
                     {
                         var clockType=_clockTypes.FirstOrDefault(c=>c.Id==zone.ClockType);
-                        clockType?.Renderer?.Invoke(g,zone);
+                        clockType?.Renderer?.Invoke(g,zone,_device.Fonts.FirstOrDefault(f => f.Id == zone.FontId));
                     }
                 }
             };
@@ -334,12 +341,13 @@ namespace PixelBoardDevice.UI
                 {
                     foreach (var zone in Zones)
                     {
-                        var pen = new Pen(Color.Yellow);
+                        var pen = new Pen(Color.Gray);
+                        pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
                         if (zone.Id == (SelectedZone?.Id ?? int.MinValue))
                         {
-                            pen = new Pen(Color.Green);
+                            pen.Color = Color.Green;
                         }
-                        g.DrawRectangle(pen, zone.X, zone.Y, zone.Width, zone.Height);
+                        g.DrawRectangle(pen, zone.X, zone.Y, zone.Width - 1, zone.Height - 1);
                         var renderer = zoneRenders.FirstOrDefault(kvp => kvp.Key(zone));
                         if (renderer.Key != null && renderer.Value != null)
                         {
@@ -632,9 +640,9 @@ namespace PixelBoardDevice.UI
                 OnPropertyChanged(nameof(SelectedZone));
                 OnPropertyChanged(nameof(AllowZoneCoordinates));
                 var currentZoneType = ZoneTypes.FirstOrDefault(z => z.ZoneCondition(_selectedZone));
-                if (currentZoneType == null || CurrentZoneType == null || CurrentZoneType.Id != currentZoneType.Id)
+                if (currentZoneType == null || SelectedZoneType == null || SelectedZoneType.Id != currentZoneType.Id)
                 {
-                    CurrentZoneType = currentZoneType;
+                    SelectedZoneType = currentZoneType;
                     AllowAnimation(currentZoneType?.AllowAnimation ?? false);
                     AllowBitmap(currentZoneType?.AllowBitmap ?? false);
                     AllowFont = currentZoneType?.AllowFont ?? false;
@@ -642,7 +650,7 @@ namespace PixelBoardDevice.UI
                     AllowText(currentZoneType?.AllowText ?? false);
                     AllowTextEditing = currentZoneType?.AllowTextEditing ?? false;
                     AllowClock(currentZoneType?.AllowClock ?? false);
-                    OnPropertyChanged(nameof(CurrentZoneType));
+                    OnPropertyChanged(nameof(SelectedZoneType));
                 }
                 if (_selectedZone != null && _selectedZone.IsFonted)
                 {
@@ -711,19 +719,20 @@ namespace PixelBoardDevice.UI
                 }
                 OnPropertyChanged(nameof(SelectedClockType));
                 AllowClockFormat = value?.AllowFormat ?? false;
+                AllowText(value?.AllowFormat ?? false);
             }
         }
 
-        private bool _AllowClockFormat;
+        private bool _allowClockFormat;
         public bool AllowClockFormat
         {
             get
             {
-                return _AllowClockFormat;
+                return _allowClockFormat;
             }
             set
             {
-                _AllowClockFormat = value;
+                _allowClockFormat = value;
                 AllowText(true);
                 AllowFont = value;
                 OnPropertyChanged(nameof(AllowClockFormat));
@@ -762,14 +771,14 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        private ZoneType _currentZoneType;
-        public ZoneType CurrentZoneType
+        private ZoneType _selectedZoneType;
+        public ZoneType SelectedZoneType
         {
-            get => _currentZoneType;
+            get => _selectedZoneType;
             set
             {
-                _currentZoneType = value;
-                OnPropertyChanged(nameof(CurrentZoneType));
+                _selectedZoneType = value;
+                OnPropertyChanged(nameof(SelectedZoneType));
 
                 if (SelectedZone == null)
                     return;

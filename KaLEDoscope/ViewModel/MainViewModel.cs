@@ -19,6 +19,8 @@ using SevenSegmentBoardDevice;
 using DeviceBuilding;
 using Abstractions;
 using PixelBoardDevice;
+using KaLEDoscope.Properties;
+using System.Windows.Media;
 
 namespace KaLEDoscope
 {
@@ -259,9 +261,11 @@ namespace KaLEDoscope
                     var customControl = customDevicesControlsKeyValuePair.Value;
                     customTabItem.Content = customControl;
                     customTabItem.Header = customDevicesControlsKeyValuePair.Key;
+                    customTabItem.Background = new SolidColorBrush(Color.FromArgb(255, 0, 176, 180));
                     tabControl.Items.Add(customTabItem);
                 }
             }
+            
             return grid;
         }
 
