@@ -89,6 +89,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ApplicationInfrastructure.cs" />
+    <Compile Include="Models\AggregationNode.cs" />
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>
     </Compile>
@@ -100,7 +101,7 @@
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="Models\LogItem.cs" />
     <Compile Include="Models\DeviceNode.cs" />
-    <Compile Include="Models\ProtocolNode.cs" />
+    <Compile Include="Models\FolderNode.cs" />
     <Compile Include="ViewModel\BaseDeviceViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Page Include="Views\BaseDeviceControl.xaml">

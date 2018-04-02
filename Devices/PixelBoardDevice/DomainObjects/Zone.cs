@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using PixelBoardDevice.Extensions;
 using PixelBoardDevice.UI.POCO;
 
 namespace PixelBoardDevice.DomainObjects
@@ -28,6 +30,19 @@ namespace PixelBoardDevice.DomainObjects
         public string BitmapBase64 { get; internal set; }
         public int ClockType { get; set; }
         public int ClockFormat { get; internal set; }
+
+        public bool IntersectWith(Zone z)
+        {
+            if ((z.X + z.Width).Between(X, X + Width) && (z.Y + z.Height).Between(Y, Y + Height))
+                return true;
+            if ((z.X + z.Width).Between(X, X + Width) && z.Y.Between(Y, Y + Height))
+                return true;
+            if (z.X.Between(X, X + Width) && (z.Y + z.Height).Between(Y, Y + Height))
+                return true;
+            if (z.X.Between(X, X + Width) && z.Y.Between(Y, Y + Height))
+                return true;
+            return false;
+        }
     }
 
     public enum ZoneTypes

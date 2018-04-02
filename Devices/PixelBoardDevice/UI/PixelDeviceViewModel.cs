@@ -343,9 +343,13 @@ namespace PixelBoardDevice.UI
                     {
                         var pen = new Pen(Color.Gray);
                         pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+                        if (!zone.IsValid)
+                        {
+                            pen.Color = Color.Red;
+                        }
                         if (zone.Id == (SelectedZone?.Id ?? int.MinValue))
                         {
-                            pen.Color = Color.Green;
+                            pen.Color = Color.Yellow;
                         }
                         g.DrawRectangle(pen, zone.X, zone.Y, zone.Width - 1, zone.Height - 1);
                         var renderer = zoneRenders.FirstOrDefault(kvp => kvp.Key(zone));
@@ -364,8 +368,20 @@ namespace PixelBoardDevice.UI
 
         private void ValidateZones()
         {
-            //
-#warning тут будет валидация
+            if (Zones == null)
+                return;
+            foreach (var zone in Zones)
+            {
+                zone.IsValid = true;
+                foreach (var concurrentZone in Zones.Except(new List<Zone> { zone }))
+                {
+                    if (zone.IntersectWith(concurrentZone))
+                    {
+                        zone.IsValid = false;
+                        break;
+                    }
+                }
+            }
         }
 
         private int _zoneLeft;

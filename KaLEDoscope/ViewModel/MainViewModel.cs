@@ -27,12 +27,12 @@ namespace KaLEDoscope
     public class MainViewModel : Notified
     {
         private ILogger _logger { get; set; }
-        private readonly ProtocolNode _directConnect;
+        private readonly FolderNode _directConnect;
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
 
-        public ObservableCollection<ProtocolNode> ProtocolNodes { get; set; } = new ObservableCollection<ProtocolNode>();
+        public ObservableCollection<FolderNode> StructureNodes { get; set; } = new ObservableCollection<FolderNode>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
 
         private TabItem _selectedTabItem;
@@ -81,17 +81,12 @@ namespace KaLEDoscope
             _deviceFactory.Builders.Add(new SevenSegmentDeviceBuilder());
             _deviceFactory.Builders.Add(new PixelDeviceBuilder());
 
-            var standaloneConfiguration = new ProtocolNode
+            _directConnect = new FolderNode
             {
-                Name = "Автономная конфигурация",
-            };
-            _directConnect = new ProtocolNode
-            {
-                Name = "Найденные устройства",
+                Name = "Структура системы",
             };
 
-            ProtocolNodes.Add(standaloneConfiguration);
-            ProtocolNodes.Add(_directConnect);
+            StructureNodes.Add(_directConnect);
             var id = int.MaxValue;
             _deviceFactory.Builders.ForEach(builder =>
             {
@@ -101,7 +96,7 @@ namespace KaLEDoscope
                     Model = builder.Model,
                     IsStandaloneConfiguration = true
                 });
-                standaloneConfiguration.Members.Add(new DeviceNode
+                _directConnect.Devices.Add(new DeviceNode
                 {
                     Device = device,
                     Name = builder.GetControls(device, logger).FirstOrDefault().Key,
@@ -127,7 +122,7 @@ namespace KaLEDoscope
             {
                 foreach (var device in devices)
                 {
-                    _directConnect.Members.Add(new DeviceNode
+                    _directConnect.Devices.Add(new DeviceNode
                     {
                         Device = device,
                         Name = device.Name,
@@ -265,7 +260,7 @@ namespace KaLEDoscope
                     tabControl.Items.Add(customTabItem);
                 }
             }
-            
+
             return grid;
         }
 
@@ -278,7 +273,7 @@ namespace KaLEDoscope
                 {
                     _scanDevices = new DelegateCommand((o) =>
                       {
-                          _directConnect.Members.Clear();
+                          _directConnect.Devices.Clear();
                           MakeNodes();
                       });
                 }
