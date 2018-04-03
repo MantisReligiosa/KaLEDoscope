@@ -27,6 +27,7 @@ namespace SevenSegmentBoardDevice
             {
                 {"Настройки часов", timerControl}
             };
+            pack.PreviewControl = new UserControl();
             return pack;
         }
 

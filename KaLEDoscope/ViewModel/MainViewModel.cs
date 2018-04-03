@@ -234,6 +234,14 @@ namespace KaLEDoscope
             var grid = new Grid();
             grid.RowDefinitions.Add(new RowDefinition
             {
+                Height = new GridLength(100, GridUnitType.Pixel)
+            });
+            grid.RowDefinitions.Add(new RowDefinition
+            {
+                Height = GridLength.Auto
+            });
+            grid.RowDefinitions.Add(new RowDefinition
+            {
                 Height = GridLength.Auto
             });
             grid.RowDefinitions.Add(new RowDefinition
@@ -289,14 +297,25 @@ namespace KaLEDoscope
                 CommandParameter = deviceNode,
                 IsEnabled = deviceNode.AllowLoad
             });
+            var splitter = new GridSplitter
+            {
+                Height = 5,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                ResizeDirection = GridResizeDirection.Rows
+            };
             grid.Children.Add(tabControl);
+            grid.Children.Add(splitter);
             grid.Children.Add(toolbar);
-            Grid.SetRow(tabControl, 1);
-            Grid.SetRow(toolbar, 0);
+            Grid.SetRow(splitter, 1);
+            Grid.SetRow(tabControl, 3);
+            Grid.SetRow(toolbar, 2);
             var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(deviceNode.Device.Model));
             if (deviceBuilder != null)
             {
                 var pack = deviceBuilder.GetControls(deviceNode.Device, _logger);
+                grid.Children.Add(pack.PreviewControl);
+                Grid.SetRow(pack.PreviewControl, 0);
                 foreach (var customDevicesControlsKeyValuePair in pack.CustomizationControls)
                 {
                     var customTabItem = new TabItem();

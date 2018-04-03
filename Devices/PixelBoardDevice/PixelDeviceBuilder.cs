@@ -7,28 +7,46 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using Resources;
 
 namespace PixelBoardDevice
 {
     public class PixelDeviceBuilder : IDeviceBuilder
     {
         public string Model => "pixelBoard";
+        private PixelDeviceViewModel _model;
+        private ScalableImage _previewControl;
 
         public ControlsPack GetControls(Device device, ILogger logger)
         {
-            var model = new PixelDeviceViewModel(device, logger);
+            _model = new PixelDeviceViewModel(device, logger);
             var pack = new ControlsPack();
             var pixelControl = new PixelControl
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
-                DataContext = model
+                DataContext = _model
             };
             pack.CustomizationControls = new Dictionary<string, UserControl>
             {
                 { "Пиксельная плата",pixelControl }
             };
+            _previewControl = new ScalableImage
+            {
+                Image = _model.PreviewImage
+            };
+            _model.PropertyChanged += Model_PropertyChanged;
+            pack.PreviewControl = _previewControl;
             return pack;
+        }
+
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName!=nameof(PixelDeviceViewModel.PreviewImage))
+            {
+                return;
+            }
+            _previewControl.Image = _model?.PreviewImage;
         }
 
         public Device UpdateCustomSettings(Device device)
