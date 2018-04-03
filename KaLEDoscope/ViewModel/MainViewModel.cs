@@ -27,12 +27,11 @@ namespace KaLEDoscope
     public class MainViewModel : Notified
     {
         private ILogger _logger { get; set; }
-        private readonly FolderNode _directConnect;
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
 
-        public ObservableCollection<FolderNode> StructureNodes { get; set; } = new ObservableCollection<FolderNode>();
+        public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
 
         private TabItem _selectedTabItem;
@@ -81,12 +80,18 @@ namespace KaLEDoscope
             _deviceFactory.Builders.Add(new SevenSegmentDeviceBuilder());
             _deviceFactory.Builders.Add(new PixelDeviceBuilder());
 
-            _directConnect = new FolderNode
+            var folderNode = new FolderNode
             {
-                Name = "Структура системы",
+                Name = "Папка",
             };
 
-            StructureNodes.Add(_directConnect);
+            var aggregationNode = new AggregationNode
+            {
+                Name = "Аггрегатор"
+            };
+
+            StructureNodes.Add(folderNode);
+            StructureNodes.Add(aggregationNode);
             var id = int.MaxValue;
             _deviceFactory.Builders.ForEach(builder =>
             {
@@ -96,10 +101,40 @@ namespace KaLEDoscope
                     Model = builder.Model,
                     IsStandaloneConfiguration = true
                 });
-                _directConnect.Devices.Add(new DeviceNode
+                folderNode.AddChildNode(new DeviceNode
                 {
                     Device = device,
-                    Name = builder.GetControls(device, logger).FirstOrDefault().Key,
+                    Name = builder.GetControls(device, logger).CustomizationControls.FirstOrDefault().Key,
+                    AllowDownload = false,
+                    AllowLoad = true,
+                    AllowSave = true,
+                    AllowUpload = false
+                });
+                device = builder.UpdateCustomSettings(new Device
+                {
+                    Id = id--,
+                    Model = builder.Model,
+                    IsStandaloneConfiguration = true
+                });
+                aggregationNode.AddChildNode(new DeviceNode
+                {
+                    Device = device,
+                    Name = builder.GetControls(device, logger).CustomizationControls.FirstOrDefault().Key,
+                    AllowDownload = false,
+                    AllowLoad = true,
+                    AllowSave = true,
+                    AllowUpload = false
+                });
+                device = builder.UpdateCustomSettings(new Device
+                {
+                    Id = id--,
+                    Model = builder.Model,
+                    IsStandaloneConfiguration = true
+                });
+                StructureNodes.Add(new DeviceNode
+                {
+                    Device = device,
+                    Name = builder.GetControls(device, logger).CustomizationControls.FirstOrDefault().Key,
                     AllowDownload = false,
                     AllowLoad = true,
                     AllowSave = true,
@@ -122,7 +157,7 @@ namespace KaLEDoscope
             {
                 foreach (var device in devices)
                 {
-                    _directConnect.Devices.Add(new DeviceNode
+                    StructureNodes.Add(new DeviceNode
                     {
                         Device = device,
                         Name = device.Name,
@@ -145,12 +180,23 @@ namespace KaLEDoscope
                 {
                     showDevicePlugin = new DelegateCommand((o) =>
                     {
-                        if (!(o is DeviceNode))
-                            return;
-                        var deviceNode = (DeviceNode)o;
-                        var existTab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == deviceNode.Device);
-                        if (existTab == null)
+                        var nodeItem = o as NodeItem;
+                        if (nodeItem is AggregationNode aggregationNode)
                         {
+                            ProcessAggregator(aggregationNode);
+                        }
+                        else if (nodeItem.Parent is AggregationNode parentAggregationNode)
+                        {
+                            ProcessAggregator(parentAggregationNode);
+                        }
+                        else if (nodeItem is DeviceNode deviceNode)
+                        {
+                            var existTab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == deviceNode.Device);
+                            if (existTab != null)
+                            {
+                                SelectedTabItem = existTab;
+                                return;
+                            }
                             var grid = GetGrid(deviceNode);
                             var newTabItem = new ClosableTab
                             {
@@ -166,14 +212,14 @@ namespace KaLEDoscope
                             DeviceTabs.Add(newTabItem);
                             SelectedTabItem = newTabItem;
                         }
-                        else
-                        {
-                            SelectedTabItem = existTab;
-                        }
                     });
                 }
                 return showDevicePlugin;
             }
+        }
+
+        private void ProcessAggregator(AggregationNode aggregationNode)
+        {
         }
 
         private static string GetTabItemTitle(DeviceNode deviceNode)
@@ -250,7 +296,8 @@ namespace KaLEDoscope
             var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(deviceNode.Device.Model));
             if (deviceBuilder != null)
             {
-                foreach (var customDevicesControlsKeyValuePair in deviceBuilder.GetControls(deviceNode.Device, _logger))
+                var pack = deviceBuilder.GetControls(deviceNode.Device, _logger);
+                foreach (var customDevicesControlsKeyValuePair in pack.CustomizationControls)
                 {
                     var customTabItem = new TabItem();
                     var customControl = customDevicesControlsKeyValuePair.Value;
@@ -260,7 +307,6 @@ namespace KaLEDoscope
                     tabControl.Items.Add(customTabItem);
                 }
             }
-
             return grid;
         }
 
@@ -273,8 +319,9 @@ namespace KaLEDoscope
                 {
                     _scanDevices = new DelegateCommand((o) =>
                       {
-                          _directConnect.Devices.Clear();
-                          MakeNodes();
+                          throw new NotImplementedException();
+                          //_rootNode.Devices.Clear();
+                          //MakeNodes();
                       });
                 }
                 return _scanDevices;

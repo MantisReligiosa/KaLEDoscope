@@ -6,6 +6,7 @@
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:local="clr-namespace:PixelBoardDevice.UI"
              xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+             xmlns:resources="clr-namespace:Resources;assembly=Resources"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
@@ -17,14 +18,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <ScrollViewer Name="scroll" Grid.Row="0" HorizontalScrollBarVisibility="Auto" CanContentScroll="True">
-            <Image Name="preview" 
-                           Source="{Binding PreviewImage}"
-                   SnapsToDevicePixels="True" UseLayoutRounding="False" RenderOptions.BitmapScalingMode="NearestNeighbor"        
-                           
-                           HorizontalAlignment="Left" VerticalAlignment="Top">
-            </Image>
-        </ScrollViewer>
+        <resources:ScalableImage Grid.Row="0" Image="{Binding PreviewImage,Mode=TwoWay}"/>
         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
         <Grid Grid.Row="2">
             <Grid>

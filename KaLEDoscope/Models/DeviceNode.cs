@@ -3,12 +3,12 @@ using System.ComponentModel;
 
 namespace KaLEDoscope
 {
-    public class DeviceNode : INotifyPropertyChanged
+    public class DeviceNode : NodeItem, INotifyPropertyChanged
     {
         public Device Device { get; set; }
 
         private string _name;
-        public string Name
+        public override string Name
         {
             get
             {

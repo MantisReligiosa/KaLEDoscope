@@ -90,6 +90,7 @@
     </ApplicationDefinition>
     <Compile Include="ApplicationInfrastructure.cs" />
     <Compile Include="Models\AggregationNode.cs" />
+    <Compile Include="Models\NodeItem.cs" />
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>
     </Compile>

@@ -10,6 +10,6 @@ namespace DeviceBuilding
     {
         string Model { get; }
         Device UpdateCustomSettings(Device device);
-        Dictionary<string, UserControl> GetControls(Device device, ILogger logger);
+        ControlsPack GetControls(Device device, ILogger logger);
     }
 }
