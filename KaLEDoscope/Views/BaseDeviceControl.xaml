@@ -206,36 +206,35 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Grid.Row="0" Grid.ColumnSpan="2" IsEnabled="{Binding ScheduledBrightness}" ItemsSource="{Binding BrightnessPeriods}" SelectedItem="{Binding SelectedBrightnessPeriod}">
+                    <ListView Grid.Row="0" Grid.ColumnSpan="2" IsEnabled="{Binding ScheduledBrightness}" ItemsSource="{Binding BrightnessPeriods}" SelectedItem="{Binding SelectedBrightnessPeriod}" Height="150" Width="250">
                         <ListView.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Добавить"
                                       Command="{Binding AddBrightnessItem}"/>
                                 <MenuItem Header="Удалить"
                                       Command="{Binding RemoveBrightnessItem}"/>
-
                             </ContextMenu>
                         </ListView.ContextMenu>
                         <ListView.View>
                             <GridView>
-                                <GridViewColumn Header="От" >
+                                <GridViewColumn Header="От" Width="50">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox Text="{Binding From}" Width="50"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn Header="До" >
+                                <GridViewColumn Header="До" Width="50">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBox Text="{Binding To}" Width="50"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn Header="Яркость">
+                                <GridViewColumn Header="Яркость" Width="150">
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBox Text="{Binding Value}" Width="50"/>
+                                            <TextBox Text="{Binding Value}" Width="150"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
@@ -258,7 +257,7 @@
                     <ColumnDefinition Width="37*"/>
                     <ColumnDefinition Width="50*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Header="Время работы" Grid.ColumnSpan="2">
+                <GroupBox Grid.Column="0" Header="Время работы" Grid.ColumnSpan="2" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -302,7 +301,7 @@
                         <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Content="Круглосуточно" IsChecked="{Binding ScheduleWorkAroundTheClock}"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Grid.Column="2" Header="Воспроизводить по дням недели">
+                <GroupBox Grid.Column="2" Header="Воспроизводить по дням недели" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
