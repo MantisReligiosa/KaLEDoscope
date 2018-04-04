@@ -183,34 +183,18 @@ namespace KaLEDoscope
                         var nodeItem = o as NodeItem;
                         if (nodeItem is AggregationNode aggregationNode)
                         {
-                            ProcessAggregator(aggregationNode);
-                        }
-                        else if (nodeItem.Parent is AggregationNode parentAggregationNode)
-                        {
-                            ProcessAggregator(parentAggregationNode);
+                            ProcessAggregator(aggregationNode,aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
                         }
                         else if (nodeItem is DeviceNode deviceNode)
                         {
-                            var existTab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == deviceNode.Device);
-                            if (existTab != null)
+                            if (nodeItem.Parent is AggregationNode aggregation)
                             {
-                                SelectedTabItem = existTab;
-                                return;
+                                ProcessAggregator(aggregation, deviceNode);
                             }
-                            var grid = GetGrid(deviceNode);
-                            var newTabItem = new ClosableTab
+                            else
                             {
-                                Title = GetTabItemTitle(deviceNode),
-                                Content = grid,
-                                DataContext = deviceNode.Device,
-                            };
-                            newTabItem.OnTabCloseClick += (sender, arguments) =>
-                            {
-                                var tab = (ClosableTab)sender;
-                                DeviceTabs.Remove(tab);
-                            };
-                            DeviceTabs.Add(newTabItem);
-                            SelectedTabItem = newTabItem;
+                                ProcessDevice(deviceNode);
+                            }
                         }
                     });
                 }
@@ -218,8 +202,38 @@ namespace KaLEDoscope
             }
         }
 
-        private void ProcessAggregator(AggregationNode aggregationNode)
+        private void ProcessDevice(DeviceNode deviceNode)
         {
+            var existTab = DeviceTabs.FirstOrDefault(t => t.DataContext == deviceNode.Device);
+            if (existTab != null)
+            {
+                SelectedTabItem = existTab;
+                return;
+            }
+            var grid = GetDeviceGrid(deviceNode);
+            var newTabItem = new ClosableTab
+            {
+                Title = GetTabItemTitle(deviceNode),
+                Content = grid,
+                DataContext = deviceNode.Device,
+            };
+            newTabItem.OnTabCloseClick += (sender, arguments) =>
+            {
+                var tab = (ClosableTab)sender;
+                DeviceTabs.Remove(tab);
+            };
+            DeviceTabs.Add(newTabItem);
+            SelectedTabItem = newTabItem;
+        }
+
+        private void ProcessAggregator(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
+        {
+            var existTab = DeviceTabs.FirstOrDefault(t => t.DataContext == aggregationNode);
+            if (existTab != null)
+            {
+                SelectedTabItem = existTab;
+                return;
+            }
         }
 
         private static string GetTabItemTitle(DeviceNode deviceNode)
@@ -227,7 +241,7 @@ namespace KaLEDoscope
             return $"{deviceNode.Device.Name} id:{deviceNode.Device.Id}";
         }
 
-        private Grid GetGrid(DeviceNode deviceNode)
+        private Grid GetDeviceGrid(DeviceNode deviceNode)
         {
             var tabControl = new TabControl();
             var baseTabItem = new TabItem();
@@ -417,7 +431,7 @@ namespace KaLEDoscope
         private void Command_OnConfigurationDownloaded(Device obj)
         {
             _updatedNode.Device = obj;
-            _dispatcher.Invoke(() => _tabItem.Content = GetGrid(_updatedNode));
+            _dispatcher.Invoke(() => _tabItem.Content = GetDeviceGrid(_updatedNode));
         }
 
         private DelegateCommand<DeviceNode> _importSettings;
