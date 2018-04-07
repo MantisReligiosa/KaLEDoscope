@@ -10,6 +10,7 @@ namespace DeviceBuilding
     public class ControlsPack
     {
         public UserControl PreviewControl { get; set; }
-        public Dictionary<string, UserControl> CustomizationControls { get; set; }
+        public UserControl CustomizationControl { get; set; }
+        public IEnumerable<object> MenuItems { get; set; }
     }
 }

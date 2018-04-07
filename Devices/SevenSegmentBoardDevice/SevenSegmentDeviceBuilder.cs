@@ -13,7 +13,7 @@ namespace SevenSegmentBoardDevice
     {
         public string Model => "boardClock";
 
-        public ControlsPack GetControls(Device device, ILogger logger)
+        public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var pack = new ControlsPack();
             var model = new TimerDeviceViewModel(device, logger);
@@ -23,10 +23,7 @@ namespace SevenSegmentBoardDevice
                 VerticalAlignment = VerticalAlignment.Stretch,
                 DataContext = model
             };
-            pack.CustomizationControls = new Dictionary<string, UserControl>
-            {
-                {"Настройки часов", timerControl}
-            };
+            pack.CustomizationControl = timerControl;
             pack.PreviewControl = new UserControl();
             return pack;
         }

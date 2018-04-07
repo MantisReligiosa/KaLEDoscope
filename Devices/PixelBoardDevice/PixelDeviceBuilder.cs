@@ -17,19 +17,15 @@ namespace PixelBoardDevice
         private PixelDeviceViewModel _model;
         private ScalableImage _previewControl;
 
-        public ControlsPack GetControls(Device device, ILogger logger)
+        public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             _model = new PixelDeviceViewModel(device, logger);
             var pack = new ControlsPack();
-            var pixelControl = new PixelControl
+            pack.CustomizationControl = new PixelControl
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 DataContext = _model
-            };
-            pack.CustomizationControls = new Dictionary<string, UserControl>
-            {
-                { "Пиксельная плата",pixelControl }
             };
             _previewControl = new ScalableImage
             {
@@ -42,7 +38,7 @@ namespace PixelBoardDevice
 
         private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName!=nameof(PixelDeviceViewModel.PreviewImage))
+            if (e.PropertyName != nameof(PixelDeviceViewModel.PreviewImage))
             {
                 return;
             }

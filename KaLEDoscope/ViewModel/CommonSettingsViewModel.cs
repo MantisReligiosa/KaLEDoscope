@@ -10,7 +10,7 @@ using Input = System.Windows.Input;
 
 namespace KaLEDoscope.ViewModel
 {
-    public class BaseDeviceViewModel : Notified
+    public class CommonSettingsViewModel : Notified
     {
         private readonly Device _device;
 
@@ -449,7 +449,7 @@ namespace KaLEDoscope.ViewModel
             }
         }
 
-        public BaseDeviceViewModel(Device device, ILogger logger)
+        public CommonSettingsViewModel(Device device, ILogger logger)
         {
             _device = device;
             _logger = logger;

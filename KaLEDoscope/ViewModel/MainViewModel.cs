@@ -8,7 +8,6 @@ using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -19,8 +18,6 @@ using SevenSegmentBoardDevice;
 using DeviceBuilding;
 using Abstractions;
 using PixelBoardDevice;
-using KaLEDoscope.Properties;
-using System.Windows.Media;
 
 namespace KaLEDoscope
 {
@@ -104,7 +101,7 @@ namespace KaLEDoscope
                 folderNode.AddChildNode(new DeviceNode
                 {
                     Device = device,
-                    Name = builder.GetControls(device, logger).CustomizationControls.FirstOrDefault().Key,
+                    Name = device.Name,
                     AllowDownload = false,
                     AllowLoad = true,
                     AllowSave = true,
@@ -119,7 +116,7 @@ namespace KaLEDoscope
                 aggregationNode.AddChildNode(new DeviceNode
                 {
                     Device = device,
-                    Name = builder.GetControls(device, logger).CustomizationControls.FirstOrDefault().Key,
+                    Name = device.Name,
                     AllowDownload = false,
                     AllowLoad = true,
                     AllowSave = true,
@@ -134,7 +131,7 @@ namespace KaLEDoscope
                 StructureNodes.Add(new DeviceNode
                 {
                     Device = device,
-                    Name = builder.GetControls(device, logger).CustomizationControls.FirstOrDefault().Key,
+                    Name = device.Name,
                     AllowDownload = false,
                     AllowLoad = true,
                     AllowSave = true,
@@ -183,7 +180,7 @@ namespace KaLEDoscope
                         var nodeItem = o as NodeItem;
                         if (nodeItem is AggregationNode aggregationNode)
                         {
-                            ProcessAggregator(aggregationNode,aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
+                            ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
                         }
                         else if (nodeItem is DeviceNode deviceNode)
                         {
@@ -210,10 +207,21 @@ namespace KaLEDoscope
                 SelectedTabItem = existTab;
                 return;
             }
-            var grid = GetDeviceGrid(deviceNode);
+            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(deviceNode.Device.Model));
+            var previewControl = new UserControl();
+            var customizationComtrol = new UserControl();
+            IEnumerable<object> menuItems = null;
+            if (deviceBuilder != null)
+            {
+                var pack = deviceBuilder.GetControlsPack(deviceNode.Device, _logger);
+                previewControl = pack.PreviewControl;
+                customizationComtrol = pack.CustomizationControl;
+                menuItems = pack.MenuItems;
+            }
+            var grid = GetDeviceItemGrid(deviceNode, previewControl, customizationComtrol, menuItems);
             var newTabItem = new ClosableTab
             {
-                Title = GetTabItemTitle(deviceNode),
+                Title = GetDeviceTabItemTitle(deviceNode),
                 Content = grid,
                 DataContext = deviceNode.Device,
             };
@@ -228,23 +236,57 @@ namespace KaLEDoscope
 
         private void ProcessAggregator(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
         {
+            var grid = GetAggregationGrid(aggregationNode, selectedDeviceNode);
             var existTab = DeviceTabs.FirstOrDefault(t => t.DataContext == aggregationNode);
             if (existTab != null)
             {
+                existTab.Content = grid;
                 SelectedTabItem = existTab;
                 return;
             }
+            var newTabItem = new ClosableTab
+            {
+                Title = GetAggregationTabItemTitle(aggregationNode),
+                Content = grid,
+                DataContext = aggregationNode,
+            };
+            newTabItem.OnTabCloseClick += (sender, arguments) =>
+            {
+                var tab = (ClosableTab)sender;
+                DeviceTabs.Remove(tab);
+            };
+            DeviceTabs.Add(newTabItem);
+            SelectedTabItem = newTabItem;
+
         }
 
-        private static string GetTabItemTitle(DeviceNode deviceNode)
+        private Grid GetAggregationGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
+        {
+            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(selectedDeviceNode.Device.Model));
+            var previewControl = new UserControl();
+            var customizationComtrol = new UserControl();
+            IEnumerable<object> menuItems = null;
+            if (deviceBuilder != null)
+            {
+                var pack = deviceBuilder.GetControlsPack(selectedDeviceNode.Device, _logger);
+                customizationComtrol = pack.CustomizationControl;
+                menuItems = pack.MenuItems;
+            }
+            return GetDeviceItemGrid(selectedDeviceNode, previewControl, customizationComtrol, menuItems);
+        }
+
+        private static string GetDeviceTabItemTitle(DeviceNode deviceNode)
         {
             return $"{deviceNode.Device.Name} id:{deviceNode.Device.Id}";
         }
 
-        private Grid GetDeviceGrid(DeviceNode deviceNode)
+        private static string GetAggregationTabItemTitle(AggregationNode aggregationNode)
         {
-            var tabControl = new TabControl();
-            var baseTabItem = new TabItem();
+            return $"{aggregationNode.Name}";
+        }
+
+        private Grid GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems)
+        {
             var grid = new Grid();
             grid.RowDefinitions.Add(new RowDefinition
             {
@@ -263,26 +305,14 @@ namespace KaLEDoscope
                 Height = new GridLength(1, GridUnitType.Star)
             });
 
-            var baseDeviceViewModel = new BaseDeviceViewModel(deviceNode.Device, _logger);
-            baseDeviceViewModel.OnRenamed += ((device) =>
-            {
-                deviceNode.Name = device.Name;
-                var tab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == deviceNode.Device);
-                if (tab != null)
-                {
-                    ((ClosableTab)tab).Title = GetTabItemTitle(deviceNode);
-                }
-            });
-            baseTabItem.Content = new BaseDeviceControl
-            {
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                DataContext = baseDeviceViewModel
-            };
-            baseTabItem.Header = "Базовые настройки";
-            tabControl.Items.Add(baseTabItem);
-            tabControl.TabStripPlacement = Dock.Left;
             var toolbar = new ToolBar();
+            toolbar.Items.Add(new Button
+            {
+                Content = "Базовые настройки",
+                Command = CommonSettings,
+                CommandParameter = deviceNode,
+                IsEnabled = true
+            });
             toolbar.Items.Add(new Button
             {
                 Content = "Синхронизировать",
@@ -311,6 +341,7 @@ namespace KaLEDoscope
                 CommandParameter = deviceNode,
                 IsEnabled = deviceNode.AllowLoad
             });
+
             var splitter = new GridSplitter
             {
                 Height = 5,
@@ -318,29 +349,50 @@ namespace KaLEDoscope
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 ResizeDirection = GridResizeDirection.Rows
             };
-            grid.Children.Add(tabControl);
             grid.Children.Add(splitter);
             grid.Children.Add(toolbar);
             Grid.SetRow(splitter, 1);
-            Grid.SetRow(tabControl, 3);
             Grid.SetRow(toolbar, 2);
-            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(deviceNode.Device.Model));
-            if (deviceBuilder != null)
+            grid.Children.Add(previewControl);
+            Grid.SetRow(previewControl, 0);
+            grid.Children.Add(customizationControl);
+            Grid.SetRow(customizationControl, 3);
+            if (toolbarItems != null)
             {
-                var pack = deviceBuilder.GetControls(deviceNode.Device, _logger);
-                grid.Children.Add(pack.PreviewControl);
-                Grid.SetRow(pack.PreviewControl, 0);
-                foreach (var customDevicesControlsKeyValuePair in pack.CustomizationControls)
+                foreach (var item in toolbarItems)
                 {
-                    var customTabItem = new TabItem();
-                    var customControl = customDevicesControlsKeyValuePair.Value;
-                    customTabItem.Content = customControl;
-                    customTabItem.Header = customDevicesControlsKeyValuePair.Key;
-                    customTabItem.Background = new SolidColorBrush(Color.FromArgb(255, 0, 176, 180));
-                    tabControl.Items.Add(customTabItem);
+                    toolbar.Items.Add(item);
                 }
             }
             return grid;
+        }
+
+        private DelegateCommand _commonSettings;
+        public Input.ICommand CommonSettings
+        {
+            get
+            {
+                if (_commonSettings == null)
+                {
+                    _commonSettings = new DelegateCommand((o) =>
+                    {
+                        var deviceNode = o as DeviceNode;
+                        var baseDeviceViewModel = new CommonSettingsViewModel(deviceNode.Device, _logger);
+                        var commonSettingsWindow = new CommonSettingsWindow(baseDeviceViewModel);
+                        baseDeviceViewModel.OnRenamed += ((device) =>
+                        {
+                            deviceNode.Name = device.Name;
+                            var tab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == deviceNode.Device);
+                            if (tab != null)
+                            {
+                                ((ClosableTab)tab).Title = GetDeviceTabItemTitle(deviceNode);
+                            }
+                        });
+                        commonSettingsWindow.ShowDialog();
+                    });
+                }
+                return _commonSettings;
+            }
         }
 
         private DelegateCommand _scanDevices;
@@ -352,6 +404,7 @@ namespace KaLEDoscope
                 {
                     _scanDevices = new DelegateCommand((o) =>
                       {
+#warning переписать
                           throw new NotImplementedException();
                           //_rootNode.Devices.Clear();
                           //MakeNodes();
@@ -431,7 +484,18 @@ namespace KaLEDoscope
         private void Command_OnConfigurationDownloaded(Device obj)
         {
             _updatedNode.Device = obj;
-            _dispatcher.Invoke(() => _tabItem.Content = GetDeviceGrid(_updatedNode));
+            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(_updatedNode.Device.Model));
+            var previewControl = new UserControl();
+            var customizationComtrol = new UserControl();
+            IEnumerable<object> menuItems = null;
+            if (deviceBuilder != null)
+            {
+                var pack = deviceBuilder.GetControlsPack(_updatedNode.Device, _logger);
+                previewControl = pack.PreviewControl;
+                customizationComtrol = pack.CustomizationControl;
+                menuItems = pack.MenuItems;
+            }
+            _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, previewControl, customizationComtrol, menuItems));
         }
 
         private DelegateCommand<DeviceNode> _importSettings;

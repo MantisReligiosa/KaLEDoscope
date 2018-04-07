@@ -10,6 +10,6 @@ namespace DeviceBuilding
     {
         string Model { get; }
         Device UpdateCustomSettings(Device device);
-        ControlsPack GetControls(Device device, ILogger logger);
+        ControlsPack GetControlsPack(Device device, ILogger logger);
     }
 }

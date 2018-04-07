@@ -90,9 +90,15 @@
     </ApplicationDefinition>
     <Compile Include="ApplicationInfrastructure.cs" />
     <Compile Include="Models\AggregationNode.cs" />
+    <Compile Include="Models\DeviceNode.cs" />
+    <Compile Include="Models\FolderNode.cs" />
+    <Compile Include="Models\LogItem.cs" />
     <Compile Include="Models\NodeItem.cs" />
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\CommonSettingsWindow.xaml.cs">
+      <DependentUpon>CommonSettingsWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ClosableTab.cs" />
     <Compile Include="Views\CloseableHeader.xaml.cs">
@@ -100,12 +106,13 @@
     </Compile>
     <Compile Include="Views\CustomDeviceControl.cs" />
     <Compile Include="DelegateCommand.cs" />
-    <Compile Include="Models\LogItem.cs" />
-    <Compile Include="Models\DeviceNode.cs" />
-    <Compile Include="Models\FolderNode.cs" />
-    <Compile Include="ViewModel\BaseDeviceViewModel.cs" />
+    <Compile Include="ViewModel\CommonSettingsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Page Include="Views\BaseDeviceControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\CommonSettingsWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
