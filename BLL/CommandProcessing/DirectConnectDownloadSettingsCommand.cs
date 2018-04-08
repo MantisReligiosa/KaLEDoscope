@@ -17,7 +17,7 @@ namespace CommandProcessing
 
         public override string Name => "Запрос конфигурации";
 
-        public event Action<Device> OnConfigurationDownloaded;
+        public event EventHandler<Device> OnConfigurationDownloaded;
 
         public DirectConnectDownloadSettingsCommand(Device device,
             DeviceFactory deviceFactory, ILogger logger, int timeout = 10000) : base(device, logger)
@@ -58,7 +58,7 @@ namespace CommandProcessing
         {
             _networkAgent.Close();
             _logger.Debug(this, $"Завершение запроса конфигурации");
-            OnConfigurationDownloaded?.Invoke(_device);
+            OnConfigurationDownloaded?.Invoke(this,_device);
         }
 
         public override void Finally()

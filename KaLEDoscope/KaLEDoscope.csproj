@@ -66,6 +66,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
       <Private>True</Private>
@@ -94,6 +95,7 @@
     <Compile Include="Models\FolderNode.cs" />
     <Compile Include="Models\LogItem.cs" />
     <Compile Include="Models\NodeItem.cs" />
+    <Compile Include="ViewModel\CustomizationViewModel.cs" />
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>
     </Compile>
@@ -104,10 +106,12 @@
     <Compile Include="Views\CloseableHeader.xaml.cs">
       <DependentUpon>CloseableHeader.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\CustomDeviceControl.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="ViewModel\CommonSettingsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="Views\CustomizationControl.xaml.cs">
+      <DependentUpon>CustomizationControl.xaml</DependentUpon>
+    </Compile>
     <Page Include="Views\BaseDeviceControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -132,6 +136,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\CustomizationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

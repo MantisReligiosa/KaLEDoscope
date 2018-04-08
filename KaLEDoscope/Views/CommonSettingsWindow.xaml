@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:KaLEDoscope.Views"
         xmlns:kaledoscope="clr-namespace:KaLEDoscope"
         mc:Ignorable="d"
-        Title="BaseDeviceWindow" ResizeMode="NoResize" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Topmost="True">
+        Title="Базовые настройки" ResizeMode="NoResize" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Topmost="True">
     <Grid>
         <kaledoscope:BaseDeviceControl x:Name="commonSettingsControl"></kaledoscope:BaseDeviceControl>
     </Grid>

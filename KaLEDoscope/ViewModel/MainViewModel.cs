@@ -18,6 +18,7 @@ using SevenSegmentBoardDevice;
 using DeviceBuilding;
 using Abstractions;
 using PixelBoardDevice;
+using System.Drawing;
 
 namespace KaLEDoscope
 {
@@ -60,8 +61,6 @@ namespace KaLEDoscope
         }
 
         public bool IsScanEnabled { get; set; }
-
-        public Dictionary<Func<DeviceNode>, Func<CustomDeviceControl>> CustomControls { get; set; }
 
         public MainViewModel(ILogger logger)
         {
@@ -154,6 +153,7 @@ namespace KaLEDoscope
             {
                 foreach (var device in devices)
                 {
+#warning Добавить апдейт, если устройства были заведены руками
                     StructureNodes.Add(new DeviceNode
                     {
                         Device = device,
@@ -260,10 +260,10 @@ namespace KaLEDoscope
 
         }
 
-        private Grid GetAggregationGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
+        private UserControl GetAggregationGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
         {
             var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(selectedDeviceNode.Device.Model));
-            var previewControl = new UserControl();
+            var previewControl = GetAggregationPreviewGrid(aggregationNode, selectedDeviceNode);
             var customizationComtrol = new UserControl();
             IEnumerable<object> menuItems = null;
             if (deviceBuilder != null)
@@ -273,6 +273,76 @@ namespace KaLEDoscope
                 menuItems = pack.MenuItems;
             }
             return GetDeviceItemGrid(selectedDeviceNode, previewControl, customizationComtrol, menuItems);
+        }
+
+        private UserControl GetAggregationPreviewGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
+        {
+            if (!aggregationNode.Nodes.Any())
+            {
+                return new UserControl();
+            }
+            if (aggregationNode.Nodes.Count == 1)
+            {
+                var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(selectedDeviceNode.Device.Model));
+                var pack = deviceBuilder.GetControlsPack(selectedDeviceNode.Device, _logger);
+                return pack.PreviewControl;
+            }
+            var control = new UserControl();
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
+            int column = 1;
+            foreach (var node in aggregationNode.Nodes)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = GridLength.Auto
+                });
+                var splitter = new GridSplitter
+                {
+                    Width = 5,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    ResizeDirection = GridResizeDirection.Columns
+                };
+                grid.Children.Add(splitter);
+                Grid.SetRow(splitter, column++);
+
+                grid.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = GridLength.Auto
+                });
+                var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(((DeviceNode)node).Device.Model));
+                var pack = deviceBuilder.GetControlsPack(((DeviceNode)node).Device, _logger);
+                var devicePreview = pack.PreviewControl;
+                if (selectedDeviceNode==node)
+                {
+                    devicePreview.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
+                }
+                grid.Children.Add(devicePreview);
+                Grid.SetRow(devicePreview, column++);
+            }
+            grid.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = GridLength.Auto
+            });
+            var finalSplitter = new GridSplitter
+            {
+                Width = 5,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                ResizeDirection = GridResizeDirection.Columns
+            };
+            grid.Children.Add(finalSplitter);
+            Grid.SetRow(finalSplitter, column++);
+            grid.ColumnDefinitions.Add(new ColumnDefinition
+            {
+                Width = new GridLength(1, GridUnitType.Star)
+            });
+            control.Content = grid;
+            return control;
         }
 
         private static string GetDeviceTabItemTitle(DeviceNode deviceNode)
@@ -285,115 +355,49 @@ namespace KaLEDoscope
             return $"{aggregationNode.Name}";
         }
 
-        private Grid GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems)
+
+        private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems)
         {
-            var grid = new Grid();
-            grid.RowDefinitions.Add(new RowDefinition
+            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _logger);
+            model.OnNodeRenamed += ((sender, node) =>
             {
-                Height = new GridLength(100, GridUnitType.Pixel)
-            });
-            grid.RowDefinitions.Add(new RowDefinition
-            {
-                Height = GridLength.Auto
-            });
-            grid.RowDefinitions.Add(new RowDefinition
-            {
-                Height = GridLength.Auto
-            });
-            grid.RowDefinitions.Add(new RowDefinition
-            {
-                Height = new GridLength(1, GridUnitType.Star)
-            });
-
-            var toolbar = new ToolBar();
-            toolbar.Items.Add(new Button
-            {
-                Content = "Базовые настройки",
-                Command = CommonSettings,
-                CommandParameter = deviceNode,
-                IsEnabled = true
-            });
-            toolbar.Items.Add(new Button
-            {
-                Content = "Синхронизировать",
-                Command = DownloadSettings,
-                CommandParameter = deviceNode,
-                IsEnabled = deviceNode.AllowDownload
-            });
-            toolbar.Items.Add(new Button
-            {
-                Content = "Применить конфигурацию",
-                Command = UploadSettings,
-                CommandParameter = deviceNode,
-                IsEnabled = deviceNode.AllowUpload
-            });
-            toolbar.Items.Add(new Button
-            {
-                Content = "Сохранить конфигурацию в файл",
-                Command = ExportSettings,
-                CommandParameter = deviceNode,
-                IsEnabled = deviceNode.AllowSave
-            });
-            toolbar.Items.Add(new Button
-            {
-                Content = "Загрузить конфигурацию из файла",
-                Command = ImportSettings,
-                CommandParameter = deviceNode,
-                IsEnabled = deviceNode.AllowLoad
-            });
-
-            var splitter = new GridSplitter
-            {
-                Height = 5,
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                ResizeDirection = GridResizeDirection.Rows
-            };
-            grid.Children.Add(splitter);
-            grid.Children.Add(toolbar);
-            Grid.SetRow(splitter, 1);
-            Grid.SetRow(toolbar, 2);
-            grid.Children.Add(previewControl);
-            Grid.SetRow(previewControl, 0);
-            grid.Children.Add(customizationControl);
-            Grid.SetRow(customizationControl, 3);
-            if (toolbarItems != null)
-            {
-                foreach (var item in toolbarItems)
+                var tab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == node.Device);
+                if (tab != null)
                 {
-                    toolbar.Items.Add(item);
+                    ((ClosableTab)tab).Title = GetDeviceTabItemTitle(node);
                 }
-            }
-            return grid;
+            });
+            model.BeforeGettingSettings += ((sender, node) =>
+            {
+                _updatedNode = node;
+                _tabItem = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == node.Device);
+            });
+            model.AfterGetingSettings += ((sender, device) =>
+              {
+                  _updatedNode.Device = device;
+                  var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(device.Model));
+                  previewControl = new UserControl();
+                  var customizationComtrol = new UserControl();
+                  IEnumerable<object> menuItems = null;
+                  if (deviceBuilder != null)
+                  {
+                      var pack = deviceBuilder.GetControlsPack(_updatedNode.Device, _logger);
+                      previewControl = pack.PreviewControl;
+                      customizationComtrol = pack.CustomizationControl;
+                      menuItems = pack.MenuItems;
+                  }
+                  _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, previewControl, customizationComtrol, menuItems));
+                  _tabItem.DataContext = device;
+              });
+            var control = new CustomizationControl();
+            control.DataContext = model;
+            control.SetPreviewControl(previewControl);
+            control.SetCustomizationControl(customizationControl);
+            control.AddToolbarItems(toolbarItems);
+            return control;
         }
 
-        private DelegateCommand _commonSettings;
-        public Input.ICommand CommonSettings
-        {
-            get
-            {
-                if (_commonSettings == null)
-                {
-                    _commonSettings = new DelegateCommand((o) =>
-                    {
-                        var deviceNode = o as DeviceNode;
-                        var baseDeviceViewModel = new CommonSettingsViewModel(deviceNode.Device, _logger);
-                        var commonSettingsWindow = new CommonSettingsWindow(baseDeviceViewModel);
-                        baseDeviceViewModel.OnRenamed += ((device) =>
-                        {
-                            deviceNode.Name = device.Name;
-                            var tab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == deviceNode.Device);
-                            if (tab != null)
-                            {
-                                ((ClosableTab)tab).Title = GetDeviceTabItemTitle(deviceNode);
-                            }
-                        });
-                        commonSettingsWindow.ShowDialog();
-                    });
-                }
-                return _commonSettings;
-            }
-        }
+
 
         private DelegateCommand _scanDevices;
         public Input.ICommand ScanDevices
@@ -404,130 +408,16 @@ namespace KaLEDoscope
                 {
                     _scanDevices = new DelegateCommand((o) =>
                       {
-#warning переписать
-                          throw new NotImplementedException();
                           //_rootNode.Devices.Clear();
-                          //MakeNodes();
+                          MakeNodes();
                       });
                 }
                 return _scanDevices;
             }
         }
 
-        private DelegateCommand<DeviceNode> _uploadSettings;
-        public Input.ICommand UploadSettings
-        {
-            get
-            {
-                if (_uploadSettings == null)
-                {
-                    _uploadSettings = new DelegateCommand<DeviceNode>((d) =>
-                    {
-                        var command = new DirectConnectUploadSettingsCommand(d.Device, _logger);
-                        _invoker.Invoke(command);
-                    });
-                }
-                return _uploadSettings;
-            }
-        }
-
-        private DelegateCommand<DeviceNode> _exportSettings;
-        public Input.ICommand ExportSettings
-        {
-            get
-            {
-                if (_exportSettings == null)
-                {
-                    _exportSettings = new DelegateCommand<DeviceNode>((d) =>
-                    {
-                        var dialog = new SaveFileDialog
-                        {
-                            FileName = d.Device.Name,
-                            DefaultExt = ".json",
-                            Filter = "JSON configuration (.json)|*.json"
-                        };
-                        if (dialog.ShowDialog() == true)
-                        {
-                            var fileName = dialog.FileName;
-                            var serialized = JsonConvert.SerializeObject(d.Device);
-                            System.IO.File.WriteAllText(fileName, serialized);
-                        }
-                    });
-                }
-                return _exportSettings;
-            }
-        }
-
-        private DelegateCommand<DeviceNode> _downloadSettings;
         private DeviceNode _updatedNode;
         private TabItem _tabItem;
-        public Input.ICommand DownloadSettings
-        {
-            get
-            {
-                if (_downloadSettings == null)
-                {
-                    _downloadSettings = new DelegateCommand<DeviceNode>((d) =>
-                    {
-                        d.AllowUpload = true;
-                        _updatedNode = d;
-                        _tabItem = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == d.Device);
-                        var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceFactory, _logger);
-                        command.OnConfigurationDownloaded += Command_OnConfigurationDownloaded;
-                        _invoker.Invoke(command);
-                    });
-                }
-                return _downloadSettings;
-            }
-        }
-
-        private void Command_OnConfigurationDownloaded(Device obj)
-        {
-            _updatedNode.Device = obj;
-            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(_updatedNode.Device.Model));
-            var previewControl = new UserControl();
-            var customizationComtrol = new UserControl();
-            IEnumerable<object> menuItems = null;
-            if (deviceBuilder != null)
-            {
-                var pack = deviceBuilder.GetControlsPack(_updatedNode.Device, _logger);
-                previewControl = pack.PreviewControl;
-                customizationComtrol = pack.CustomizationControl;
-                menuItems = pack.MenuItems;
-            }
-            _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, previewControl, customizationComtrol, menuItems));
-        }
-
-        private DelegateCommand<DeviceNode> _importSettings;
-        public Input.ICommand ImportSettings
-        {
-            get
-            {
-                if (_importSettings == null)
-                {
-                    _importSettings = new DelegateCommand<DeviceNode>((d) =>
-                    {
-                        _updatedNode = d;
-                        _tabItem = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == d.Device);
-                        d.AllowUpload = true;
-                        var dialog = new OpenFileDialog
-                        {
-                            DefaultExt = ".json",
-                            Filter = "JSON configuration (.json)|*.json"
-                        };
-                        if (dialog.ShowDialog() == true)
-                        {
-                            var fileName = dialog.FileName;
-                            var text = System.IO.File.ReadAllText(fileName);
-                            var device = JsonConvert.DeserializeObject(text, d.Device.GetType());
-                            d.Device = _deviceFactory.Customize(device);
-                            Command_OnConfigurationDownloaded(d.Device);
-                        }
-                    });
-                }
-                return _importSettings;
-            }
-        }
 
         private void LogMessage(string Message)
         {

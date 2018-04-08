@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="KaLEDoscope.Views.CustomizationControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:KaLEDoscope.Views"
+             mc:Ignorable="d">
+    <Grid x:Name="grid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
+        <ToolBar x:Name="toolbar" Grid.Row="2">
+            <ToolBar.Items>
+                <Button Content="Базовые настройки" Command="{Binding CommonSettings}" CommandParameter="{Binding DeviceNode}"></Button>
+                <Button Content="Синхронизировать" Command="{Binding DownloadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowDownload}"/>
+                <Button Content="Применить конфигурацию" Command="{Binding UploadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowUpload}"/>
+                <Button Content="Сохранить конфигурацию в файл" Command="{Binding SaveSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowSave}"/>
+                <Button Content="Загрузить конфигурацию из файла" Command="{Binding LoadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowLoad}"/>
+            </ToolBar.Items>
+        </ToolBar>
+    </Grid>
+</UserControl>
