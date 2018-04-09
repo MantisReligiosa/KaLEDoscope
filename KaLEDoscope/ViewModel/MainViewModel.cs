@@ -19,6 +19,7 @@ using DeviceBuilding;
 using Abstractions;
 using PixelBoardDevice;
 using System.Drawing;
+using Aggregations;
 
 namespace KaLEDoscope
 {
@@ -76,14 +77,26 @@ namespace KaLEDoscope
             _deviceFactory.Builders.Add(new SevenSegmentDeviceBuilder());
             _deviceFactory.Builders.Add(new PixelDeviceBuilder());
 
+            var folder = new Folder
+            {
+                Id = 1,
+                Name = "Папка"
+            };
             var folderNode = new FolderNode
             {
-                Name = "Папка",
+                Name = folder.Name,
+                Folder = folder
             };
 
+            var aggregation = new Aggregation
+            {
+                Id = 1,
+                Name = "Аггрегатор"
+            };
             var aggregationNode = new AggregationNode
             {
-                Name = "Аггрегатор"
+                Name = aggregation.Name,
+                Aggregation = aggregation
             };
 
             StructureNodes.Add(folderNode);
@@ -95,7 +108,8 @@ namespace KaLEDoscope
                 {
                     Id = id--,
                     Model = builder.Model,
-                    IsStandaloneConfiguration = true
+                    IsStandaloneConfiguration = true,
+                    Folder = folder,
                 });
                 folderNode.AddChildNode(new DeviceNode
                 {
@@ -110,7 +124,8 @@ namespace KaLEDoscope
                 {
                     Id = id--,
                     Model = builder.Model,
-                    IsStandaloneConfiguration = true
+                    IsStandaloneConfiguration = true,
+                    Aggregation = aggregation
                 });
                 aggregationNode.AddChildNode(new DeviceNode
                 {
@@ -289,6 +304,7 @@ namespace KaLEDoscope
             }
             var control = new UserControl();
             var grid = new Grid();
+            control.Content = grid;
             grid.ColumnDefinitions.Add(new ColumnDefinition
             {
                 Width = new GridLength(1, GridUnitType.Star)
@@ -308,21 +324,24 @@ namespace KaLEDoscope
                     ResizeDirection = GridResizeDirection.Columns
                 };
                 grid.Children.Add(splitter);
-                Grid.SetRow(splitter, column++);
+                Grid.SetColumn(splitter, column++);
 
                 grid.ColumnDefinitions.Add(new ColumnDefinition
                 {
-                    Width = GridLength.Auto
+                    Width = new GridLength(1, GridUnitType.Star)
                 });
                 var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(((DeviceNode)node).Device.Model));
                 var pack = deviceBuilder.GetControlsPack(((DeviceNode)node).Device, _logger);
                 var devicePreview = pack.PreviewControl;
-                if (selectedDeviceNode==node)
+                devicePreview.HorizontalAlignment = HorizontalAlignment.Stretch;
+                devicePreview.VerticalAlignment = VerticalAlignment.Stretch;
+                if (selectedDeviceNode == node)
                 {
                     devicePreview.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
+                    devicePreview.BorderThickness = new Thickness(2);
                 }
                 grid.Children.Add(devicePreview);
-                Grid.SetRow(devicePreview, column++);
+                Grid.SetColumn(devicePreview, column++);
             }
             grid.ColumnDefinitions.Add(new ColumnDefinition
             {
@@ -336,12 +355,11 @@ namespace KaLEDoscope
                 ResizeDirection = GridResizeDirection.Columns
             };
             grid.Children.Add(finalSplitter);
-            Grid.SetRow(finalSplitter, column++);
+            Grid.SetColumn(finalSplitter, column);
             grid.ColumnDefinitions.Add(new ColumnDefinition
             {
                 Width = new GridLength(1, GridUnitType.Star)
             });
-            control.Content = grid;
             return control;
         }
 

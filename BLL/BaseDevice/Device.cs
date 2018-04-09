@@ -1,4 +1,6 @@
-﻿namespace BaseDevice
+﻿using Aggregations;
+
+namespace BaseDevice
 {
     public class Device
     {
@@ -9,5 +11,7 @@
         public Network Network { get; set; } = new Network();
         public string Model { get; set; }
         public bool IsStandaloneConfiguration { get; set; }
+        public Folder Folder { get; set; }
+        public Aggregation Aggregation { get; set; }
     }
 }

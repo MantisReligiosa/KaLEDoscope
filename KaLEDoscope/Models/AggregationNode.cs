@@ -1,6 +1,9 @@
-﻿namespace KaLEDoscope
+﻿using Aggregations;
+
+namespace KaLEDoscope
 {
     public class AggregationNode : NodeItem
     {
+        public Aggregation Aggregation { get; internal set; }
     }
 }

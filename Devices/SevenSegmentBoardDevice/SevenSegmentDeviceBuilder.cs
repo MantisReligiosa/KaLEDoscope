@@ -24,7 +24,13 @@ namespace SevenSegmentBoardDevice
                 DataContext = model
             };
             pack.CustomizationControl = timerControl;
-            pack.PreviewControl = new UserControl();
+            pack.PreviewControl = new UserControl
+            {
+                Content=new Label
+                {
+                    Content="Тут будет предпросмотр для часов"
+                }
+            };
             return pack;
         }
 
