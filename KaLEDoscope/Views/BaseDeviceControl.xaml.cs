@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Xceed.Wpf.Toolkit;
 
 namespace KaLEDoscope
 {
@@ -23,6 +24,24 @@ namespace KaLEDoscope
         public BaseDeviceControl()
         {
             InitializeComponent();
+        }
+
+        private void ButtonSpinner_Spin(object sender, SpinEventArgs e)
+        {
+            ButtonSpinner spinner = (ButtonSpinner)sender;
+            TextBox txtBox = (TextBox)spinner.Content;
+
+            int value = 0;
+            if (Int32.TryParse(txtBox.Text, out int parsed))
+            {
+                value = parsed;
+            }
+
+            if (e.Direction == SpinDirection.Increase)
+                value++;
+            else
+                value--;
+            txtBox.Text = value.ToString();
         }
     }
 }

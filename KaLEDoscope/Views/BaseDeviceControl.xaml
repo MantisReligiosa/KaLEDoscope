@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:local="clr-namespace:KaLEDoscope"
              mc:Ignorable="d">
     <UserControl.Resources>
@@ -40,13 +41,10 @@
                        Grid.Column="0" 
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Top"/>
-                    <TextBox Grid.Row="0" 
-                                    Grid.Column="1" 
-                                    Height="23"
-                                    TextWrapping="Wrap" 
-                                    VerticalAlignment="Top"
-                                    Text="{Binding Id}"
-                                    />
+                    <xctk:ButtonSpinner Grid.Row="0" 
+                                    Grid.Column="1" Spin="ButtonSpinner_Spin">
+                        <TextBox Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}" Margin="-2,-3,-1,-3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="199" Height="27"/>
+                    </xctk:ButtonSpinner>
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid HorizontalAlignment="Right" Width="188">
@@ -110,15 +108,10 @@
                        Grid.Column="0" 
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Top"/>
-                <TextBox Grid.Row="2" 
-                                    Grid.Column="2" 
-                                    HorizontalAlignment="Left" 
-                                    Height="23"
-                                    TextWrapping="Wrap" 
-                                    VerticalAlignment="Top"
-                                    Width="120"
-                                    Text="{Binding Port}"
-                                    />
+                <xctk:ButtonSpinner Grid.Row="2" 
+                                    Grid.Column="2" Spin="ButtonSpinner_Spin">
+                    <TextBox Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" Margin="-2,-3,-1,-3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="102" Height="27"/>
+                </xctk:ButtonSpinner>
                 <Label Content="Маска подсети" 
                        Grid.Row="3" 
                        Grid.Column="0" 
@@ -186,15 +179,17 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Slider SmallChange="0" Value="{Binding ManualBrightnessValue}" IsEnabled="{Binding ManualBrightness}"/>
-                    <TextBox Grid.Column="1" 
+                    <xctk:ButtonSpinner Grid.Column="1" Spin="ButtonSpinner_Spin">
+                    <TextBox 
                              HorizontalAlignment="Left" 
-                             Height="23"
+                             Height="26"
                              TextWrapping="Wrap" 
                              VerticalAlignment="Top"
                              Width="25"
-                             Text="{Binding ManualBrightnessValue}"
+                             Text="{Binding ManualBrightnessValue, UpdateSourceTrigger=PropertyChanged}" Margin="-2,-2,-1,-2"
                              IsEnabled="{Binding ManualBrightness}"
                             />
+                    </xctk:ButtonSpinner>
                 </Grid>
                 <RadioButton Grid.Row="3" Content="По расписанию" IsChecked="{Binding ScheduledBrightness}"/>
                 <Grid Grid.Row="4">

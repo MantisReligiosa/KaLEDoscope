@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:SevenSegmentBoardDevice.UI"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
@@ -123,7 +124,9 @@
                 <Label Grid.Row="4" Grid.Column="0" Content="Адрес сервера" IsEnabled="{Binding SyncSource.IsCutomized}"/>
                 <TextBox Grid.Row="4" Grid.Column="1" IsEnabled="{Binding SyncSource.IsCutomized}" Text="{Binding TimeSyncServerIp}"/>
                 <Label Grid.Row="5" Grid.Column="0" Content="Порт" IsEnabled="{Binding SyncSource.IsCutomized}"/>
-                <TextBox Grid.Row="5" Grid.Column="1" IsEnabled="{Binding SyncSource.IsCutomized}" Text="{Binding TimeSyncServerPort}"/>
+                <xctk:ButtonSpinner Grid.Row="5" Grid.Column="1" Spin="ButtonSpinner_Spin">
+                    <TextBox IsEnabled="{Binding SyncSource.IsCutomized}" Text="{Binding TimeSyncServerPort, UpdateSourceTrigger=PropertyChanged}" Margin="-2,-3,-1,-3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="132" Height="26"/>
+                </xctk:ButtonSpinner>
             </Grid>
         </GroupBox >
         <GroupBox Visibility="Collapsed" Grid.Row="1" Grid.Column="0" Header="Настройка таймера/секундомера"  Style="{StaticResource GroupBoxStyle}">
