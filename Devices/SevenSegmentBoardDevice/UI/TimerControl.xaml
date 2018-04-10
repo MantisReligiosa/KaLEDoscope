@@ -56,75 +56,48 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Grid.ColumnSpan="2" Grid.Row="0" ItemsSource="{Binding AlarmSchedule}" SelectedItem="{Binding SelectedAlarm}">
-                        <ListView.ContextMenu>
+                    <DataGrid Grid.ColumnSpan="2" 
+                              Grid.Row="0" 
+                              ItemsSource="{Binding AlarmSchedule}" 
+                              SelectedItem="{Binding SelectedAlarm}"
+                              AutoGenerateColumns="False" CanUserAddRows="False">
+                        <DataGrid.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Добавить новый"
                                       Command="{Binding AddAlarm}"/>
                                 <MenuItem Header="Удалить"
                                       Command="{Binding RemoveAlarm}"/>
-
                             </ContextMenu>
-                        </ListView.ContextMenu>
-                        <ListView.View>
-                            <GridView>
-                                <GridViewColumn Width="30">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <CheckBox IsChecked="{Binding IsActive}"/>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Время" Width="80">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox Text="{Binding StartTimeSpan}"/>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                                <GridViewColumn Header="Длительность" Width="80">
-                                    <GridViewColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox Text="{Binding Period}"/>
-                                        </DataTemplate>
-                                    </GridViewColumn.CellTemplate>
-                                </GridViewColumn>
-                            </GridView>
-                        </ListView.View>
-                    </ListView>
+                        </DataGrid.ContextMenu>
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="" Width="30" Binding="{Binding Path=IsActive}"/>
+                            <DataGridTextColumn Header="Время" Width="80" Binding="{Binding Path=StartTimeSpan}"/>
+                            <DataGridTextColumn Header="Длительность" Width="*" Binding="{Binding Path=Period}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                     <Button Grid.Column="0" Grid.Row="1" Content="Добавить" Command="{Binding AddAlarm}"/>
                     <Button Grid.Column="1" Grid.Row="1" Content="Удалить" Command="{Binding RemoveAlarm}"/>
                 </Grid>
             </GroupBox>
         </Grid>
-        <GroupBox Grid.Row="0" Grid.Column="1" Header="Отображаемая информация"  Style="{StaticResource GroupBoxStyle}">
-            <ListView ItemsSource="{Binding DisplayFrames}" Grid.Row="0" Grid.ColumnSpan="2">
-                <ListView.View>
-                    <GridView>
-                        <GridViewColumn Width="30">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsChecked}" IsEnabled="{Binding IsEnabled}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Объекты">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Label Content="{Binding Name}" IsEnabled="{Binding IsEnabled}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Время отображения, сек">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBox Text="{Binding DisplayPeriod}" Width="100" IsEnabled="{Binding IsEnabled}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                    </GridView>
-                </ListView.View>
-            </ListView>
+        <GroupBox Grid.Row="0" Grid.Column="1" Header="Отображаемая информация"  Style="{StaticResource GroupBoxStyle}" Width="350">
+            <DataGrid ItemsSource="{Binding DisplayFrames}" Grid.Row="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Resources>
+                    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                        <Setter Property="IsEnabled" Value="True"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="" Width="30" Binding="{Binding Path=IsChecked}"/>
+                    <DataGridTextColumn Header="Объекты" Width="120" Binding="{Binding Path=Name}"/>
+                    <DataGridTextColumn Header="Время отображения, сек" Width="*" Binding="{Binding Path=DisplayPeriod}"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </GroupBox>
         <GroupBox Grid.Row="0" Grid.Column="2" Header="Источник времени"  Style="{StaticResource GroupBoxStyle}">
             <Grid>
