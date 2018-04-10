@@ -49,14 +49,14 @@
             <GroupBox Grid.Row="1" Header="Конфигурация будильников" HorizontalAlignment="Right" Width="252"  Style="{StaticResource GroupBoxStyle}">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="150"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Grid.ColumnSpan="2" Grid.Row="0" ItemsSource="{Binding AlarmSchedule}" SelectedItem="{Binding SelectedAlarm}" Height="150">
+                    <ListView Grid.ColumnSpan="2" Grid.Row="0" ItemsSource="{Binding AlarmSchedule}" SelectedItem="{Binding SelectedAlarm}">
                         <ListView.ContextMenu>
                             <ContextMenu>
                                 <MenuItem Header="Добавить новый"
