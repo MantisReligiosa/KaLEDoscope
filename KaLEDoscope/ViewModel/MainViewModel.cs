@@ -92,7 +92,7 @@ namespace KaLEDoscope
             var aggregation = new Aggregation
             {
                 Id = 1,
-                Name = "Аггрегатор"
+                Name = "Агрегатор"
             };
             var aggregationNode = new AggregationNode
             {

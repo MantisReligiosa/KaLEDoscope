@@ -2,7 +2,7 @@
 
 namespace PixelBoardDevice.DomainObjects
 {
-    public class Screen
+    public class Program
     {
         public int Id { get; set; }
         public string Name { get; set; }

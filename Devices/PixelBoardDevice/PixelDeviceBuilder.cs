@@ -66,17 +66,17 @@ namespace PixelBoardDevice
                     Width = 160
                 },
                 Fonts = castedDevice?.Fonts ?? new List<BinaryFont>(),
-                Screens = castedDevice?.Screens ?? new List<Screen>
+                Programs = castedDevice?.Programs ?? new List<Program>
                 {
-                    new Screen
+                    new Program
                     {
                         Order = 1,
                         Period = 10,
-                        Name = "Экран1",
+                        Name = "Программа1",
                         Zones = new List<Zone>()
                     }
                 },
-                Name = String.IsNullOrEmpty(device.Name) ? "Пиксельная плата" : device.Name
+                Name = String.IsNullOrEmpty(device.Name) ? "Электронное табло" : device.Name
             };
             return pixelBoard;
         }

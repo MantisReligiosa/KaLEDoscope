@@ -176,7 +176,7 @@ namespace PixelBoardDevice.UI
         };
 
         public ObservableCollection<ZoneType> ZoneTypes { get; set; }
-        public ObservableCollection<Screen> Screens { get; set; }
+        public ObservableCollection<Program> Programs { get; set; }
         public ObservableCollection<Zone> Zones { get; set; }
         public ObservableCollection<Font.FontFamily> Fonts { get; set; }
         public ObservableCollection<int> FontSizes { get; set; }
@@ -189,13 +189,13 @@ namespace PixelBoardDevice.UI
             _device = (PixelBoard)d;
             _logger = l;
             ZoneTypes = new ObservableCollection<ZoneType>(_zoneTypes);
-            Screens = new ObservableCollection<Screen>(_device.Screens);
+            Programs = new ObservableCollection<Program>(_device.Programs);
             Fonts = new ObservableCollection<Font.FontFamily>(new InstalledFontCollection().Families.Select(f => new Font.FontFamily(f.Name)));
             Zones = new ObservableCollection<Zone>();
             ClockFormats = new ObservableCollection<ClockFormat>(_clockFormats);
             ClockTypes = new ObservableCollection<ClockType>(_clockTypes);
             Zones.CollectionChanged += Zones_CollectionChanged;
-            SelectedScreen = Screens.FirstOrDefault();
+            SelectedProgram = Programs.FirstOrDefault();
             FontSizes = new ObservableCollection<int>(_fontSizes);
             AllowChangeBoardSize = allowChangeBoardSize;
             DeviceHeight = _device.BoardSize.Height;
@@ -391,7 +391,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _zoneLeft = value;
-                var deviceZone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (deviceZone != null)
                 {
                     deviceZone.X = value;
@@ -407,7 +407,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _zoneTop = value;
-                var deviceZone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (deviceZone != null)
                 {
                     deviceZone.Y = value;
@@ -423,7 +423,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _zoneHeight = value;
-                var deviceZone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (deviceZone != null)
                 {
                     deviceZone.Height = value;
@@ -439,7 +439,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _zoneWidth = value;
-                var deviceZone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (deviceZone != null)
                 {
                     deviceZone.Width = value;
@@ -459,15 +459,15 @@ namespace PixelBoardDevice.UI
                 _selectedFont = value;
                 if (_selectedFont != null && SelectedFontSize != 0)
                 {
-                    UpdateZoneFont(SelectedScreen, SelectedZone, value, SelectedFontSize, IsItalic, IsBold);
+                    UpdateZoneFont(SelectedProgram, SelectedZone, value, SelectedFontSize, IsItalic, IsBold);
                 }
                 OnPropertyChanged(nameof(SelectedFont));
             }
         }
 
-        private void UpdateZoneFont(Screen screen, Zone zone, Font.FontFamily newFont, int newFontSize, bool italic, bool bold)
+        private void UpdateZoneFont(Program program, Zone zone, Font.FontFamily newFont, int newFontSize, bool italic, bool bold)
         {
-            var deviceZone = GetDeviceZone(screen.Id, zone.Id);
+            var deviceZone = GetDeviceZone(program.Id, zone.Id);
             if (!deviceZone.IsFonted)
             {
                 return;
@@ -475,7 +475,7 @@ namespace PixelBoardDevice.UI
             var existBinaryFont = _device.Fonts.FirstOrDefault(bf => bf.Id == deviceZone.FontId);
             if (existBinaryFont != null)
             {
-                var numberOfFontEntry = _device.Screens.Sum(s => s.Zones.Count(f => f.IsFonted && f.FontId == existBinaryFont.Id));
+                var numberOfFontEntry = _device.Programs.Sum(s => s.Zones.Count(f => f.IsFonted && f.FontId == existBinaryFont.Id));
                 if (numberOfFontEntry <= 1)
                 {
                     _device.Fonts.Remove(existBinaryFont);
@@ -498,12 +498,12 @@ namespace PixelBoardDevice.UI
                 _device.Fonts.Add(newBinaryFont);
             }
             deviceZone.FontId = newBinaryFont.Id;
-            GetDeviceZone(screen.Id, zone.Id).FontId = newBinaryFont.Id;
+            GetDeviceZone(program.Id, zone.Id).FontId = newBinaryFont.Id;
         }
 
-        private Zone GetDeviceZone(int screenId, int zoneId)
+        private Zone GetDeviceZone(int programId, int zoneId)
         {
-            return _device?.Screens?.FirstOrDefault(s => s.Id == screenId)?.Zones?.FirstOrDefault(z => z.Id == zoneId);
+            return _device?.Programs?.FirstOrDefault(s => s.Id == programId)?.Zones?.FirstOrDefault(z => z.Id == zoneId);
         }
 
         private int _selectedFontSize;
@@ -515,7 +515,7 @@ namespace PixelBoardDevice.UI
                 _selectedFontSize = value;
                 if (SelectedFont != null && _selectedFontSize != 0)
                 {
-                    UpdateZoneFont(SelectedScreen, SelectedZone, SelectedFont, value, IsItalic, IsBold);
+                    UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, value, IsItalic, IsBold);
                 }
                 OnPropertyChanged(nameof(SelectedFontSize));
             }
@@ -530,7 +530,7 @@ namespace PixelBoardDevice.UI
                 _isBold = value;
                 if (SelectedFont != null && _selectedFontSize != 0)
                 {
-                    UpdateZoneFont(SelectedScreen, SelectedZone, SelectedFont, SelectedFontSize, IsItalic, value);
+                    UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, SelectedFontSize, IsItalic, value);
                 }
                 OnPropertyChanged(nameof(IsBold));
                 OnPropertyChanged(nameof(FontWeight));
@@ -548,7 +548,7 @@ namespace PixelBoardDevice.UI
                 _isItalic = value;
                 if (SelectedFont != null && _selectedFontSize != 0)
                 {
-                    UpdateZoneFont(SelectedScreen, SelectedZone, SelectedFont, SelectedFontSize, value, IsBold);
+                    UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, SelectedFontSize, value, IsBold);
                 }
                 OnPropertyChanged(nameof(IsItalic));
                 OnPropertyChanged(nameof(FontStyle));
@@ -621,20 +621,20 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        private Screen _selectedScreen;
-        public Screen SelectedScreen
+        private Program _selectedProgram;
+        public Program SelectedProgram
         {
-            get => _selectedScreen;
+            get => _selectedProgram;
             set
             {
-                _selectedScreen = value;
+                _selectedProgram = value;
                 Zones.Clear();
-                if (_selectedScreen != null)
+                if (_selectedProgram != null)
                 {
-                    _selectedScreen.Zones.ForEach(z => Zones.Add(z));
+                    _selectedProgram.Zones.ForEach(z => Zones.Add(z));
                 }
                 SelectedZone = null;
-                OnPropertyChanged(nameof(SelectedScreen));
+                OnPropertyChanged(nameof(SelectedProgram));
                 OnPropertyChanged(nameof(Zones));
             }
         }
@@ -712,7 +712,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _text = value;
-                var ticker = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                var ticker = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (ticker.ZoneType == (int)DomainObjects.ZoneTypes.Text)
                 {
                     ticker.Text = value;
@@ -728,7 +728,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _selectedClockType = value;
-                var zone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
                 {
                     zone.ClockType = value?.Id ?? 0;
@@ -762,7 +762,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _selectedClockFormat = value;
-                var zone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
                 {
                     zone.ClockFormat = value?.Id ?? 0;
@@ -778,7 +778,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _externalSourceTag = value;
-                var zone = GetDeviceZone(SelectedScreen.Id, SelectedZone.Id);
+                var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (zone.ZoneType == (int)DomainObjects.ZoneTypes.MQTT)
                 {
                     zone.ExternalSourceTag = value;
@@ -826,20 +826,20 @@ namespace PixelBoardDevice.UI
                     SelectedZone = newZone;
                     OnPropertyChanged(nameof(SelectedZone));
                     OnPropertyChanged(nameof(Zones));
-                    var deviceScreen = _device.Screens.FirstOrDefault(s => s.Id == SelectedScreen.Id);
-                    var deviceScreenZones = new List<Zone>();
-                    foreach (var zone in deviceScreen.Zones)
+                    var devicePrograms = _device.Programs.FirstOrDefault(s => s.Id == SelectedProgram.Id);
+                    var deviceProgramZones = new List<Zone>();
+                    foreach (var zone in devicePrograms.Zones)
                     {
                         if (zone.Id == newZone.Id)
                         {
-                            deviceScreenZones.Add(newZone);
+                            deviceProgramZones.Add(newZone);
                         }
                         else
                         {
-                            deviceScreenZones.Add(zone);
+                            deviceProgramZones.Add(zone);
                         }
                     }
-                    deviceScreen.Zones = deviceScreenZones;
+                    devicePrograms.Zones = deviceProgramZones;
                 }
             }
         }
@@ -862,20 +862,20 @@ namespace PixelBoardDevice.UI
                               return;
                           }
                           var image = Image.FromFile(dialog.FileName);
-                          UpdateZoneImage(SelectedScreen, SelectedZone, image);
+                          UpdateZoneImage(SelectedProgram, SelectedZone, image);
                       });
                 }
                 return _loadBitmap;
             }
         }
 
-        private void UpdateZoneImage(Screen screen, Zone zone, Image image)
+        private void UpdateZoneImage(Program program, Zone zone, Image image)
         {
             if (zone.Width == 0 && zone.Height == 0)
             {
                 return;
             }
-            var deviceZone = GetDeviceZone(screen.Id, zone.Id);
+            var deviceZone = GetDeviceZone(program.Id, zone.Id);
             var bitmap = new Bitmap(image);
             var width = (bitmap.Width > zone.Width) ? zone.Width : bitmap.Width;
             var height = (bitmap.Height > zone.Height) ? zone.Height : bitmap.Height;
@@ -886,48 +886,48 @@ namespace PixelBoardDevice.UI
             OnPropertyChanged("");
         }
 
-        private DelegateCommand _addScreen;
-        public Input.ICommand AddScreen
+        private DelegateCommand _addProgram;
+        public Input.ICommand AddProgram
         {
             get
             {
-                if (_addScreen == null)
+                if (_addProgram == null)
                 {
-                    _addScreen = new DelegateCommand((o) =>
+                    _addProgram = new DelegateCommand((o) =>
                     {
-                        var nextOrderValue = (_device.Screens.Any()) ? _device.Screens.Max(s => s.Order) + 1 : 1;
-                        var nextId = (_device.Screens.Any()) ? _device.Screens.Max(x => x.Id) + 1 : 0;
-                        var screen = new Screen
+                        var nextOrderValue = (_device.Programs.Any()) ? _device.Programs.Max(s => s.Order) + 1 : 1;
+                        var nextId = (_device.Programs.Any()) ? _device.Programs.Max(x => x.Id) + 1 : 0;
+                        var program = new Program
                         {
                             Order = nextOrderValue,
                             Id = nextId,
-                            Name = $"Экран{nextOrderValue}",
+                            Name = $"Программа{nextOrderValue}",
                             Period = 10,
                             Zones = new List<Zone>()
                         };
-                        Screens.Add(screen);
-                        _device.Screens.Add(screen);
+                        Programs.Add(program);
+                        _device.Programs.Add(program);
                     });
                 }
-                return _addScreen;
+                return _addProgram;
             }
         }
 
-        private DelegateCommand _deleteScreen;
-        public Input.ICommand DeleteScreen
+        private DelegateCommand _deleteProgram;
+        public Input.ICommand DeleteProgram
         {
             get
             {
-                if (_deleteScreen == null)
+                if (_deleteProgram == null)
                 {
-                    _deleteScreen = new DelegateCommand((o) =>
+                    _deleteProgram = new DelegateCommand((o) =>
                     {
-                        _device.Screens.Remove(_device.Screens.FirstOrDefault(s => s.Id == SelectedScreen.Id));
-                        Screens.Remove(SelectedScreen);
-                        SelectedScreen = null;
+                        _device.Programs.Remove(_device.Programs.FirstOrDefault(s => s.Id == SelectedProgram.Id));
+                        Programs.Remove(SelectedProgram);
+                        SelectedProgram = Programs.FirstOrDefault();
                     });
                 }
-                return _deleteScreen;
+                return _deleteProgram;
             }
         }
 
@@ -940,14 +940,14 @@ namespace PixelBoardDevice.UI
                 {
                     _addZone = new DelegateCommand((o) =>
                     {
-                        var nextId = Screens.Max(s => s.Zones.Any() ? s.Zones.Max(z => z.Id) : 0) + 1;
+                        var nextId = Programs.Max(s => s.Zones.Any() ? s.Zones.Max(z => z.Id) : 0) + 1;
                         var zone = new Zone
                         {
                             ZoneType = (int)DomainObjects.ZoneTypes.Text,
                             Id = nextId,
                             Name = "Текст"
                         };
-                        SelectedScreen.Zones.Add(zone);
+                        SelectedProgram.Zones.Add(zone);
                         Zones.Add(zone);
                         OnPropertyChanged(nameof(Zones));
                     });
@@ -966,7 +966,7 @@ namespace PixelBoardDevice.UI
                     _deleteZone = new DelegateCommand((o) =>
                     {
                         var zone = SelectedZone;
-                        SelectedScreen.Zones.Remove(zone);
+                        SelectedProgram.Zones.Remove(zone);
                         Zones.Remove(zone);
                         OnPropertyChanged(nameof(Zones));
                     });

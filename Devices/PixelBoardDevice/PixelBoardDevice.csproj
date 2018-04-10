@@ -59,7 +59,7 @@
   <ItemGroup>
     <Compile Include="DomainObjects\BinaryFont.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
-    <Compile Include="DomainObjects\Screen.cs" />
+    <Compile Include="DomainObjects\Program.cs" />
     <Compile Include="DomainObjects\Zone.cs" />
     <Compile Include="Extensions\IntegerExtension.cs" />
     <Compile Include="PixelDeviceBuilder.cs" />

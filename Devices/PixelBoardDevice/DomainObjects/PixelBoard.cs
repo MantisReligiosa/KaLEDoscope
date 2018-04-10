@@ -14,6 +14,6 @@ namespace PixelBoardDevice.DomainObjects
             "`~!@#$%^&*()[]{}-_+=*:;\"',.<>/\\| ";
         public List<BinaryFont> Fonts { get; set; }
         public BoardSize BoardSize { get; set; }
-        public List<Screen> Screens { get; set; }
+        public List<Program> Programs { get; set; }
     }
 }

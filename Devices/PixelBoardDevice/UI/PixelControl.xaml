@@ -92,13 +92,13 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <Grid.Resources>
-                <CollectionViewSource Source="{Binding Path=Screens}" x:Key="cvs">
+                <CollectionViewSource Source="{Binding Path=Programs}" x:Key="cvs">
                     <CollectionViewSource.SortDescriptions>
                         <scm:SortDescription PropertyName="Order" Direction="Ascending"/>
                     </CollectionViewSource.SortDescriptions>
                 </CollectionViewSource>
             </Grid.Resources>
-            <ListView Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding Source={StaticResource cvs}}" SelectedItem="{Binding SelectedScreen}">
+            <ListView Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding Source={StaticResource cvs}}" SelectedItem="{Binding SelectedProgram}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="Название" Width="60">
@@ -127,8 +127,8 @@
             </ListView>
             <ListBox Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2" Width="170"
                      ItemsSource="{Binding Zones}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedZone}"/>
-            <Button Grid.Column="0" Grid.Row="1" Command="{Binding AddScreen}" Content="Добавить экран"/>
-            <Button Grid.Column="1" Grid.Row="1" Command="{Binding DeleteScreen}" Content="Удалить экран"/>
+            <Button Grid.Column="0" Grid.Row="1" Command="{Binding AddProgram}" Content="Добавить программу"/>
+            <Button Grid.Column="1" Grid.Row="1" Command="{Binding DeleteProgram}" Content="Удалить программу"/>
             <Button Grid.Column="2" Grid.Row="1" Command="{Binding AddZone}" Content="Добавить зону"/>
             <Button Grid.Column="3" Grid.Row="1" Command="{Binding DeleteZone}" Content="Удалить зону"/>
             <Grid Grid.Column="4" Grid.Row="0" Grid.RowSpan="2" Width="275">
@@ -174,7 +174,7 @@
                             <TextBox Grid.Column="3" Grid.Row="1" Text="{Binding ZoneWidth}"/>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="3" Header="Текст" Style="{StaticResource GroupBoxStyle}" Visibility="{Binding TextVisibility}">
+                    <GroupBox Grid.Row="4" Header="Текст" Style="{StaticResource GroupBoxStyle}" Visibility="{Binding TextVisibility}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
@@ -202,7 +202,7 @@
                             </TextBox>
                         </Grid>
                     </GroupBox>
-                    <GroupBox Grid.Row="4" Header="Анимация" Visibility="{Binding AnimationVisibility}" Style="{StaticResource GroupBoxStyle}">
+                    <GroupBox Grid.Row="3" Header="Анимация" Visibility="{Binding AnimationVisibility}" Style="{StaticResource GroupBoxStyle}">
                         <ComboBox Grid.Column="1"></ComboBox>
                     </GroupBox>
                     <GroupBox Grid.Row="5" Header="Растр" Visibility="{Binding BitmapVisibility}" Style="{StaticResource GroupBoxStyle}">
