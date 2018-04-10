@@ -20,10 +20,11 @@ using Abstractions;
 using PixelBoardDevice;
 using System.Drawing;
 using Aggregations;
+using GongSolutions.Wpf.DragDrop;
 
 namespace KaLEDoscope
 {
-    public class MainViewModel : Notified
+    public class MainViewModel : Notified, IDropTarget
     {
         private ILogger _logger { get; set; }
         private readonly Dispatcher _dispatcher;
@@ -441,6 +442,58 @@ namespace KaLEDoscope
         {
             _log.AppendLine(Message);
             OnPropertyChanged(nameof(Log));
+        }
+
+        public void DragOver(IDropInfo dropInfo)
+        {
+            var sourceNode = dropInfo.Data as NodeItem;
+            var targetNode = dropInfo.TargetItem as NodeItem;
+            if ((sourceNode is DeviceNode) && ((targetNode is AggregationNode) || (targetNode is FolderNode) || (targetNode is null)))
+            {
+                dropInfo.DropTargetAdorner = DropTargetAdorners.Highlight;
+                dropInfo.Effects = DragDropEffects.Move;
+            }
+            else
+            {
+                dropInfo.Effects = DragDropEffects.None;
+            }
+        }
+
+        public void Drop(IDropInfo dropInfo)
+        {
+            var deviceNode = dropInfo.Data as DeviceNode;
+            deviceNode.Device.Aggregation = null;
+            deviceNode.Device.Folder = null;
+            var parentNode = deviceNode.Parent;
+            if (parentNode == null)
+            {
+                StructureNodes.Remove(deviceNode);
+            }
+            else
+            {
+                parentNode.Nodes.Remove(deviceNode);
+            }
+            var targetNode = dropInfo.TargetItem as NodeItem;
+            if (targetNode == null)
+            {
+                StructureNodes.Add(deviceNode);
+                deviceNode.Parent = null;
+                return;
+            }
+            targetNode.Nodes.Add(deviceNode);
+            deviceNode.Parent = targetNode;
+            if (targetNode is AggregationNode aggregationNode)
+            {
+                deviceNode.Device.Aggregation = aggregationNode.Aggregation;
+                if (DeviceTabs.Any(t => t.DataContext == aggregationNode))
+                {
+                    ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
+                }
+            }
+            if (targetNode is FolderNode folderNode)
+            {
+                deviceNode.Device.Folder = folderNode.Folder;
+            }
         }
     }
 }

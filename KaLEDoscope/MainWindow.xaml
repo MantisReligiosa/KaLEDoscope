@@ -6,6 +6,7 @@
         xmlns:self="clr-namespace:KaLEDoscope"
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
+        xmlns:dd="urn:gong-wpf-dragdrop"
         Title="MainWindow" d:DesignWidth="900" d:DesignHeight="540" WindowState="Maximized">
     <Window.Resources>
         <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
@@ -37,7 +38,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TreeView x:Name="trvMenu" Grid.Row="0" Grid.ColumnSpan="10" ItemsSource="{Binding Path=StructureNodes}" Style="{StaticResource TreeViewStyle}">
+                <TreeView x:Name="trvMenu" Grid.Row="0" Grid.ColumnSpan="10" ItemsSource="{Binding Path=StructureNodes}" Style="{StaticResource TreeViewStyle}"
+                          dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="MouseDoubleClick">
                             <i:InvokeCommandAction Command="{Binding Path=ShowDevicePlugin}"

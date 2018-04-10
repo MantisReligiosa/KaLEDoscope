@@ -13,6 +13,6 @@ namespace KaLEDoscope
         }
 
         public ObservableCollection<NodeItem> Nodes { get; set; } = new ObservableCollection<NodeItem>();
-        public NodeItem Parent { get; private set; }
+        public NodeItem Parent { get; set; }
     }
 }
