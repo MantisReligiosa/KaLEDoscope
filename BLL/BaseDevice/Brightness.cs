@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Abstractions;
+using System;
 using System.Collections.Generic;
 
 namespace BaseDevice
@@ -10,11 +11,48 @@ namespace BaseDevice
         public List<BrightnessPeriod> BrightnessPeriods { get; set; }
     }
 
-    public class BrightnessPeriod
+    public class BrightnessPeriod : Notified
     {
         public TimeSpan From { get; set; }
+
+        public string PeriodStart
+        {
+            get
+            {
+                return From.ToString(@"hh\:mm");
+            }
+            set
+            {
+                if (!TimeSpan.TryParse(value, out TimeSpan timeSpan))
+                {
+                    timeSpan = new TimeSpan(0, 0, 0);
+                }
+                From = timeSpan;
+                OnPropertyChanged(nameof(PeriodStart));
+            }
+        }
+
         public TimeSpan To { get; set; }
-        public int Value { get; set; }
+        public string PeriodEnd
+        {
+            get
+            {
+                return To.ToString(@"hh\:mm");
+            }
+            set
+            {
+                if (!TimeSpan.TryParse(value, out TimeSpan timeSpan))
+                {
+                    timeSpan = new TimeSpan(0, 0, 0);
+                }
+                To = timeSpan;
+                OnPropertyChanged(nameof(PeriodEnd));
+            }
+        }
+
+
+        public int Value { get;
+            set; }
     }
 
     public enum Mode

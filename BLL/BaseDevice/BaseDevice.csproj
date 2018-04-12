@@ -47,6 +47,10 @@
     <Compile Include="WorkSchedule.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Domain\Abstractions\Abstractions.csproj">
+      <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
+      <Name>Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Aggregations\Aggregations.csproj">
       <Project>{0E5E77B5-6EE4-423A-B8A0-8DF697784F03}</Project>
       <Name>Aggregations</Name>

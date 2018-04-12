@@ -484,12 +484,14 @@ namespace KaLEDoscope.ViewModel
                     _addBrightnessItem = new DelegateCommand((o) =>
                     {
                         var from = BrightnessPeriods.Any() ? BrightnessPeriods.Max(p => p.To) : new TimeSpan(0, 0, 0);
-                        BrightnessPeriods.Add(new BrightnessPeriod
+                        var period = new BrightnessPeriod
                         {
                             From = from,
                             To = new TimeSpan(0, 0, 0),
                             Value = 1
-                        });
+                        };
+                        BrightnessPeriods.Add(period);
+                        _device.Brightness.BrightnessPeriods.Add(period);
                     });
                 }
                 return _addBrightnessItem;

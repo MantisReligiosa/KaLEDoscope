@@ -1,6 +1,4 @@
-﻿using System;
-using System.Windows.Controls;
-using Xceed.Wpf.Toolkit;
+﻿using System.Windows.Controls;
 
 namespace PixelBoardDevice.UI
 {
@@ -12,25 +10,6 @@ namespace PixelBoardDevice.UI
         public PixelControl()
         {
             InitializeComponent();
-        }
-
-
-        private void ButtonSpinner_Spin(object sender, SpinEventArgs e)
-        {
-            ButtonSpinner spinner = (ButtonSpinner)sender;
-            TextBox txtBox = (TextBox)spinner.Content;
-
-            int value = 0;
-            if (Int32.TryParse(txtBox.Text, out int parsed))
-            {
-                value = parsed;
-            }
-
-            if (e.Direction == SpinDirection.Increase)
-                value++;
-            else
-                value--;
-            txtBox.Text = value.ToString();
         }
     }
 }

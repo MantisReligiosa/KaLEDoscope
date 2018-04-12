@@ -41,10 +41,10 @@
                        Grid.Column="0" 
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Top"/>
-                    <xctk:ButtonSpinner Grid.Row="0" 
-                                    Grid.Column="1" Spin="ButtonSpinner_Spin">
-                        <TextBox Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}" Margin="-2,-3,-1,-3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="199" Height="27"/>
-                    </xctk:ButtonSpinner>
+                    <xctk:IntegerUpDown Grid.Row="0" 
+                                        Grid.Column="1" 
+                                        Value="{Binding Id}"
+                                        Minimum="0"/>
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid HorizontalAlignment="Right" Width="188">
@@ -70,14 +70,12 @@
         </GroupBox>
         <GroupBox Grid.Row="1" 
                   Grid.Column="0" 
-                  Header="Сетевые параметры" 
-                  HorizontalAlignment="Left" 
-                  VerticalAlignment="Top"
+                  Header="Сетевые параметры"
                   Style="{StaticResource GroupBoxStyle}">
             <Grid >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"></ColumnDefinition>
-                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="auto"></RowDefinition>
@@ -96,11 +94,9 @@
                        VerticalAlignment="Top"/>
                 <TextBox Grid.Row="1" 
                                     Grid.Column="1" 
-                                    HorizontalAlignment="Left" 
                                     Height="23"
-                                    TextWrapping="Wrap" 
-                                    VerticalAlignment="Top"
-                                    Width="120"
+                                    TextWrapping="Wrap"
+                                    
                                     Text="{Binding IpAddress}"
                                     />
                 <Label Content="IP порт" 
@@ -108,10 +104,10 @@
                        Grid.Column="0" 
                        HorizontalAlignment="Left" 
                        VerticalAlignment="Top"/>
-                <xctk:ButtonSpinner Grid.Row="2" 
-                                    Grid.Column="2" Spin="ButtonSpinner_Spin">
-                    <TextBox Text="{Binding Port, UpdateSourceTrigger=PropertyChanged}" Margin="-2,-3,-1,-3" HorizontalAlignment="Left" VerticalAlignment="Top" Width="102" Height="27"/>
-                </xctk:ButtonSpinner>
+                <xctk:IntegerUpDown Grid.Row="2" 
+                                    Grid.Column="2"
+                                    Value="{Binding Port}"
+                                    Minimum="1"/>
                 <Label Content="Маска подсети" 
                        Grid.Row="3" 
                        Grid.Column="0" 
@@ -136,11 +132,9 @@
                        VerticalAlignment="Top"/>
                 <TextBox Grid.Row="4" 
                                     Grid.Column="1" 
-                                    HorizontalAlignment="Left" 
                                     Height="23"
                                     TextWrapping="Wrap" 
                                     VerticalAlignment="Top"
-                                    Width="120"
                                     Text="{Binding Gateway}"
                                     />
                 <Label Content="DNS сервер" 
@@ -150,16 +144,13 @@
                        VerticalAlignment="Top"/>
                 <TextBox Grid.Row="5" 
                                     Grid.Column="1" 
-                                    HorizontalAlignment="Left" 
                                     Height="23"
-                                    TextWrapping="Wrap" 
-                                    VerticalAlignment="Top"
-                                    Width="120"
+                                    TextWrapping="Wrap"
                                     Text="{Binding DnsServer}"
                                     />
             </Grid>
         </GroupBox>
-        <GroupBox Grid.Row="1" 
+        <GroupBox Grid.Row="1" Grid.RowSpan="2"
                   Grid.Column="1" 
                   Header="Управление яркостью"
                   Style="{StaticResource GroupBoxStyle}">
@@ -179,17 +170,11 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
                     <Slider SmallChange="0" Value="{Binding ManualBrightnessValue}" IsEnabled="{Binding ManualBrightness}"/>
-                    <xctk:ButtonSpinner Grid.Column="1" Spin="ButtonSpinner_Spin">
-                    <TextBox 
-                             HorizontalAlignment="Left" 
-                             Height="26"
-                             TextWrapping="Wrap" 
-                             VerticalAlignment="Top"
-                             Width="25"
-                             Text="{Binding ManualBrightnessValue, UpdateSourceTrigger=PropertyChanged}" Margin="-2,-2,-1,-2"
-                             IsEnabled="{Binding ManualBrightness}"
-                            />
-                    </xctk:ButtonSpinner>
+                    <xctk:IntegerUpDown Grid.Column="1" 
+                                        Value="{Binding ManualBrightnessValue}" 
+                                        IsEnabled="{Binding ManualBrightness}" 
+                                        Maximum="10" 
+                                        Minimum="0"/>
                 </Grid>
                 <RadioButton Grid.Row="3" Content="По расписанию" IsChecked="{Binding ScheduledBrightness}"/>
                 <Grid Grid.Row="4">
@@ -206,7 +191,6 @@
                               IsEnabled="{Binding ScheduledBrightness}" 
                               ItemsSource="{Binding BrightnessPeriods}" 
                               SelectedItem="{Binding SelectedBrightnessPeriod}" 
-                              Height="150" 
                               AutoGenerateColumns="False"
                               Width="250" CanUserAddRows="False">
                         <DataGrid.ContextMenu>
@@ -218,32 +202,45 @@
                             </ContextMenu>
                         </DataGrid.ContextMenu>
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="От" Binding="{Binding Path=From}" Width="50"/>
-                            <DataGridTextColumn Header="До" Binding="{Binding Path=To}" Width="50"/>
+                            <DataGridTemplateColumn Header="От" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <xctk:TimePicker Text="{Binding Path=PeriodStart, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="До" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <xctk:TimePicker Text="{Binding Path=PeriodEnd, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                             <DataGridTextColumn Header="Яркость" Binding="{Binding Path=Value}" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Grid.Row="1" Grid.Column="0" Content="Добавить" Command="{Binding AddBrightnessItem}"/>
-                    <Button Grid.Row="1" Grid.Column="1" Content="Удалить" Command="{Binding RemoveBrightnessItem}"/>
+                    <Button Grid.Row="1" Grid.Column="0" Content="Добавить" Command="{Binding AddBrightnessItem}" IsEnabled="{Binding ScheduledBrightness}"/>
+                    <Button Grid.Row="1" Grid.Column="1" Content="Удалить" Command="{Binding RemoveBrightnessItem}" IsEnabled="{Binding ScheduledBrightness}"/>
                 </Grid>
             </Grid>
         </GroupBox>
         <GroupBox Grid.Column="0" 
                   Grid.Row="2" 
-                  Grid.ColumnSpan="2" 
                   Header="Расписание работы"
                   Style="{StaticResource GroupBoxStyle}">
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="7*"></ColumnDefinition>
-                    <ColumnDefinition Width="37*"/>
-                    <ColumnDefinition Width="50*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Header="Время работы" Grid.ColumnSpan="2" Style="{StaticResource GroupBoxStyle}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Header="Время работы" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"></RowDefinition>
@@ -257,33 +254,29 @@
                                VerticalAlignment="Top"
                                IsEnabled="{Binding IsScheduledWork}"
                                />
-                        <TextBox Grid.Row="0" 
-                                    Grid.Column="1" 
-                                    Height="23"
-                                    TextWrapping="Wrap" 
-                                    VerticalAlignment="Top"
-                                    Text="{Binding ScheduledWorkStart}"
-                                 IsEnabled="{Binding IsScheduledWork}"
-                                    />
+                        <xctk:TimePicker Grid.Row="0" 
+                                         Grid.Column="1"
+                                         Text="{Binding ScheduledWorkStart}"
+                                         IsEnabled="{Binding IsScheduledWork}"
+                                         Format="ShortTime"
+                                         Width="80"/>
                         <Label Content="Стоп" 
-                               Grid.Row="1" 
-                               Grid.Column="0" 
+                               Grid.Row="0" 
+                               Grid.Column="2" 
                                HorizontalAlignment="Left" 
                                VerticalAlignment="Top"
                                IsEnabled="{Binding IsScheduledWork}"
                                />
-                        <TextBox Grid.Row="1" 
-                                    Grid.Column="1" 
-                                    Height="23"
-                                    TextWrapping="Wrap" 
-                                    VerticalAlignment="Top"
-                                    Text="{Binding ScheduledWorkEnd}"
-                                 IsEnabled="{Binding IsScheduledWork}"
-                                    />
-                        <CheckBox Grid.Row="2" Grid.ColumnSpan="2" Content="Круглосуточно" IsChecked="{Binding ScheduleWorkAroundTheClock}"/>
+                        <xctk:TimePicker Grid.Row="0" 
+                                         Grid.Column="3"
+                                         Text="{Binding ScheduledWorkEnd}"
+                                         IsEnabled="{Binding IsScheduledWork}"
+                                         Format="ShortTime"
+                                         Width="80"/>
+                        <CheckBox Grid.Row="1" Grid.ColumnSpan="2" Content="Круглосуточно" IsChecked="{Binding ScheduleWorkAroundTheClock}"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Grid.Column="2" Header="Воспроизводить по дням недели" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox Grid.Row="1" Header="Воспроизводить по дням недели" Style="{StaticResource GroupBoxStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"></ColumnDefinition>
