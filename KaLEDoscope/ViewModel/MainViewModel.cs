@@ -2,8 +2,6 @@
 using CommandProcessing;
 using KaLEDoscope.ViewModel;
 using KaLEDoscope.Views;
-using Microsoft.Win32;
-using Newtonsoft.Json;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -18,8 +16,6 @@ using SevenSegmentBoardDevice;
 using DeviceBuilding;
 using Abstractions;
 using PixelBoardDevice;
-using System.Drawing;
-using Aggregations;
 using GongSolutions.Wpf.DragDrop;
 
 namespace KaLEDoscope

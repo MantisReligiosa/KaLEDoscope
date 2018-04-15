@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using Resources;
+using PixelBoardDevice.Serialization;
+using Newtonsoft.Json;
 
 namespace PixelBoardDevice
 {
@@ -20,12 +22,14 @@ namespace PixelBoardDevice
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             _model = new PixelDeviceViewModel(device, logger);
-            var pack = new ControlsPack();
-            pack.CustomizationControl = new PixelControl
+            var pack = new ControlsPack
             {
-                HorizontalAlignment = HorizontalAlignment.Stretch,
-                VerticalAlignment = VerticalAlignment.Stretch,
-                DataContext = _model
+                CustomizationControl = new PixelControl
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    DataContext = _model
+                }
             };
             _previewControl = new ScalableImage
             {
@@ -79,6 +83,18 @@ namespace PixelBoardDevice
                 Name = String.IsNullOrEmpty(device.Name) ? "Электронное табло" : device.Name
             };
             return pixelBoard;
+        }
+
+        public string SerializeDevice(Device device)
+        {
+            var pixelBoard = (PixelBoard)device;
+            var serializablePixelDevice = (SerializablePixelDevice)pixelBoard;
+            return JsonConvert.SerializeObject(serializablePixelDevice);
+        }
+
+        public Device DeserializeDevice(string text)
+        {
+            throw new NotImplementedException();
         }
     }
 }

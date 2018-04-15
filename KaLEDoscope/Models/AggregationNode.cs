@@ -1,4 +1,4 @@
-﻿using Aggregations;
+﻿using BaseDevice;
 
 namespace KaLEDoscope
 {

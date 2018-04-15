@@ -67,10 +67,10 @@ namespace KaLEDoscope.ViewModel
                 {
                     _downloadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
-                    d.AllowUpload = true;
-                    BeforeGettingSettings?.Invoke(this, d);
-                    var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceFactory, _logger);
-                    command.OnConfigurationDownloaded += ((sender, device) => AfterGetingSettings?.Invoke(this, device));
+                        d.AllowUpload = true;
+                        BeforeGettingSettings?.Invoke(this, d);
+                        var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceFactory, _logger);
+                        command.OnConfigurationDownloaded += ((sender, device) => AfterGetingSettings?.Invoke(this, device));
                         _invoker.Invoke(command);
                     });
                 }
@@ -113,7 +113,7 @@ namespace KaLEDoscope.ViewModel
                         if (dialog.ShowDialog() == true)
                         {
                             var fileName = dialog.FileName;
-                            var serialized = JsonConvert.SerializeObject(d.Device);
+                            var serialized = _deviceFactory.SerializeDevice(d.Device);
                             System.IO.File.WriteAllText(fileName, serialized);
                         }
                     });
@@ -142,8 +142,7 @@ namespace KaLEDoscope.ViewModel
                         {
                             var fileName = dialog.FileName;
                             var text = System.IO.File.ReadAllText(fileName);
-                            var device = JsonConvert.DeserializeObject(text, d.Device.GetType());
-                            d.Device = _deviceFactory.Customize(device);
+                            d.Device = _deviceFactory.DeserializeDevice(text);
                             AfterGetingSettings?.Invoke(this, d.Device);
                         }
                     });

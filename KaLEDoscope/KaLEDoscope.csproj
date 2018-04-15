@@ -191,10 +191,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BLL\Aggregations\Aggregations.csproj">
-      <Project>{0E5E77B5-6EE4-423A-B8A0-8DF697784F03}</Project>
-      <Name>Aggregations</Name>
-    </ProjectReference>
     <ProjectReference Include="..\BLL\BaseDevice\BaseDevice.csproj">
       <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
       <Name>BaseDevice</Name>

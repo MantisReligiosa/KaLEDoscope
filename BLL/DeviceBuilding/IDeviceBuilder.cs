@@ -1,8 +1,5 @@
 ﻿using BaseDevice;
 using ServiceInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Windows.Controls;
 
 namespace DeviceBuilding
 {
@@ -11,5 +8,7 @@ namespace DeviceBuilding
         string Model { get; }
         Device UpdateCustomSettings(Device device);
         ControlsPack GetControlsPack(Device device, ILogger logger);
+        string SerializeDevice(Device device);
+        Device DeserializeDevice(string text);
     }
 }

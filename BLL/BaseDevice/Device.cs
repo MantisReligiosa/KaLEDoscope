@@ -1,6 +1,4 @@
-﻿using Aggregations;
-
-namespace BaseDevice
+﻿namespace BaseDevice
 {
     public class Device
     {

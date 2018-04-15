@@ -13,6 +13,11 @@ namespace SevenSegmentBoardDevice
     {
         public string Model => "boardClock";
 
+        public Device DeserializeDevice(string text)
+        {
+            throw new NotImplementedException();
+        }
+
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var pack = new ControlsPack();
@@ -32,6 +37,11 @@ namespace SevenSegmentBoardDevice
                 }
             };
             return pack;
+        }
+
+        public string SerializeDevice(Device device)
+        {
+            throw new NotImplementedException();
         }
 
         public Device UpdateCustomSettings(Device device)

@@ -36,7 +36,7 @@ namespace CommandProcessing
             _logger.Debug(this, $"Жду ответ {_timeout} мс");
             _networkAgent.Listen(_device.Network.Port, (recieveString) =>
             {
-                var d = JsonConvert.DeserializeObject(recieveString, _device.GetType());
+                var d = _deviceFactory.DeserializeDevice(recieveString);
                 _device = _deviceFactory.Customize(d);
                 _timer.Stop();
                 EndCommand();
