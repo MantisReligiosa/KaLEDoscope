@@ -7,7 +7,7 @@
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         xmlns:dd="urn:gong-wpf-dragdrop"
-        Title="MainWindow" d:DesignWidth="900" d:DesignHeight="540" WindowState="Maximized">
+        Title="MainWindow" d:DesignWidth="900" d:DesignHeight="540" WindowState="Maximized" Icon="Resources/Logo.ico">
     <Window.Resources>
         <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
     </Window.Resources>

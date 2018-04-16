@@ -17,7 +17,7 @@ namespace PixelBoardDevice
     {
         public string Model => "pixelBoard";
         private PixelDeviceViewModel _model;
-        private ScalableImage _previewControl;
+        private UserControl _previewControl;
 
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
@@ -31,9 +31,12 @@ namespace PixelBoardDevice
                     DataContext = _model
                 }
             };
-            _previewControl = new ScalableImage
+            _previewControl = new ProgramPreviewControl
             {
-                Image = _model.PreviewImage
+                DataContext = new ProgramPreviewViewModel
+                {
+                    Program = _model.SelectedProgram
+                }
             };
             _model.PropertyChanged += Model_PropertyChanged;
             pack.PreviewControl = _previewControl;
@@ -46,7 +49,7 @@ namespace PixelBoardDevice
             {
                 return;
             }
-            _previewControl.Image = _model?.PreviewImage;
+            //_previewControl.Image = _model?.PreviewImage;
         }
 
         public Device UpdateCustomSettings(Device device)
