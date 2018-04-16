@@ -2,8 +2,8 @@
 using BaseDevice;
 using ServiceInterfaces;
 using System.Collections.Generic;
-using System;
 using Newtonsoft.Json;
+using Extensions;
 
 namespace DeviceBuilding
 {
@@ -23,7 +23,7 @@ namespace DeviceBuilding
         public Device Customize(Device device)
         {
             var builder = Builders.FirstOrDefault(b => b.Model.Equals(device.Model));
-            if (builder != null)
+            if (!builder.IsNull())
             {
                 device = builder.UpdateCustomSettings(device);
             }
@@ -47,7 +47,7 @@ namespace DeviceBuilding
             var device = JsonConvert.DeserializeObject<Device>(text);
             _logger.Debug(this, "Извлечение базовой информации");
             var builder = Builders.FirstOrDefault(b => b.Model.Equals(device.Model));
-            if (builder != null)
+            if (!builder.IsNull())
             {
                 device = builder.DeserializeDevice(text);
             }

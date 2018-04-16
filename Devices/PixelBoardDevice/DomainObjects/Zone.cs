@@ -1,7 +1,5 @@
-﻿using System;
+﻿using Extensions;
 using System.Linq;
-using PixelBoardDevice.Extensions;
-using PixelBoardDevice.UI.POCO;
 
 namespace PixelBoardDevice.DomainObjects
 {

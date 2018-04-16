@@ -1,9 +1,6 @@
-﻿using ServiceInterfaces;
+﻿using Extensions;
+using ServiceInterfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommandProcessing
 {
@@ -17,14 +14,14 @@ namespace CommandProcessing
 
         public void Invoke(ICommand command)
         {
-            _logger.Info(this, $"{command.Name}" + ((command.Device != null) ? $" устройства {command.Device.Name}" : String.Empty));
+            _logger.Info(this, $"{command.Name}" + ((!command.Device.IsNull()) ? $" устройства {command.Device.Name}" : String.Empty));
             try
             {
                 command.Execute();
             }
             catch(Exception exception)
             {
-                if (command.Device != null)
+                if (!command.Device.IsNull())
                 {
                     _logger.Error(this, $"Ошибка отправки команды \"{command.Name}\" устройству \"{command.Device.Name}\"", exception);
                 }

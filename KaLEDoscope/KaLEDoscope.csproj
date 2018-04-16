@@ -215,6 +215,10 @@
       <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
       <Name>Abstractions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Domain\Extensions\Extensions.csproj">
+      <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
+      <Name>Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Logger\Logger.csproj">
       <Project>{F5C748BA-65E1-430D-8385-CFD198FE850E}</Project>
       <Name>Logger</Name>

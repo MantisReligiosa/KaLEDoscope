@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extensions;
+using System;
 using System.Collections.Generic;
 using System.Windows.Input;
 
@@ -33,7 +34,7 @@ namespace UiCommands
         /// </summary>
         public DelegateCommand(Action<object> executeMethod, Func<bool> canExecuteMethod, bool isAutomaticRequeryDisabled)
         {
-            if (executeMethod == null)
+            if (executeMethod.IsNull())
             {
                 throw new ArgumentNullException("executeMethod");
             }
@@ -52,7 +53,7 @@ namespace UiCommands
         /// </summary>
         public bool CanExecute()
         {
-            if (_canExecuteMethod != null)
+            if (!_canExecuteMethod.IsNull())
             {
                 return _canExecuteMethod();
             }
@@ -64,7 +65,7 @@ namespace UiCommands
         /// </summary>
         public void Execute(object o)
         {
-            if (_executeMethod != null)
+            if (!_executeMethod.IsNull())
             {
                 _executeMethod(o);
             }
@@ -191,7 +192,7 @@ namespace UiCommands
         /// </summary>
         public DelegateCommand(Action<T> executeMethod, Func<T, bool> canExecuteMethod, bool isAutomaticRequeryDisabled)
         {
-            if (executeMethod == null)
+            if (executeMethod.IsNull())
             {
                 throw new ArgumentNullException("executeMethod");
             }
@@ -210,7 +211,7 @@ namespace UiCommands
         /// </summary>
         public bool CanExecute(T parameter)
         {
-            if (_canExecuteMethod != null)
+            if (!_canExecuteMethod.IsNull())
             {
                 return _canExecuteMethod(parameter);
             }
@@ -222,7 +223,7 @@ namespace UiCommands
         /// </summary>
         public void Execute(T parameter)
         {
-            if (_executeMethod != null)
+            if (!_executeMethod.IsNull())
             {
                 _executeMethod(parameter);
             }
@@ -302,10 +303,10 @@ namespace UiCommands
             // if T is of value type and the parameter is not
             // set yet, then return false if CanExecute delegate
             // exists, else return true
-            if (parameter == null &&
+            if (parameter.IsNull() &&
                 typeof(T).IsValueType)
             {
-                return (_canExecuteMethod == null);
+                return (_canExecuteMethod.IsNull());
             }
             return CanExecute((T)parameter);
         }
@@ -335,7 +336,7 @@ namespace UiCommands
     {
         internal static void CallWeakReferenceHandlers(List<WeakReference> handlers)
         {
-            if (handlers != null)
+            if (!handlers.IsNull())
             {
                 // Take a snapshot of the handlers before we call out to them since the handlers
                 // could cause the array to me modified while we are reading it.
@@ -347,7 +348,7 @@ namespace UiCommands
                 {
                     WeakReference reference = handlers[i];
                     EventHandler handler = reference.Target as EventHandler;
-                    if (handler == null)
+                    if (handler.IsNull())
                     {
                         // Clean up old handlers that have been collected
                         handlers.RemoveAt(i);
@@ -370,12 +371,12 @@ namespace UiCommands
 
         internal static void AddHandlersToRequerySuggested(List<WeakReference> handlers)
         {
-            if (handlers != null)
+            if (!handlers.IsNull())
             {
                 foreach (WeakReference handlerRef in handlers)
                 {
                     EventHandler handler = handlerRef.Target as EventHandler;
-                    if (handler != null)
+                    if (!handler.IsNull())
                     {
                         CommandManager.RequerySuggested += handler;
                     }
@@ -385,12 +386,12 @@ namespace UiCommands
 
         internal static void RemoveHandlersFromRequerySuggested(List<WeakReference> handlers)
         {
-            if (handlers != null)
+            if (!handlers.IsNull())
             {
                 foreach (WeakReference handlerRef in handlers)
                 {
                     EventHandler handler = handlerRef.Target as EventHandler;
-                    if (handler != null)
+                    if (!handler.IsNull())
                     {
                         CommandManager.RequerySuggested -= handler;
                     }
@@ -405,7 +406,7 @@ namespace UiCommands
 
         internal static void AddWeakReferenceHandler(ref List<WeakReference> handlers, EventHandler handler, int defaultListSize)
         {
-            if (handlers == null)
+            if (handlers.IsNull())
             {
                 handlers = (defaultListSize > 0 ? new List<WeakReference>(defaultListSize) : new List<WeakReference>());
             }
@@ -415,13 +416,13 @@ namespace UiCommands
 
         internal static void RemoveWeakReferenceHandler(List<WeakReference> handlers, EventHandler handler)
         {
-            if (handlers != null)
+            if (!handlers.IsNull())
             {
                 for (int i = handlers.Count - 1; i >= 0; i--)
                 {
                     WeakReference reference = handlers[i];
                     EventHandler existingHandler = reference.Target as EventHandler;
-                    if ((existingHandler == null) || (existingHandler == handler))
+                    if ((existingHandler.IsNull()) || (existingHandler == handler))
                     {
                         // Clean up old handlers that have been collected
                         // in addition to the handler that is to be removed.

@@ -16,11 +16,13 @@ using System.Drawing;
 using PixelBoardDevice.DomainObjects;
 using Microsoft.Win32;
 using System.Collections;
+using Extensions;
 
 namespace PixelBoardDevice.UI
 {
     public class PixelDeviceViewModel : Notified
     {
+        public event EventHandler ModelChanged;
         private readonly PixelBoard _device;
         private readonly ILogger _logger;
         private readonly List<ZoneType> _zoneTypes = new List<ZoneType>
@@ -35,7 +37,7 @@ namespace PixelBoardDevice.UI
                 AllowText = true,
                 AllowTextEditing=true,
                 AllowClock = false,
-                ZoneCondition = (z) => (z!=null) && z.ZoneType==(int)DomainObjects.ZoneTypes.Text,
+                ZoneCondition = (z) => (!z.IsNull()) && z.ZoneType==(int)DomainObjects.ZoneTypes.Text,
                 Customize = () => new Zone
                 {
                     ZoneType=(int)DomainObjects.ZoneTypes.Text,
@@ -54,7 +56,7 @@ namespace PixelBoardDevice.UI
                 AllowMQTT=false,
                 AllowTextEditing=false,
                 AllowClock = false,
-                ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.Sensor,
+                ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.Sensor,
                 Customize = () => new Zone{
                     ZoneType = (int)DomainObjects.ZoneTypes.Sensor,
                     IsValid=true,
@@ -71,7 +73,7 @@ namespace PixelBoardDevice.UI
                 AllowText = false,
                 AllowMQTT = true,
                 AllowClock = false,
-                ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.MQTT,
+                ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.MQTT,
                 Customize = () => new Zone{
                     ZoneType=(int)DomainObjects.ZoneTypes.MQTT,
                     IsValid =true,
@@ -87,7 +89,7 @@ namespace PixelBoardDevice.UI
                 AllowFont=false,
                 AllowText=false,
                 AllowClock = false,
-                ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.Picture,
+                ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.Picture,
                 Customize = () => new Zone{
                     ZoneType=(int)DomainObjects.ZoneTypes.Picture,
                     IsValid =true,
@@ -103,7 +105,7 @@ namespace PixelBoardDevice.UI
                 AllowFont = true,
                 AllowText = false,
                 AllowClock = true,
-                ZoneCondition = (z) => (z!=null)&&z.ZoneType==(int)DomainObjects.ZoneTypes.Clock,
+                ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.Clock,
                 Customize = () => new Zone{
                     IsValid=true,
                     ZoneType=(int)DomainObjects.ZoneTypes.Clock,
@@ -121,7 +123,7 @@ namespace PixelBoardDevice.UI
                 Renderer = ( g,zone,binaryFont) =>
                 {
                     var selectedClockFormat = _clockFormats.FirstOrDefault(cf=>cf.Id == zone.ClockFormat);
-                    if (selectedClockFormat == null)
+                    if (selectedClockFormat.IsNull())
                     {
                         return;
                     }
@@ -185,7 +187,7 @@ namespace PixelBoardDevice.UI
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
         {
-            PropertyChanged += RedrawPreviewOnPropertyChanged;
+            PropertyChanged += (s, e) => ValidateAndInvokePreview();
             _device = (PixelBoard)d;
             _logger = l;
             ZoneTypes = new ObservableCollection<ZoneType>(_zoneTypes);
@@ -194,7 +196,7 @@ namespace PixelBoardDevice.UI
             Zones = new ObservableCollection<Zone>();
             ClockFormats = new ObservableCollection<ClockFormat>(_clockFormats);
             ClockTypes = new ObservableCollection<ClockType>(_clockTypes);
-            Zones.CollectionChanged += Zones_CollectionChanged;
+            Zones.CollectionChanged += (s, e) => ValidateAndInvokePreview();
             SelectedProgram = Programs.FirstOrDefault();
             FontSizes = new ObservableCollection<int>(_fontSizes);
             AllowChangeBoardSize = allowChangeBoardSize;
@@ -208,20 +210,10 @@ namespace PixelBoardDevice.UI
             AllowText(false);
         }
 
-        private void Zones_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void ValidateAndInvokePreview()
         {
             ValidateZones();
-            RedrawPreview();
-        }
-
-        private void RedrawPreviewOnPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals(nameof(PreviewImage)))
-            {
-                return;
-            }
-            ValidateZones();
-            RedrawPreview();
+            ModelChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private readonly Dictionary<Func<Zone, bool>, Action<Zone, PixelBoard, Graphics>> zoneRenders
@@ -265,8 +257,6 @@ namespace PixelBoardDevice.UI
                 }
             };
 
-
-
         private static void RenderBitmap(Graphics g, Zone zone)
         {
             var base64 = zone.BitmapBase64;
@@ -301,74 +291,78 @@ namespace PixelBoardDevice.UI
 
         private static void RenderText(Graphics g, BinaryFont binaryFont, string text, int x, int y, int width, int height)
         {
-            if (binaryFont != null)
+            if (binaryFont.IsNull())
             {
-                System.Drawing.FontStyle style = System.Drawing.FontStyle.Regular;
-                if (binaryFont.Italic && binaryFont.Bold)
-                {
-                    style = System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Bold;
-                }
-                else if (binaryFont.Italic)
-                {
-                    style = System.Drawing.FontStyle.Italic;
-                }
-                else if (binaryFont.Bold)
-                {
-                    style = System.Drawing.FontStyle.Bold;
-                }
-                var font = new System.Drawing.Font(
-                    binaryFont.Source, binaryFont.Height, style, GraphicsUnit.Pixel);
-                g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
-                g.DrawString(text, font, new SolidBrush(Color.Red), new RectangleF(x, y, width, height));
+                return;
             }
+            System.Drawing.FontStyle style = System.Drawing.FontStyle.Regular;
+            if (binaryFont.Italic && binaryFont.Bold)
+            {
+                style = System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Bold;
+            }
+            else if (binaryFont.Italic)
+            {
+                style = System.Drawing.FontStyle.Italic;
+            }
+            else if (binaryFont.Bold)
+            {
+                style = System.Drawing.FontStyle.Bold;
+            }
+            var font = new System.Drawing.Font(
+                binaryFont.Source, binaryFont.Height, style, GraphicsUnit.Pixel);
+            g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
+            g.DrawString(text, font, new SolidBrush(Color.Red), new RectangleF(x, y, width, height));
         }
 
 
         private void RedrawPreview()
         {
-            if (DeviceHeight == 0 || DeviceWidth == 0)
-            {
-                return;
-            }
-            int width = DeviceWidth;
-            int height = DeviceHeight;
-            var bitmap = new Bitmap(width, height);
 
-            using (var g = Graphics.FromImage(bitmap))
-            {
-                g.Clear(Color.Black);
-                if (Zones?.Any() ?? false)
-                {
-                    foreach (var zone in Zones)
-                    {
-                        var pen = new Pen(Color.Gray);
-                        pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
-                        if (!zone.IsValid)
+            /*
+                        if (DeviceHeight == 0 || DeviceWidth == 0)
                         {
-                            pen.Color = Color.Red;
+                            return;
                         }
-                        if (zone.Id == (SelectedZone?.Id ?? int.MinValue))
+                        int width = DeviceWidth;
+                        int height = DeviceHeight;
+                        var bitmap = new Bitmap(width, height);
+
+                        using (var g = Graphics.FromImage(bitmap))
                         {
-                            pen.Color = Color.Yellow;
+                            g.Clear(Color.Black);
+                            if (Zones?.Any() ?? false)
+                            {
+                                foreach (var zone in Zones)
+                                {
+                                    var pen = new Pen(Color.Gray);
+                                    pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dot;
+                                    if (!zone.IsValid)
+                                    {
+                                        pen.Color = Color.Red;
+                                    }
+                                    if (zone.Id == (SelectedZone?.Id ?? int.MinValue))
+                                    {
+                                        pen.Color = Color.Yellow;
+                                    }
+                                    g.DrawRectangle(pen, zone.X, zone.Y, zone.Width - 1, zone.Height - 1);
+                                    var renderer = zoneRenders.FirstOrDefault(kvp => kvp.Key(zone));
+                                    if (renderer.Key != null && renderer.Value != null)
+                                    {
+                                        renderer.Value(zone, _device, g);
+                                    }
+                                }
+                            }
                         }
-                        g.DrawRectangle(pen, zone.X, zone.Y, zone.Width - 1, zone.Height - 1);
-                        var renderer = zoneRenders.FirstOrDefault(kvp => kvp.Key(zone));
-                        if (renderer.Key != null && renderer.Value != null)
-                        {
-                            renderer.Value(zone, _device, g);
-                        }
-                    }
-                }
-            }
-            var hBitmap = bitmap.GetHbitmap();
-            var bitSrc = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,
-                System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
-            PreviewImage = bitSrc;
+                        var hBitmap = bitmap.GetHbitmap();
+                        var bitSrc = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap, IntPtr.Zero, Int32Rect.Empty,
+                            System.Windows.Media.Imaging.BitmapSizeOptions.FromEmptyOptions());
+                        PreviewImage = bitSrc;
+                        */
         }
 
         private void ValidateZones()
         {
-            if (Zones == null)
+            if (Zones.IsNull())
                 return;
             foreach (var zone in Zones)
             {
@@ -392,7 +386,7 @@ namespace PixelBoardDevice.UI
             {
                 _zoneLeft = value;
                 var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (deviceZone != null)
+                if (!deviceZone.IsNull())
                 {
                     deviceZone.X = value;
                 }
@@ -408,7 +402,7 @@ namespace PixelBoardDevice.UI
             {
                 _zoneTop = value;
                 var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (deviceZone != null)
+                if (!deviceZone.IsNull())
                 {
                     deviceZone.Y = value;
                 }
@@ -424,7 +418,7 @@ namespace PixelBoardDevice.UI
             {
                 _zoneHeight = value;
                 var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (deviceZone != null)
+                if (!deviceZone.IsNull())
                 {
                     deviceZone.Height = value;
                 }
@@ -440,7 +434,7 @@ namespace PixelBoardDevice.UI
             {
                 _zoneWidth = value;
                 var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (deviceZone != null)
+                if (!deviceZone.IsNull())
                 {
                     deviceZone.Width = value;
                 }
@@ -448,7 +442,7 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        public object PreviewImage { get; set; }
+        //public object PreviewImage { get; set; }
 
         private Font.FontFamily _selectedFont;
         public Font.FontFamily SelectedFont
@@ -457,7 +451,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _selectedFont = value;
-                if (_selectedFont != null && SelectedFontSize != 0)
+                if (!_selectedFont.IsNull() && SelectedFontSize != 0)
                 {
                     UpdateZoneFont(SelectedProgram, SelectedZone, value, SelectedFontSize, IsItalic, IsBold);
                 }
@@ -473,7 +467,7 @@ namespace PixelBoardDevice.UI
                 return;
             }
             var existBinaryFont = _device.Fonts.FirstOrDefault(bf => bf.Id == deviceZone.FontId);
-            if (existBinaryFont != null)
+            if (!existBinaryFont.IsNull())
             {
                 var numberOfFontEntry = _device.Programs.Sum(s => s.Zones.Count(f => f.IsFonted && f.FontId == existBinaryFont.Id));
                 if (numberOfFontEntry <= 1)
@@ -483,7 +477,7 @@ namespace PixelBoardDevice.UI
             }
             var newBinaryFont = _device.Fonts
                 .FirstOrDefault(bf => bf.Height == newFontSize && bf.Source == newFont.Source && bf.Italic == italic && bf.Bold == bold);
-            if (newBinaryFont == null)
+            if (newBinaryFont.IsNull())
             {
                 var newBinaryFontId = _device.Fonts.Any() ? _device.Fonts.Max(f => f.Id) + 1 : 0;
                 newBinaryFont = new BinaryFont
@@ -513,7 +507,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _selectedFontSize = value;
-                if (SelectedFont != null && _selectedFontSize != 0)
+                if (!SelectedFont.IsNull() && _selectedFontSize != 0)
                 {
                     UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, value, IsItalic, IsBold);
                 }
@@ -528,7 +522,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _isBold = value;
-                if (SelectedFont != null && _selectedFontSize != 0)
+                if (!SelectedFont.IsNull() && _selectedFontSize != 0)
                 {
                     UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, SelectedFontSize, IsItalic, value);
                 }
@@ -546,7 +540,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _isItalic = value;
-                if (SelectedFont != null && _selectedFontSize != 0)
+                if (!SelectedFont.IsNull() && _selectedFontSize != 0)
                 {
                     UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, SelectedFontSize, value, IsBold);
                 }
@@ -559,7 +553,7 @@ namespace PixelBoardDevice.UI
 
         public bool AllowChangeBoardSize { get; set; }
 
-        public bool AllowZoneCoordinates => SelectedZone != null;
+        public bool AllowZoneCoordinates => !SelectedZone.IsNull();
 
         public bool AllowFont { get; set; }
         public bool AllowTextEditing { get; set; }
@@ -629,7 +623,7 @@ namespace PixelBoardDevice.UI
             {
                 _selectedProgram = value;
                 Zones.Clear();
-                if (_selectedProgram != null)
+                if (!_selectedProgram.IsNull())
                 {
                     _selectedProgram.Zones.ForEach(z => Zones.Add(z));
                 }
@@ -646,7 +640,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _selectedZone = value;
-                if (_selectedZone != null)
+                if (!_selectedZone.IsNull())
                 {
                     ZoneLeft = _selectedZone.X;
                     ZoneTop = _selectedZone.Y;
@@ -656,7 +650,7 @@ namespace PixelBoardDevice.UI
                 OnPropertyChanged(nameof(SelectedZone));
                 OnPropertyChanged(nameof(AllowZoneCoordinates));
                 var currentZoneType = ZoneTypes.FirstOrDefault(z => z.ZoneCondition(_selectedZone));
-                if (currentZoneType == null || SelectedZoneType == null || SelectedZoneType.Id != currentZoneType.Id)
+                if (currentZoneType.IsNull() || SelectedZoneType.IsNull() || SelectedZoneType.Id != currentZoneType.Id)
                 {
                     SelectedZoneType = currentZoneType;
                     AllowAnimation(currentZoneType?.AllowAnimation ?? false);
@@ -668,11 +662,11 @@ namespace PixelBoardDevice.UI
                     AllowClock(currentZoneType?.AllowClock ?? false);
                     OnPropertyChanged(nameof(SelectedZoneType));
                 }
-                if (_selectedZone != null && _selectedZone.IsFonted)
+                if (!_selectedZone.IsNull() && _selectedZone.IsFonted)
                 {
                     var fontId = _selectedZone.FontId;
                     var binaryFont = _device.Fonts.FirstOrDefault(bf => bf.Id == fontId);
-                    if (binaryFont == null)
+                    if (binaryFont.IsNull())
                     {
                         SelectedFont = null;
                     }
@@ -796,7 +790,7 @@ namespace PixelBoardDevice.UI
                 _selectedZoneType = value;
                 OnPropertyChanged(nameof(SelectedZoneType));
 
-                if (SelectedZone == null)
+                if (SelectedZone.IsNull())
                     return;
                 var newZone = value.Customize();
                 newZone.Id = SelectedZone.Id;
@@ -849,7 +843,7 @@ namespace PixelBoardDevice.UI
         {
             get
             {
-                if (_loadBitmap == null)
+                if (_loadBitmap.IsNull())
                 {
                     _loadBitmap = new DelegateCommand((o) =>
                       {
@@ -891,7 +885,7 @@ namespace PixelBoardDevice.UI
         {
             get
             {
-                if (_addProgram == null)
+                if (_addProgram.IsNull())
                 {
                     _addProgram = new DelegateCommand((o) =>
                     {
@@ -918,7 +912,7 @@ namespace PixelBoardDevice.UI
         {
             get
             {
-                if (_deleteProgram == null)
+                if (_deleteProgram.IsNull())
                 {
                     _deleteProgram = new DelegateCommand((o) =>
                     {
@@ -936,7 +930,7 @@ namespace PixelBoardDevice.UI
         {
             get
             {
-                if (_addZone == null)
+                if (_addZone.IsNull())
                 {
                     _addZone = new DelegateCommand((o) =>
                     {
@@ -961,7 +955,7 @@ namespace PixelBoardDevice.UI
         {
             get
             {
-                if (_deleteZone == null)
+                if (_deleteZone.IsNull())
                 {
                     _deleteZone = new DelegateCommand((o) =>
                     {

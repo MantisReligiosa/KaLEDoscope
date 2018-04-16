@@ -6,8 +6,6 @@ using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
-using Resources;
 using PixelBoardDevice.Serialization;
 using Newtonsoft.Json;
 
@@ -16,12 +14,10 @@ namespace PixelBoardDevice
     public class PixelDeviceBuilder : IDeviceBuilder
     {
         public string Model => "pixelBoard";
-        private PixelDeviceViewModel _model;
-        private UserControl _previewControl;
 
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
-            _model = new PixelDeviceViewModel(device, logger);
+            var _model = new PixelDeviceViewModel(device, logger);
             var pack = new ControlsPack
             {
                 CustomizationControl = new PixelControl
@@ -31,25 +27,12 @@ namespace PixelBoardDevice
                     DataContext = _model
                 }
             };
-            _previewControl = new ProgramPreviewControl
+            var _previewControl = new ProgramPreviewControl
             {
-                DataContext = new ProgramPreviewViewModel
-                {
-                    Program = _model.SelectedProgram
-                }
+                DataContext = new ProgramPreviewViewModel(_model)
             };
-            _model.PropertyChanged += Model_PropertyChanged;
             pack.PreviewControl = _previewControl;
             return pack;
-        }
-
-        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName != nameof(PixelDeviceViewModel.PreviewImage))
-            {
-                return;
-            }
-            //_previewControl.Image = _model?.PreviewImage;
         }
 
         public Device UpdateCustomSettings(Device device)

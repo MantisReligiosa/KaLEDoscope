@@ -13,6 +13,7 @@ using CommandProcessing;
 using SevenSegmentBoardDevice.UI.POCO;
 using SevenSegmentBoardDevice.Commands;
 using UiCommands;
+using Extensions;
 
 namespace SevenSegmentBoardDevice.UI
 {
@@ -250,7 +251,7 @@ namespace SevenSegmentBoardDevice.UI
             {
                 _displayFormat = value;
                 _device.BoardType.DisplayFormatId = value?.Id ?? default(int);
-                if (value == null)
+                if (value.IsNull())
                 {
                     return;
                 }

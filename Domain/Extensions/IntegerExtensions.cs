@@ -1,6 +1,6 @@
-﻿namespace PixelBoardDevice.Extensions
+﻿namespace Extensions
 {
-    public static class IntegerExtension
+    public static class IntegerExtensions
     {
         public static bool Between(this int i, int from, int to)
         {

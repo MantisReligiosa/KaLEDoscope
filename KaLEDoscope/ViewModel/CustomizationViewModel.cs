@@ -2,6 +2,7 @@
 using BaseDevice;
 using CommandProcessing;
 using DeviceBuilding;
+using Extensions;
 using KaLEDoscope.Views;
 using Microsoft.Win32;
 using Newtonsoft.Json;
@@ -39,7 +40,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                if (_commonSettings == null)
+                if (_commonSettings.IsNull())
                 {
                     _commonSettings = new DelegateCommand((o) =>
                     {
@@ -63,7 +64,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                if (_downloadSettings == null)
+                if (_downloadSettings.IsNull())
                 {
                     _downloadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
@@ -83,7 +84,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                if (_uploadSettings == null)
+                if (_uploadSettings.IsNull())
                 {
                     _uploadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
@@ -100,7 +101,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                if (_saveSettings == null)
+                if (_saveSettings.IsNull())
                 {
                     _saveSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
@@ -127,7 +128,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                if (_loadSettings == null)
+                if (_loadSettings.IsNull())
                 {
                     _loadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {

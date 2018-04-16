@@ -111,6 +111,10 @@
       <Project>{11fba52a-1c5b-4248-a35c-3b7c95d9480c}</Project>
       <Name>Abstractions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Domain\Extensions\Extensions.csproj">
+      <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
+      <Name>Extensions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\Resources\Resources.csproj">
       <Project>{d00400bb-008f-4d07-90f8-5cefb1ffc585}</Project>
       <Name>Resources</Name>

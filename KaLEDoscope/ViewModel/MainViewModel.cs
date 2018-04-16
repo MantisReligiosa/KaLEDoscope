@@ -17,6 +17,7 @@ using DeviceBuilding;
 using Abstractions;
 using PixelBoardDevice;
 using GongSolutions.Wpf.DragDrop;
+using Extensions;
 
 namespace KaLEDoscope
 {
@@ -185,7 +186,7 @@ namespace KaLEDoscope
         {
             get
             {
-                if (showDevicePlugin == null)
+                if (showDevicePlugin.IsNull())
                 {
                     showDevicePlugin = new DelegateCommand((o) =>
                     {
@@ -214,7 +215,7 @@ namespace KaLEDoscope
         private void ProcessDevice(DeviceNode deviceNode)
         {
             var existTab = DeviceTabs.FirstOrDefault(t => t.DataContext == deviceNode.Device);
-            if (existTab != null)
+            if (!existTab.IsNull())
             {
                 SelectedTabItem = existTab;
                 return;
@@ -223,7 +224,7 @@ namespace KaLEDoscope
             var previewControl = new UserControl();
             var customizationComtrol = new UserControl();
             IEnumerable<object> menuItems = null;
-            if (deviceBuilder != null)
+            if (!deviceBuilder.IsNull())
             {
                 var pack = deviceBuilder.GetControlsPack(deviceNode.Device, _logger);
                 previewControl = pack.PreviewControl;
@@ -250,7 +251,7 @@ namespace KaLEDoscope
         {
             var grid = GetAggregationGrid(aggregationNode, selectedDeviceNode);
             var existTab = DeviceTabs.FirstOrDefault(t => t.DataContext == aggregationNode);
-            if (existTab != null)
+            if (!existTab.IsNull())
             {
                 existTab.Content = grid;
                 SelectedTabItem = existTab;
@@ -278,7 +279,7 @@ namespace KaLEDoscope
             var previewControl = GetAggregationPreviewGrid(aggregationNode, selectedDeviceNode);
             var customizationComtrol = new UserControl();
             IEnumerable<object> menuItems = null;
-            if (deviceBuilder != null)
+            if (!deviceBuilder.IsNull())
             {
                 var pack = deviceBuilder.GetControlsPack(selectedDeviceNode.Device, _logger);
                 customizationComtrol = pack.CustomizationControl;
@@ -377,7 +378,7 @@ namespace KaLEDoscope
             model.OnNodeRenamed += ((sender, node) =>
             {
                 var tab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == node.Device);
-                if (tab != null)
+                if (!tab.IsNull())
                 {
                     ((ClosableTab)tab).Title = GetDeviceTabItemTitle(node);
                 }
@@ -394,7 +395,7 @@ namespace KaLEDoscope
                   previewControl = new UserControl();
                   var customizationComtrol = new UserControl();
                   IEnumerable<object> menuItems = null;
-                  if (deviceBuilder != null)
+                  if (!deviceBuilder.IsNull())
                   {
                       var pack = deviceBuilder.GetControlsPack(_updatedNode.Device, _logger);
                       previewControl = pack.PreviewControl;
@@ -419,7 +420,7 @@ namespace KaLEDoscope
         {
             get
             {
-                if (_scanDevices == null)
+                if (_scanDevices.IsNull())
                 {
                     _scanDevices = new DelegateCommand((o) =>
                       {
@@ -461,7 +462,7 @@ namespace KaLEDoscope
             deviceNode.Device.Aggregation = null;
             deviceNode.Device.Folder = null;
             var parentNode = deviceNode.Parent;
-            if (parentNode == null)
+            if (parentNode.IsNull())
             {
                 StructureNodes.Remove(deviceNode);
             }
@@ -470,7 +471,7 @@ namespace KaLEDoscope
                 parentNode.Nodes.Remove(deviceNode);
             }
             var targetNode = dropInfo.TargetItem as NodeItem;
-            if (targetNode == null)
+            if (targetNode.IsNull())
             {
                 StructureNodes.Add(deviceNode);
                 deviceNode.Parent = null;

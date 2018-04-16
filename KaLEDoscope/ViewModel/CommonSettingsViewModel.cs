@@ -1,5 +1,6 @@
 ﻿using Abstractions;
 using BaseDevice;
+using Extensions;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -479,7 +480,7 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                if (_addBrightnessItem == null)
+                if (_addBrightnessItem.IsNull())
                 {
                     _addBrightnessItem = new DelegateCommand((o) =>
                     {
