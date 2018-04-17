@@ -166,7 +166,7 @@
                                 <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
                             <Label Grid.Column="0" Grid.Row="0">Слева</Label>
-                            <xctk:IntegerUpDown Grid.Column="1" Grid.Row="0" Value="{Binding ZoneLeft}" Minimum="0"/>
+                            <xctk:IntegerUpDown Grid.Column="1" Grid.Row="0" Value="{Binding ZoneLeft, Mode=TwoWay}" Minimum="0"/>
                             <Label Grid.Column="2" Grid.Row="0">Сверху</Label>
                             <xctk:IntegerUpDown Grid.Column="3" Grid.Row="0" Value="{Binding ZoneTop}" Minimum="0"/>
                             <Label Grid.Column="0" Grid.Row="1">Высота</Label>

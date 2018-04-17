@@ -22,5 +22,6 @@
                 <Button Content="Загрузить конфигурацию из файла" Command="{Binding LoadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowLoad}"/>
             </ToolBar.Items>
         </ToolBar>
+        <ScrollViewer x:Name="previewArea" Grid.Row="0"/>
     </Grid>
 </UserControl>

@@ -16,8 +16,7 @@ namespace KaLEDoscope.Views
 
         internal void SetPreviewControl(UserControl previewControl)
         {
-            grid.Children.Add(previewControl);
-            Grid.SetRow(previewControl, 0);
+            previewArea.Content = previewControl;
         }
 
         internal void SetCustomizationControl(UserControl customizationControl)

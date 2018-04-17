@@ -222,16 +222,16 @@ namespace KaLEDoscope
             }
             var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(deviceNode.Device.Model));
             var previewControl = new UserControl();
-            var customizationComtrol = new UserControl();
+            var customizationControl = new UserControl();
             IEnumerable<object> menuItems = null;
             if (!deviceBuilder.IsNull())
             {
                 var pack = deviceBuilder.GetControlsPack(deviceNode.Device, _logger);
                 previewControl = pack.PreviewControl;
-                customizationComtrol = pack.CustomizationControl;
+                customizationControl = pack.CustomizationControl;
                 menuItems = pack.MenuItems;
             }
-            var grid = GetDeviceItemGrid(deviceNode, previewControl, customizationComtrol, menuItems);
+            var grid = GetDeviceItemGrid(deviceNode, previewControl, customizationControl, menuItems);
             var newTabItem = new ClosableTab
             {
                 Title = GetDeviceTabItemTitle(deviceNode),

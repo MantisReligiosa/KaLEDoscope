@@ -83,6 +83,7 @@
     <Compile Include="DomainObjects\BoardSize.cs" />
     <Compile Include="DomainObjects\Program.cs" />
     <Compile Include="DomainObjects\Zone.cs" />
+    <Compile Include="MouseBehaviour.cs" />
     <Compile Include="PixelDeviceBuilder.cs" />
     <Compile Include="UI\ProgramPreviewViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
