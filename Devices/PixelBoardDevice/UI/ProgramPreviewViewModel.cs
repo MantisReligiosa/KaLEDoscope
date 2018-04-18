@@ -2,6 +2,8 @@
 using Extensions;
 using PixelBoardDevice.DomainObjects;
 using System;
+using System.Drawing.Drawing2D;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;

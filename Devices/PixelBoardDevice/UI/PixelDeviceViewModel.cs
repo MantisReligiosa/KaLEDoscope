@@ -367,15 +367,22 @@ namespace PixelBoardDevice.UI
         {
             if (Zones.IsNull())
                 return;
+            var incorrectZonesId = new List<int>();
             foreach (var zone in Zones)
             {
+                if (incorrectZonesId.Any(id=>id==zone.Id))
+                {
+                    zone.IsValid = false;
+                    continue;
+                }
                 zone.IsValid = true;
                 foreach (var concurrentZone in Zones.Except(new List<Zone> { zone }))
                 {
                     if (zone.IntersectWith(concurrentZone))
                     {
                         zone.IsValid = false;
-                        break;
+                        incorrectZonesId.Add(zone.Id);
+                        incorrectZonesId.Add(concurrentZone.Id);
                     }
                 }
             }
