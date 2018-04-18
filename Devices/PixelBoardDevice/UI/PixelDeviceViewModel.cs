@@ -200,6 +200,9 @@ namespace PixelBoardDevice.UI
             SelectedProgram = Programs.FirstOrDefault();
             FontSizes = new ObservableCollection<int>(_fontSizes);
             AllowChangeBoardSize = allowChangeBoardSize;
+            PreviewScale = 1;
+            PreviewScaleMinRate = .2;
+            PreviewScaleMaxRate = 5;
             DeviceHeight = _device.BoardSize.Height;
             DeviceWidth = _device.BoardSize.Width;
             AllowChangeBoardSize = _device.IsStandaloneConfiguration;
@@ -441,8 +444,6 @@ namespace PixelBoardDevice.UI
                 OnPropertyChanged(nameof(ZoneWidth));
             }
         }
-
-        //public object PreviewImage { get; set; }
 
         private Font.FontFamily _selectedFont;
         public Font.FontFamily SelectedFont
@@ -969,6 +970,62 @@ namespace PixelBoardDevice.UI
             }
         }
 
+        private DelegateCommand _resetScale;
+        public Input.ICommand ResetScale
+        {
+            get
+            {
+                if (_resetScale.IsNull())
+                {
+                    _resetScale = new DelegateCommand((o) =>
+                    {
+                        PreviewScale = 1;
+                    });
+                }
+                return _resetScale;
+            }
+        }
+
         public ILogger Logger => _logger;
+
+        private double _previewScale;
+        public double PreviewScale
+        {
+            get
+            {
+                return _previewScale;
+            }
+            set
+            {
+                if (_previewScale != value)
+                {
+                    _previewScale = value;
+                    PreviewScalePercents = Convert.ToInt32(value * 100);
+                    OnPropertyChanged(nameof(PreviewScale));
+                }
+            }
+        }
+
+        private int _previewScalePercents;
+        public int PreviewScalePercents
+        {
+            get
+            {
+                return _previewScalePercents;
+            }
+            set
+            {
+                if (_previewScalePercents != value)
+                {
+                    _previewScalePercents = value;
+                    PreviewScale = (double)value / 100;
+                    OnPropertyChanged(nameof(PreviewScalePercents));
+                }
+            }
+        }
+
+
+        public readonly double PreviewScaleMinRate;
+        public readonly double PreviewScaleMaxRate;
     }
 }

@@ -14,7 +14,6 @@ namespace PixelBoardDevice.UI
     public class ProgramPreviewViewModel : Notified
     {
         private readonly PixelDeviceViewModel _model;
-        private double _scale = 2;
         private MouseState _currentMouseState;
         private MouseState _suggestedMouseState;
 
@@ -22,6 +21,7 @@ namespace PixelBoardDevice.UI
 
         public int ViewHeight { get; set; }
         public int ViewWidht { get; set; }
+        public Cursor Cursor { get; set; }
 
         public ProgramPreviewViewModel(PixelDeviceViewModel pixelDeviceViewModel)
         {
@@ -34,8 +34,8 @@ namespace PixelBoardDevice.UI
 
         private void Redraw()
         {
-            ViewHeight = Convert.ToInt32(_model.DeviceHeight * _scale);
-            ViewWidht = Convert.ToInt32(_model.DeviceWidth * _scale);
+            ViewHeight = Convert.ToInt32(_model.DeviceHeight * _model.PreviewScale);
+            ViewWidht = Convert.ToInt32(_model.DeviceWidth * _model.PreviewScale);
             if (_model.SelectedProgram.IsNull())
             {
                 return;
@@ -83,14 +83,33 @@ namespace PixelBoardDevice.UI
                         StrokeThickness = 1
                     };
                 }
-                Canvas.SetTop(rect, zone.Y * _scale);
-                Canvas.SetLeft(rect, zone.X * _scale);
-                rect.Width = zone.Width * _scale;
-                rect.Height = zone.Height * _scale;
+                Canvas.SetTop(rect, zone.Y * _model.PreviewScale);
+                Canvas.SetLeft(rect, zone.X * _model.PreviewScale);
+                rect.Width = zone.Width * _model.PreviewScale;
+                rect.Height = zone.Height * _model.PreviewScale;
                 PreviewContent.Children.Add(rect);
             }
         }
 
+        private DelegateCommand _mouseLeave;
+        public Input.ICommand MouseLeave
+        {
+            get
+            {
+                if (_mouseLeave.IsNull())
+                {
+                    _mouseLeave = new DelegateCommand((o) =>
+                      {
+                          if (_currentMouseState == MouseState.Movement)
+                          {
+                              _suggestedMouseState = MouseState.Movement;
+                              SetCursor(_suggestedMouseState);
+                          }
+                      });
+                }
+                return _mouseLeave;
+            }
+        }
 
         private DelegateCommand _mouseMove;
         public Input.ICommand MouseMove
@@ -107,36 +126,62 @@ namespace PixelBoardDevice.UI
                         if (_currentMouseState == MouseState.Movement)
                         {
                             SuggestMouseState(cursorViewX, cursorViewY, out _suggestedMouseState, out Zone zone);
-                            if (_suggestedMouseState == MouseState.HorizontalResizing)
-                            {
-                                Mouse.SetCursor(Cursors.SizeWE);
-                            }
-                            else if (_suggestedMouseState == MouseState.VerticalResizing)
-                            {
-                                Mouse.SetCursor(Cursors.SizeNS);
-                            }
-                            else if (_suggestedMouseState == MouseState.DiagonalResiging)
-                            {
-                                Mouse.SetCursor(Cursors.SizeNWSE);
-                            }
-                            else if (_suggestedMouseState == MouseState.Drag)
-                            {
-                                Mouse.SetCursor(Cursors.SizeAll);
-                            }
-                            else
-                            {
-                                Mouse.SetCursor(Cursors.Arrow);
-                            }
+                            SetCursor(_suggestedMouseState);
                         }
                         else if (_currentMouseState == MouseState.Drag)
                         {
-                            var deltaX = Convert.ToInt32((cursorViewX - _capturedCursorX) / _scale);
-                            var deltaY = Convert.ToInt32((cursorViewY - _capturedCursorY) / _scale);
-                            _model.ZoneLeft = _capturedZoneX + deltaX;
-                            _model.ZoneTop = _capturedZoneY + deltaY;
-                            Redraw();
+                            SetCursor(MouseState.Drag);
+                            var deltaX = Convert.ToInt32((cursorViewX - _capturedCursorX) / _model.PreviewScale);
+                            var deltaY = Convert.ToInt32((cursorViewY - _capturedCursorY) / _model.PreviewScale);
+                            var zoneLeft = _capturedZoneX + deltaX;
+                            var zoneTop = _capturedZoneY + deltaY;
+                            var zoneRight = zoneLeft + _capturedZoneWidth;
+                            var zoneBottom = zoneTop + _capturedZoneHeight;
+                            if (zoneTop >= 0 && zoneBottom <= _model.DeviceHeight)
+                            {
+                                _model.ZoneTop = zoneTop;
+                            }
+                            if (zoneLeft >= 0 && zoneRight <= _model.DeviceWidth)
+                            {
+                                _model.ZoneLeft = zoneLeft;
+                            }
                         }
-#error Обработать Resize, Обработать Scale
+                        else if (_currentMouseState == MouseState.HorizontalResizing)
+                        {
+                            SetCursor(MouseState.HorizontalResizing);
+                            var deltaX = Convert.ToInt32((cursorViewX - _capturedCursorX) / _model.PreviewScale);
+                            var zoneWidth = _capturedZoneWidth + deltaX;
+                            if (zoneWidth > 0)
+                            {
+                                _model.ZoneWidth = zoneWidth;
+                            }
+                        }
+                        else if (_currentMouseState == MouseState.VerticalResizing)
+                        {
+                            SetCursor(MouseState.VerticalResizing);
+                            var deltaY = Convert.ToInt32((cursorViewY - _capturedCursorY) / _model.PreviewScale);
+                            var zoneHeight = _capturedZoneHeight + deltaY;
+                            if (zoneHeight > 0)
+                            {
+                                _model.ZoneHeight = zoneHeight;
+                            }
+                        }
+                        else if (_suggestedMouseState == MouseState.DiagonalResiging)
+                        {
+                            SetCursor(MouseState.DiagonalResiging);
+                            var deltaX = Convert.ToInt32((cursorViewX - _capturedCursorX) / _model.PreviewScale);
+                            var deltaY = Convert.ToInt32((cursorViewY - _capturedCursorY) / _model.PreviewScale);
+                            var zoneHeight = _capturedZoneHeight + deltaY;
+                            if (zoneHeight > 0)
+                            {
+                                _model.ZoneHeight = zoneHeight;
+                            }
+                            var zoneWidth = _capturedZoneWidth + deltaX;
+                            if (zoneWidth > 0)
+                            {
+                                _model.ZoneWidth = zoneWidth;
+                            }
+                        }
                     });
                 }
                 return _mouseMove;
@@ -165,6 +210,7 @@ namespace PixelBoardDevice.UI
                             return;
                         }
                         _currentMouseState = _suggestedMouseState;
+                        SetCursor(_currentMouseState);
                         var args = (MouseButtonEventArgs)o;
                         var cursorViewX = Convert.ToInt32(args.GetPosition(PreviewContent).X);
                         var cursorViewY = Convert.ToInt32(args.GetPosition(PreviewContent).Y);
@@ -183,6 +229,57 @@ namespace PixelBoardDevice.UI
                     });
                 }
                 return _mouseDown;
+            }
+        }
+
+        private void SetCursor(MouseState state)
+        {
+            if (state == MouseState.HorizontalResizing)
+            {
+                Cursor = Cursors.SizeWE;
+            }
+            else if (state == MouseState.VerticalResizing)
+            {
+                Cursor = Cursors.SizeNS;
+            }
+            else if (state == MouseState.DiagonalResiging)
+            {
+                Cursor = Cursors.SizeNWSE;
+            }
+            else if (state == MouseState.Drag)
+            {
+                Cursor = Cursors.SizeAll;
+            }
+        }
+
+        private DelegateCommand _mouseWheel;
+        public Input.ICommand MouseWheel
+        {
+            get
+            {
+                if (_mouseWheel.IsNull())
+                {
+                    _mouseWheel = new DelegateCommand((o) =>
+                    {
+                        if (_currentMouseState != MouseState.Movement)
+                            return;
+                        var increment = .1;
+                        var args = (MouseWheelEventArgs)o;
+                        var delta = args.Delta;
+                        if (delta < 0 && _model.PreviewScale > _model.PreviewScaleMinRate)
+                        {
+                            _model.PreviewScale -= increment;
+                            Redraw();
+                        }
+                        else if (delta > 0 && _model.PreviewScale < _model.PreviewScaleMaxRate)
+                        {
+                            _model.PreviewScale += increment;
+                            Redraw();
+                        }
+                    });
+
+                }
+                return _mouseWheel;
             }
         }
 
@@ -208,15 +305,15 @@ namespace PixelBoardDevice.UI
 
         private void SuggestMouseState(int cursorViewX, int cursorViewY, out MouseState suggestedMouseState, out Zone involvedZone)
         {
-            var sensitiveBorderDelta = 1;
+            var sensitiveBorderDelta = 2;
             suggestedMouseState = MouseState.Movement;
             involvedZone = null;
             foreach (var zone in _model.SelectedProgram.Zones)
             {
-                var zoneViewX1 = (zone.X) * _scale;
-                var zoneViewX2 = (zone.X + zone.Width) * _scale;
-                var zoneViewY1 = (zone.Y) * _scale;
-                var zoneViewY2 = (zone.Y + zone.Height) * _scale;
+                var zoneViewX1 = (zone.X) * _model.PreviewScale;
+                var zoneViewX2 = (zone.X + zone.Width) * _model.PreviewScale;
+                var zoneViewY1 = (zone.Y) * _model.PreviewScale;
+                var zoneViewY2 = (zone.Y + zone.Height) * _model.PreviewScale;
 
                 if (cursorViewX.Between(zoneViewX2 - sensitiveBorderDelta, zoneViewX2 + sensitiveBorderDelta) &&
                     cursorViewY.Between(zoneViewY2 - sensitiveBorderDelta, zoneViewY2 + sensitiveBorderDelta))
@@ -241,7 +338,7 @@ namespace PixelBoardDevice.UI
                     return;
                 }
                 if (cursorViewX.Between(zoneViewX1, zoneViewX2) &&
-                    cursorViewY.Between(zoneViewY1, zoneViewX2))
+                    cursorViewY.Between(zoneViewY1, zoneViewY2))
                 {
                     involvedZone = zone;
                     suggestedMouseState = MouseState.Drag;

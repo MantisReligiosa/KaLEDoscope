@@ -8,6 +8,9 @@ using System.Collections.Generic;
 using System.Windows;
 using PixelBoardDevice.Serialization;
 using Newtonsoft.Json;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Data;
 
 namespace PixelBoardDevice
 {
@@ -32,6 +35,48 @@ namespace PixelBoardDevice
                 DataContext = new ProgramPreviewViewModel(_model)
             };
             pack.PreviewControl = _previewControl;
+            var slider = new Slider
+            {
+                Width = 300,
+                TickFrequency = .1,
+                IsSnapToTickEnabled = true,
+                Maximum = _model.PreviewScaleMaxRate,
+                Minimum = _model.PreviewScaleMinRate,
+                TickPlacement = System.Windows.Controls.Primitives.TickPlacement.BottomRight,
+            };
+            var sliderBinding = new Binding(nameof(PixelDeviceViewModel.PreviewScale))
+            {
+                Source = _model
+            };
+            slider.SetBinding(Slider.ValueProperty, sliderBinding);
+            var combobox = new ComboBox
+            {
+                IsEditable = true,
+                IsReadOnly = false,
+                DisplayMemberPath = "Caption",
+                SelectedValuePath = "Value",
+                Width = 60
+            };
+            var comboboxBinding = new Binding(nameof(PixelDeviceViewModel.PreviewScalePercents))
+            {
+                Source = _model
+            };
+            combobox.SetBinding(ComboBox.SelectedValueProperty, comboboxBinding);
+            for (double i = _model.PreviewScaleMinRate; i < _model.PreviewScaleMaxRate; i += .1)
+            {
+                var value = Convert.ToInt32(i * 100);
+                combobox.Items.Add(new
+                {
+                    Value = value,
+                    Caption = $"{value} %"
+                });
+            }
+            pack.MenuItems = new List<object>
+            {
+                new Separator(),
+                slider,
+                combobox
+            };
             return pack;
         }
 

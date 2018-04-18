@@ -9,7 +9,10 @@
              Height="{Binding ViewHeight}" 
              Width="{Binding ViewWidht}" 
              Background="Black" 
+             Cursor="{Binding Cursor}"
              local:MouseBehaviour.MouseMoveCommand="{Binding MouseMove}"
              local:MouseBehaviour.MouseDownCommand="{Binding MouseDown}"
-             local:MouseBehaviour.MouseUpCommand="{Binding MouseUp}">
+             local:MouseBehaviour.MouseUpCommand="{Binding MouseUp}"
+             local:MouseBehaviour.MouseLeaveCommand="{Binding MouseLeave}"
+             local:MouseBehaviour.MouseWheelCommand="{Binding MouseWheel}">
 </UserControl>

@@ -93,5 +93,63 @@ namespace PixelBoardDevice
             element.SetValue(MouseDownCommandProperty, value);
         }
 
+        public static readonly DependencyProperty MouseLeaveCommandProperty =
+            DependencyProperty.RegisterAttached("MouseLeaveCommand", typeof(ICommand),
+            typeof(MouseBehaviour), new FrameworkPropertyMetadata(
+            new PropertyChangedCallback(MouseLeaveCommandChanged)));
+
+        private static void MouseLeaveCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            FrameworkElement element = (FrameworkElement)d;
+
+            element.MouseLeave += new MouseEventHandler(Element_MouseLeave);
+        }
+
+        private static void Element_MouseLeave(object sender, MouseEventArgs e)
+        {
+            var element = (FrameworkElement)sender;
+            ICommand command = GetMouseLeaveCommand(element);
+            command.Execute(e);
+        }
+
+        public static ICommand GetMouseLeaveCommand(FrameworkElement element)
+        {
+            return (ICommand)element.GetValue(MouseLeaveCommandProperty);
+        }
+
+        public static void SetMouseLeaveCommand(UIElement element, ICommand value)
+        {
+            element.SetValue(MouseLeaveCommandProperty, value);
+        }
+
+        public static readonly DependencyProperty MouseWheelCommandProperty =
+            DependencyProperty.RegisterAttached("MouseWheelCommand", typeof(ICommand),
+            typeof(MouseBehaviour), new FrameworkPropertyMetadata(
+            new PropertyChangedCallback(MouseWheelCommandChanged)));
+
+        private static void MouseWheelCommandChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            FrameworkElement element = (FrameworkElement)d;
+
+            element.MouseWheel += new MouseWheelEventHandler(Element_MouseWheel);
+        }
+
+        private static void Element_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            var element = (FrameworkElement)sender;
+            ICommand command = GetMouseWheelCommand(element);
+            command.Execute(e);
+
+        }
+
+        public static ICommand GetMouseWheelCommand(FrameworkElement element)
+        {
+            return (ICommand)element.GetValue(MouseWheelCommandProperty);
+        }
+
+        public static void SetMouseWheelCommand(UIElement element, ICommand value)
+        {
+            element.SetValue(MouseWheelCommandProperty, value);
+        }
     }
 }
