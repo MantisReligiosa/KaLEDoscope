@@ -2,11 +2,15 @@
 using Extensions;
 using PixelBoardDevice.DomainObjects;
 using System;
+using System.Collections.Generic;
 using System.Drawing.Drawing2D;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using UiCommands;
 using Input = System.Windows.Input;
@@ -38,6 +42,10 @@ namespace PixelBoardDevice.UI
         {
             ViewHeight = Convert.ToInt32(_model.DeviceHeight * _model.PreviewScale);
             ViewWidht = Convert.ToInt32(_model.DeviceWidth * _model.PreviewScale);
+            if (ViewHeight == 0 || ViewWidht == 0)
+            {
+                return;
+            }
             if (_model.SelectedProgram.IsNull())
             {
                 return;
@@ -45,45 +53,36 @@ namespace PixelBoardDevice.UI
             PreviewContent.Children.Clear();
             foreach (var zone in _model.SelectedProgram.Zones)
             {
-                Rectangle rect;
+                var rect = new Rectangle
+                {
+                    StrokeDashArray = new DoubleCollection
+                        {
+                            4, 2
+                        },
+                    StrokeThickness = 1
+                };
                 if (zone.IsValid)
                 {
                     if (zone.Id == (_model.SelectedZone?.Id ?? int.MinValue))
                     {
-                        rect = new Rectangle
-                        {
-                            Stroke = Brushes.Green,
-                            StrokeDashArray = new DoubleCollection
-                        {
-                            4, 2
-                        },
-                            StrokeThickness = 1
-                        };
+                        rect.Stroke = Brushes.Green;
                     }
                     else
                     {
-                        rect = new Rectangle
-                        {
-                            Stroke = Brushes.Gray,
-                            StrokeDashArray = new DoubleCollection
-                        {
-                            4, 2
-                        },
-                            StrokeThickness = 1
-                        };
+                        rect.Stroke = Brushes.Gray;
+                    }
+                    var renderer = zoneRenders.FirstOrDefault(kvp => kvp.Key(zone));
+                    if (renderer.Key != null && renderer.Value != null)
+                    {
+                        renderer.Value(zone,
+                                       PreviewContent,
+                                       _model.Device.Fonts.FirstOrDefault(f => f.Id == zone.FontId),
+                                       _model.PreviewScale);
                     }
                 }
                 else
                 {
-                    rect = new Rectangle
-                    {
-                        Stroke = Brushes.Red,
-                        StrokeDashArray = new DoubleCollection
-                        {
-                            4, 2
-                        },
-                        StrokeThickness = 1
-                    };
+                    rect.Stroke = Brushes.Red;
                 }
                 Canvas.SetTop(rect, zone.Y * _model.PreviewScale);
                 Canvas.SetLeft(rect, zone.X * _model.PreviewScale);
@@ -304,6 +303,158 @@ namespace PixelBoardDevice.UI
                 }
                 return _mouseUp;
             }
+        }
+
+        private readonly Dictionary<Func<Zone, bool>, Action<Zone, Canvas, BinaryFont, double>> zoneRenders
+            = new Dictionary<Func<Zone, bool>, Action<Zone, Canvas, BinaryFont, double>>
+            {
+                {
+                    (z) => z.ZoneType==(int)ZoneTypes.Text,
+                    (zone, canvas, font, scale) =>
+                    {
+                        RenderText(canvas, font, zone.Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                    }
+                },
+                {
+                    (z) => z.ZoneType==(int)ZoneTypes.Sensor,
+                    (zone, canvas, font, scale) =>
+                    {
+                        RenderText(canvas, font, "[Sensor]", zone.X, zone.Y, zone.Width, zone.Height, scale);
+                    }
+                },
+                {
+                    (z) => z.ZoneType==(int)ZoneTypes.MQTT,
+                    (zone, canvas, font, scale) =>
+                    {
+                        RenderText(canvas, font, "[MQTT]", zone.X, zone.Y, zone.Width, zone.Height, scale);
+                    }
+                },
+                {
+                    (z) => z.ZoneType==(int)ZoneTypes.Picture,
+                    (zone, canvas, font, scale) =>
+                    {
+                        RenderBitmap(canvas, zone.BitmapBase64, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                    }
+                },
+                {
+                    (z) => (z.ZoneType==(int)ZoneTypes.Clock && z.ClockType == 1), //Текстовые часы
+                    (zone, canvas, font, scale) =>
+                    {
+                        RenderText(canvas, font, zone.Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                    }
+                },
+                {
+                    (z) => (z.ZoneType==(int)ZoneTypes.Clock && z.ClockType == 2), //Графические часы
+                    (zone, canvas, font, scale) =>
+                    {
+                        DrawClockPicture(canvas, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                    }
+                }
+
+            };
+
+        private static void DrawClockPicture(Canvas canvas, int x, int y, int width, int height, double scale)
+        {
+            var diameter = ((width < height) ? width : height) - 4;
+            if (diameter < 0)
+                return;
+            var circle = new Ellipse
+            {
+                Stroke = Brushes.Red,
+                Height = diameter * scale,
+                Width = diameter * scale
+            };
+            Canvas.SetTop(circle, (y + 2) * scale);
+            Canvas.SetLeft(circle, (x + 2) * scale);
+
+            var verticalLine = new Line
+            {
+                Stroke = Brushes.Red,
+                X1 = (x + 2 + diameter / 2) * scale,
+                Y1 = (y + 2 + diameter / 2) * scale,
+                X2 = (x + 2 + diameter / 2) * scale,
+                Y2 = (y + 3) * scale,
+            };
+
+            var horizontalLine = new Line
+            {
+                Stroke = Brushes.Red,
+                X1 = (x + 2 + diameter / 2) * scale,
+                Y1 = (y + 2 + diameter / 2) * scale,
+                X2 = (x + 3) * scale,
+                Y2 = (y + 2 + diameter / 2) * scale,
+            };
+
+            canvas.Children.Add(circle);
+            canvas.Children.Add(verticalLine);
+            canvas.Children.Add(horizontalLine);
+        }
+
+        private static void RenderBitmap(Canvas canvas, string bitmapBase64, int x, int y, int width, int height, double scale)
+        {
+            if (String.IsNullOrEmpty(bitmapBase64))
+            {
+                return;
+            }
+        }
+
+        private static void RenderText(Canvas canvas, BinaryFont font, string text, int x, int y, int width, int height, double scale)
+        {
+            if (font.IsNull())
+            {
+                return;
+            }
+            if (String.IsNullOrEmpty(text))
+            {
+                return;
+            }
+            System.Drawing.FontStyle style = System.Drawing.FontStyle.Regular;
+            if (font.Italic && font.Bold)
+            {
+                style = System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Bold;
+            }
+            else if (font.Italic)
+            {
+                style = System.Drawing.FontStyle.Italic;
+            }
+            else if (font.Bold)
+            {
+                style = System.Drawing.FontStyle.Bold;
+            }
+            var drawingFont = new System.Drawing.Font(
+                font.Source, font.Height, style, System.Drawing.GraphicsUnit.Pixel);
+            var memoryStream = new MemoryStream();
+            var image = BitmapProcessing.BitmapProcessor.DrawTextImage(
+                text,
+                drawingFont,
+                System.Drawing.Color.Red,
+                System.Drawing.Color.Transparent,
+                System.Drawing.Size.Empty) as System.Drawing.Bitmap;
+
+            var imageWidth = image.Width;
+            var imageHeight = image.Height;
+            var trimmedWidth = (imageWidth < width) ? imageWidth : width;
+            var trimmedHeight = (imageHeight < height) ? imageHeight : height;
+            image = image.Clone(new System.Drawing.Rectangle(0, 0, trimmedWidth, trimmedHeight), image.PixelFormat);
+            image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Bmp);
+            memoryStream.Position = 0;
+            var bitmapImage = new BitmapImage();
+            bitmapImage.BeginInit();
+            bitmapImage.StreamSource = memoryStream;
+            bitmapImage.EndInit();
+            var imageControl = new Image
+            {
+                Source = bitmapImage,
+                SnapsToDevicePixels = true,
+                UseLayoutRounding = false,
+            };
+            RenderOptions.SetBitmapScalingMode(imageControl, BitmapScalingMode.NearestNeighbor);
+            var m = imageControl.LayoutTransform.Value;
+            m.Scale(scale, scale);
+            imageControl.LayoutTransform = new MatrixTransform(m);
+            Canvas.SetTop(imageControl, y * scale);
+            Canvas.SetLeft(imageControl, x * scale);
+            canvas.Children.Add(imageControl);
         }
 
         private void SuggestMouseState(int cursorViewX, int cursorViewY, out MouseState suggestedMouseState, out Zone involvedZone)

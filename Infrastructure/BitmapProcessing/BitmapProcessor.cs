@@ -178,7 +178,7 @@ namespace BitmapProcessing
             return monochrome;
         }
 
-        private static Image DrawTextImage(String text, System.Drawing.Font font, Color textColor, Color backColor, Size minSize)
+        public static Image DrawTextImage(String text, System.Drawing.Font font, Color textColor, Color backColor, Size minSize)
         {
             //first, create a dummy bitmap just to get a graphics object
             SizeF textSize;
