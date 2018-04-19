@@ -236,6 +236,7 @@ namespace PixelBoardDevice.UI
 
         private void SetCursor(MouseState state)
         {
+            Cursor = Cursors.Arrow;
             if (state == MouseState.HorizontalResizing)
             {
                 Cursor = Cursors.SizeWE;
