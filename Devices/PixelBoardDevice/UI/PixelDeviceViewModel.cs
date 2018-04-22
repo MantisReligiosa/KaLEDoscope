@@ -15,7 +15,6 @@ using System.Windows;
 using System.Drawing;
 using PixelBoardDevice.DomainObjects;
 using Microsoft.Win32;
-using System.Collections;
 using Extensions;
 
 namespace PixelBoardDevice.UI
@@ -203,38 +202,6 @@ namespace PixelBoardDevice.UI
             ModelChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        private static void RenderBitmap(Graphics g, Zone zone)
-        {
-            var base64 = zone.BitmapBase64;
-            if (String.IsNullOrEmpty(base64))
-            {
-                return;
-            }
-            var bytes = Convert.FromBase64String(base64);
-            var bitArray = new BitArray(bytes);
-            var bitmapHeight = zone.BitmapHeight;
-            var bitmapWidth = bitArray.Length / bitmapHeight;
-            var x = 1;
-            var y = 1;
-            foreach (var bit in bitArray)
-            {
-                if ((bool)bit)
-                {
-                    g.FillRectangle(new SolidBrush(Color.Red), new Rectangle(zone.X + x, zone.Y + y, 1, 1));
-                }
-                y++;
-                if (y > bitmapHeight)
-                {
-                    y = 1;
-                    x++;
-                    if (x > bitmapWidth)
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
         private void ValidateZones()
         {
             if (Zones.IsNull())
@@ -242,7 +209,7 @@ namespace PixelBoardDevice.UI
             var incorrectZonesId = new List<int>();
             foreach (var zone in Zones)
             {
-                if (incorrectZonesId.Any(id=>id==zone.Id))
+                if (incorrectZonesId.Any(id => id == zone.Id))
                 {
                     zone.IsValid = false;
                     continue;
@@ -719,6 +686,45 @@ namespace PixelBoardDevice.UI
             }
         }
 
+        public bool IsImageProcessingEnabled { get; set; } = false;
+
+        private DelegateCommand _invertBitmap;
+        public Input.ICommand InvertBitmap
+        {
+            get
+            {
+                if (_invertBitmap.IsNull())
+                {
+                    _invertBitmap = new DelegateCommand((o) => 
+                    {
+                        var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                        var base64String = deviceZone.BitmapBase64;
+                        var invertedbase64 = BitmapProcessor.InvertBase64String(base64String);
+                        deviceZone.BitmapBase64 = invertedbase64;
+                        OnPropertyChanged("");
+                    });
+                }
+                return _invertBitmap;
+            }
+        }
+
+        private DelegateCommand _clearBitmap;
+        public Input.ICommand ClearBitmap
+        {
+            get
+            {
+                if (_clearBitmap.IsNull())
+                {
+                    _clearBitmap = new DelegateCommand((o) =>
+                    {
+                        UpdateZoneImage(SelectedProgram, SelectedZone, null);
+                        IsImageProcessingEnabled = false;
+                    });
+                }
+                return _clearBitmap;
+            }
+        }
+
         private DelegateCommand _loadBitmap;
         public Input.ICommand LoadBitmap
         {
@@ -736,6 +742,7 @@ namespace PixelBoardDevice.UI
                           {
                               return;
                           }
+                          IsImageProcessingEnabled = true;
                           var image = Image.FromFile(dialog.FileName);
                           UpdateZoneImage(SelectedProgram, SelectedZone, image);
                       });
@@ -746,20 +753,24 @@ namespace PixelBoardDevice.UI
 
         private void UpdateZoneImage(Program program, Zone zone, Image image)
         {
-            if (zone.Width == 0 && zone.Height == 0)
-            {
-                return;
-            }
             var deviceZone = GetDeviceZone(program.Id, zone.Id);
-            var bitmap = new Bitmap(image);
-            var width = (bitmap.Width > zone.Width) ? zone.Width : bitmap.Width;
-            var height = (bitmap.Height > zone.Height) ? zone.Height : bitmap.Height;
-            var trimmedBitmap = bitmap.Clone(new Rectangle(0, 0, width, height), bitmap.PixelFormat);
-            var base64String = BitmapProcessor.GenerateBase64ImageMono(new Bitmap(trimmedBitmap));
-            deviceZone.BitmapHeight = height;
-            deviceZone.BitmapBase64 = base64String;
+            if (image.IsNull())
+            {
+                deviceZone.BitmapHeight = 0;
+                deviceZone.BitmapBase64 = String.Empty;
+            }
+            else
+            {
+                var bitmap = new Bitmap(image);
+                var height = bitmap.Height;
+                var base64String = BitmapProcessor.GenerateBase64ImageMono(bitmap);
+                deviceZone.BitmapHeight = height;
+                deviceZone.BitmapBase64 = base64String;
+            }
             OnPropertyChanged("");
         }
+
+
 
         private DelegateCommand _addProgram;
         public Input.ICommand AddProgram
@@ -820,7 +831,11 @@ namespace PixelBoardDevice.UI
                         {
                             ZoneType = (int)DomainObjects.ZoneTypes.Text,
                             Id = nextId,
-                            Name = "Текст"
+                            Name = "Текст",
+                            X = 0,
+                            Y = 0,
+                            Height = 10,
+                            Width = 10
                         };
                         SelectedProgram.Zones.Add(zone);
                         Zones.Add(zone);

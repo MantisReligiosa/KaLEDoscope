@@ -333,7 +333,7 @@ namespace PixelBoardDevice.UI
                     (z) => z.ZoneType==(int)ZoneTypes.Picture,
                     (zone, canvas, font, scale) =>
                     {
-                        RenderBitmap(canvas, zone.BitmapBase64, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderBitmap(canvas, zone.BitmapBase64,zone.BitmapHeight,  zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
@@ -390,12 +390,14 @@ namespace PixelBoardDevice.UI
             canvas.Children.Add(horizontalLine);
         }
 
-        private static void RenderBitmap(Canvas canvas, string bitmapBase64, int x, int y, int width, int height, double scale)
+        private static void RenderBitmap(Canvas canvas, string bitmapBase64, int bitmapHeight, int x, int y, int width, int height, double scale)
         {
             if (String.IsNullOrEmpty(bitmapBase64))
             {
                 return;
             }
+            var bitmap = BitmapProcessing.BitmapProcessor.GetMonochromeBitmap(bitmapBase64, bitmapHeight, System.Drawing.Color.Red);
+            PutBitmapOnCanvas(bitmap, canvas, x, y, width, height, scale);
         }
 
         private static void RenderText(Canvas canvas, BinaryFont font, string text, int x, int y, int width, int height, double scale)
@@ -423,28 +425,30 @@ namespace PixelBoardDevice.UI
             }
             var drawingFont = new System.Drawing.Font(
                 font.Source, font.Height, style, System.Drawing.GraphicsUnit.Pixel);
-            var memoryStream = new MemoryStream();
-            var image = BitmapProcessing.BitmapProcessor.DrawTextImage(
+            var bitmap = BitmapProcessing.BitmapProcessor.DrawTextImage(
                 text,
                 drawingFont,
                 System.Drawing.Color.Red,
                 System.Drawing.Color.Transparent,
                 System.Drawing.Size.Empty) as System.Drawing.Bitmap;
 
-            var imageWidth = image.Width;
-            var imageHeight = image.Height;
+            PutBitmapOnCanvas(bitmap, canvas, x, y, width, height, scale);
+        }
+
+        private static void PutBitmapOnCanvas(System.Drawing.Bitmap bitmap, Canvas canvas,int x, int y, int width, int height, double scale)
+        {
+            var imageWidth = bitmap.Width;
+            var imageHeight = bitmap.Height;
             var trimmedWidth = (imageWidth < width) ? imageWidth : width;
             var trimmedHeight = (imageHeight < height) ? imageHeight : height;
-            image = image.Clone(new System.Drawing.Rectangle(0, 0, trimmedWidth, trimmedHeight), image.PixelFormat);
-            image.Save(memoryStream, System.Drawing.Imaging.ImageFormat.Bmp);
-            memoryStream.Position = 0;
-            var bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.StreamSource = memoryStream;
-            bitmapImage.EndInit();
+            bitmap = bitmap.Clone(new System.Drawing.Rectangle(0, 0, trimmedWidth, trimmedHeight), bitmap.PixelFormat);
+
+            var hBitmap = bitmap.GetHbitmap();
+
             var imageControl = new Image
             {
-                Source = bitmapImage,
+                Source = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(hBitmap,
+                            IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions()),
                 SnapsToDevicePixels = true,
                 UseLayoutRounding = false,
             };

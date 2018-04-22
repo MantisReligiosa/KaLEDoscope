@@ -207,7 +207,16 @@
                         <ComboBox Grid.Column="1"></ComboBox>
                     </GroupBox>
                     <GroupBox Grid.Row="5" Header="Растр" Visibility="{Binding BitmapVisibility}" Style="{StaticResource GroupBoxStyle}">
-                        <Button Content="Загрузить" Command="{Binding LoadBitmap}"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0" Content="Загрузить" Command="{Binding LoadBitmap}"/>
+                            <Button Grid.Column="1" Content="Сбросить" Command="{Binding ClearBitmap}" IsEnabled="{Binding IsImageProcessingEnabled}"/>
+                            <Button Grid.Column="2" Content="Инвертировать" Command="{Binding InvertBitmap}" IsEnabled="{Binding IsImageProcessingEnabled}"/>
+                        </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="6" Header="Тэг сервера" Visibility="{Binding ExternalTagVisibility}" Style="{StaticResource GroupBoxStyle}">
                         <Grid>

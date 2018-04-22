@@ -126,6 +126,38 @@ namespace BitmapProcessing
             return trimmedBitmap;
         }
 
+        private static unsafe Bitmap FromMonochromeBitmap(bool[,] monochromeBitmap, byte red, byte green, byte blue)
+        {
+            var height = monochromeBitmap.GetLength(0);
+            var width = monochromeBitmap.GetLength(1);
+            var bitmap = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+            BitmapData bd = bitmap.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            try
+            {
+                byte* curpos;
+                fixed (bool* monochromeBitmapPointer = monochromeBitmap)
+                {
+                    bool* monochromePointer = monochromeBitmapPointer;
+                    for (int h = 0; h < height; h++)
+                    {
+                        curpos = ((byte*)bd.Scan0) + h * bd.Stride;
+                        for (int w = 0; w < width; w++)
+                        {
+                            *curpos++ = (*monochromePointer) ? blue : (byte)0;
+                            *curpos++ = (*monochromePointer) ? green : (byte)0;
+                            *curpos++ = (*monochromePointer) ? red : (byte)0;
+                            ++monochromePointer;
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                bitmap.UnlockBits(bd);
+            }
+            return bitmap;
+        }
+
         private static unsafe void BitmapToByte(Bitmap bmp, out byte[,,] rgbBitmap, out byte[,] grayScaleBitmap, out bool[,] monochromeBitmap)
         {
             var width = bmp.Width;
@@ -235,6 +267,33 @@ namespace BitmapProcessing
             bitArray.CopyTo(resultBytes, 0);
             var base64String = Convert.ToBase64String(resultBytes);
             return base64String;
+        }
+
+        public static Bitmap GetMonochromeBitmap(string base64String,int height, Color color)
+        {
+            var bytes = Convert.FromBase64String(base64String);
+            var bitArray = new BitArray(bytes);
+            var width = bitArray.Count / height;
+            var bits = new bool[height, width];
+            var index = 0;
+            for (int w = 0; w < width; w++)
+            {
+                for (int h = 0; h < height; h++)
+                {
+                    bits[h, w] = bitArray[index++];
+                }
+            }
+            return FromMonochromeBitmap(bits,255,0,0);
+        }
+
+        public static string InvertBase64String(string base64String)
+        {
+            var bytes = Convert.FromBase64String(base64String);
+            var bitArray = new BitArray(bytes);
+            bitArray.Not();
+            bitArray.CopyTo(bytes, 0);
+            var invertedString = Convert.ToBase64String(bytes);
+            return invertedString;
         }
     }
 }
