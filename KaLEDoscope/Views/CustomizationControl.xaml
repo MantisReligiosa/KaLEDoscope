@@ -13,13 +13,38 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
-        <ToolBar x:Name="toolbar" Grid.Row="2">
+        <ToolBar x:Name="toolbar" Grid.Row="2" Height="27">
             <ToolBar.Items>
-                <Button Content="Базовые настройки" Command="{Binding CommonSettings}" CommandParameter="{Binding DeviceNode}"></Button>
-                <Button Content="Синхронизировать" Command="{Binding DownloadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowDownload}"/>
-                <Button Content="Применить конфигурацию" Command="{Binding UploadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowUpload}"/>
-                <Button Content="Сохранить конфигурацию в файл" Command="{Binding SaveSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowSave}"/>
-                <Button Content="Загрузить конфигурацию из файла" Command="{Binding LoadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowLoad}"/>
+                <Button  Command="{Binding CommonSettings}" CommandParameter="{Binding DeviceNode}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="..\Resources\configure.png" Stretch="UniformToFill"/>
+                        <Label Padding="0">Базовые настройки</Label>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding DownloadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowDownload}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="..\Resources\Synchronize.png" Stretch="UniformToFill"/>
+                        <Label Padding="0">Синхронизировать</Label>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding UploadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowUpload}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="..\Resources\Download.png" Stretch="UniformToFill"/>
+                        <Label Padding="0">Применить конфигурацию</Label>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding SaveSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowSave}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="..\Resources\Save.png" Stretch="UniformToFill"/>
+                        <Label Padding="0">Сохранить конфигурацию в файл</Label>
+                    </StackPanel>
+                </Button>
+                <Button Command="{Binding LoadSettings}" CommandParameter="{Binding DeviceNode}" IsEnabled="{Binding Path=DeviceNode.AllowLoad}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="..\Resources\Folder.png" Stretch="UniformToFill"/>
+                        <Label Padding="0">Загрузить конфигурацию из файла</Label>
+                    </StackPanel>
+                </Button>
             </ToolBar.Items>
         </ToolBar>
         <ScrollViewer x:Name="previewArea" Grid.Row="0"/>

@@ -269,7 +269,7 @@ namespace BitmapProcessing
             return base64String;
         }
 
-        public static Bitmap GetMonochromeBitmap(string base64String,int height, Color color)
+        public static Bitmap GetMonochromeBitmap(string base64String, int height, Color color)
         {
             var bytes = Convert.FromBase64String(base64String);
             var bitArray = new BitArray(bytes);
@@ -283,7 +283,7 @@ namespace BitmapProcessing
                     bits[h, w] = bitArray[index++];
                 }
             }
-            return FromMonochromeBitmap(bits,255,0,0);
+            return FromMonochromeBitmap(bits, 255, 0, 0);
         }
 
         public static string InvertBase64String(string base64String)

@@ -8,11 +8,25 @@
         mc:Ignorable="d"
         xmlns:dd="urn:gong-wpf-dragdrop"
         Title="MainWindow" d:DesignWidth="900" d:DesignHeight="540" WindowState="Maximized" Icon="Resources/Logo.ico">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding Quit}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding ClearStructure}"/>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenStructure}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveStructure}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveStructureAs}"/>
+        <KeyBinding Key="F5" Command="{Binding ScanDevices}"/>
+    </Window.InputBindings>
     <Window.Resources>
         <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="3*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
             <RowDefinition Height="1*"></RowDefinition>
@@ -22,71 +36,132 @@
             <ColumnDefinition Width="auto"></ColumnDefinition>
             <ColumnDefinition Width="4*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <GridSplitter Grid.Row="0" Grid.Column="1" Grid.RowSpan="3" Width="5"
+        <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="10">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_Файл">
+                    <MenuItem Header="_Новый проект" InputGestureText="Ctrl+N" Command="{Binding ClearStructure}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\New.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Открыть..." InputGestureText="Ctrl+O" Command="{Binding OpenStructure}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Folder.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveStructure}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Save.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Coхранить как..." InputGestureText="Ctrl+Shift+S" Command="{Binding SaveStructureAs}"/>
+                    <Separator/>
+                    <MenuItem Header="_Настройки..." Command="{Binding Options}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Settings.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_Выход" InputGestureText="Alt+F4" Command="{Binding Quit}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Exit.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="_Структура">
+                    <MenuItem Header="_Добавить элемент">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\HardDisk.png"/>
+                        </MenuItem.Icon>
+                        <MenuItem Header="_Аггрегатор" Command="{Binding NewAggregator}">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\Aggregation.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="_Папку" Command="{Binding NewFolder}">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\Folder.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator/>
+                    </MenuItem>
+                    <MenuItem Header="Удалить элемент" Command="{Binding RemoveNode}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\trashBin.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Сканировать" InputGestureText="F5" Command="{Binding ScanDevices}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Search.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Справка">
+                    <MenuItem Header="О программе...">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Help.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <ToolBar x:Name="toolbar" Grid.Row="1" Grid.ColumnSpan="10" Height="27">
+            <ToolBar.Items>
+                <Button Command="{Binding ClearStructure}">
+                    <Image Source="Resources\New.png"/>
+                </Button>
+                <Button Command="{Binding OpenStructure}" >
+                    <Image Source="Resources\Folder.png"/>
+                </Button>
+                <Button Command="{Binding SaveStructure}" >
+                    <Image Source="Resources\Save.png"/>
+                </Button>
+                <Separator/>
+                <Button Command="{Binding ScanDevices}" VerticalAlignment="Bottom">
+                    <Image Source="Resources\Search.png"/>
+                </Button>
+            </ToolBar.Items>
+        </ToolBar>
+        <GridSplitter Grid.Row="2" Grid.Column="1" Grid.RowSpan="3" Width="5"
                       VerticalAlignment="Stretch" HorizontalAlignment="Center"></GridSplitter>
-        <GridSplitter Grid.Row="1" Grid.Column="2" Height="5"
+        <GridSplitter Grid.Row="3" Grid.Column="2" Height="5"
                       VerticalAlignment="Center" HorizontalAlignment="Stretch"></GridSplitter>
-        <Grid Grid.Row="0" Grid.RowSpan="3">
-            <Grid Grid.Row="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TreeView x:Name="trvMenu" Grid.Row="0" Grid.ColumnSpan="10" ItemsSource="{Binding Path=StructureNodes}" Style="{StaticResource TreeViewStyle}"
+        <TreeView Grid.Row="2" Grid.RowSpan="3" x:Name="trvMenu" ItemsSource="{Binding Path=StructureNodes}" Style="{StaticResource TreeViewStyle}"
                           dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:InvokeCommandAction Command="{Binding Path=ShowDevicePlugin}"
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseDoubleClick">
+                    <i:InvokeCommandAction Command="{Binding Path=ShowDevicePlugin}"
                                    CommandParameter="{Binding ElementName=trvMenu,Path=SelectedItem}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <TreeView.Resources>
-                        <HierarchicalDataTemplate DataType="{x:Type self:FolderNode}" ItemsSource="{Binding Path=Nodes}">
-                            <StackPanel Orientation="Horizontal">
-                                <!--<Image Source="/WpfTutorialSamples;component/Images/group.png" Margin="0,0,5,0" />-->
-                                <TextBlock Text="[" Foreground="Blue" />
-                                <TextBlock Text="{Binding Name}" />
-                                <TextBlock Text="]" Foreground="Blue" />
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type self:AggregationNode}" ItemsSource="{Binding Path=Nodes}">
-                            <StackPanel Orientation="Horizontal">
-                                <!--<Image Source="/WpfTutorialSamples;component/Images/group.png" Margin="0,0,5,0" />-->
-                                <TextBlock Text="&lt;" Foreground="Red" />
-                                <TextBlock Text="{Binding Name}" />
-                                <TextBlock Text=">" Foreground="Red" />
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                        <DataTemplate DataType="{x:Type self:DeviceNode}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Path=Name}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </TreeView.Resources>
-                </TreeView>
-                <Button Grid.Row="1" Grid.Column="0" Content="Очистить"/>
-                <Button Grid.Row="1" Grid.Column="1" Content="Загрузить"/>
-                <Button Grid.Row="1" Grid.Column="2" Content="Сохранить"/>
-                <Button Grid.Row="2" Grid.Column="0" Content="Добавить..."/>
-                <Button Grid.Row="2" Grid.Column="1" Content="Удалить"/>
-                <Button Grid.Row="2" Grid.Column="2" Content="Сканировать"/>
-            </Grid>
-        </Grid>
-
-
-        <TextBox Name="lbLog" Grid.Column="2" Grid.Row="2" Text="{Binding Log}" IsReadOnly="True">
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type self:FolderNode}" ItemsSource="{Binding Path=Nodes}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\Folder.png" Margin="0,0,5,0" Height="16"/>
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type self:AggregationNode}" ItemsSource="{Binding Path=Nodes}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\Aggregation.png" Margin="0,0,5,0" Height="16"/>
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type self:DeviceNode}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\HardDisk.png" Margin="0,0,5,0" Height="16"/>
+                        <TextBlock Text="{Binding Path=Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <TextBox Name="lbLog" Grid.Column="2" Grid.Row="4" Text="{Binding Log}" IsReadOnly="True">
 
         </TextBox>
         <TabControl 
                 x:Name="tabControl" 
                 Grid.Column="2" 
-                Grid.Row="0" 
+                Grid.Row="2" 
                 ItemsSource="{Binding Path=DeviceTabs}" 
                 SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
         </TabControl>

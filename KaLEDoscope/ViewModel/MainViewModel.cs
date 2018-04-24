@@ -3,7 +3,6 @@ using CommandProcessing;
 using KaLEDoscope.ViewModel;
 using KaLEDoscope.Views;
 using ServiceInterfaces;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -18,6 +17,7 @@ using Abstractions;
 using PixelBoardDevice;
 using GongSolutions.Wpf.DragDrop;
 using Extensions;
+using System;
 
 namespace KaLEDoscope
 {
@@ -30,6 +30,8 @@ namespace KaLEDoscope
 
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
+
+        public event EventHandler ShowOptions;
 
         private TabItem _selectedTabItem;
         public TabItem SelectedTabItem
@@ -44,6 +46,8 @@ namespace KaLEDoscope
                 OnPropertyChanged(nameof(SelectedTabItem));
             }
         }
+
+        public string StructureFileName { get; set; } = string.Empty;
 
         private StringBuilder _log = new StringBuilder();
         public string Log
@@ -179,6 +183,151 @@ namespace KaLEDoscope
                 }
             });
             IsScanEnabled = true;
+        }
+
+        private DelegateCommand _Options;
+        public Input.ICommand Options
+        {
+            get
+            {
+                if (_Options.IsNull())
+                {
+                    _Options = new DelegateCommand((o) => 
+                    {
+                        ShowOptions?.Invoke(this, EventArgs.Empty);
+                    });
+                }
+                return _Options;
+            }
+        }
+
+        private DelegateCommand _Quit;
+        public Input.ICommand Quit
+        {
+            get
+            {
+                if (_Quit.IsNull())
+                {
+                    _Quit = new DelegateCommand((o) => 
+                    {
+                        throw new NotImplementedException();
+                    });
+                }
+                return _Quit;
+            }
+        }
+
+        private DelegateCommand _OpenStructure;
+        public Input.ICommand OpenStructure
+        {
+            get
+            {
+                if (_OpenStructure.IsNull())
+                {
+                    _OpenStructure = new DelegateCommand((o) => 
+                    {
+                        throw new NotImplementedException();
+                    });
+                }
+                return _OpenStructure;
+            }
+        }
+
+        private DelegateCommand _RemoveNode;
+        public Input.ICommand RemoveNode
+        {
+            get
+            {
+                if (_RemoveNode.IsNull())
+                {
+                    _RemoveNode = new DelegateCommand((o) => 
+                    {
+                        throw new NotImplementedException();
+                    });
+                }
+                return _RemoveNode;
+            }
+        }
+
+        private DelegateCommand _NewFolder;
+        public Input.ICommand NewFolder
+        {
+            get
+            {
+                if (_NewFolder.IsNull())
+                {
+                    _NewFolder = new DelegateCommand((o) => 
+                    {
+                        throw new NotImplementedException();
+                    });
+                }
+                return _NewFolder;
+            }
+        }
+
+        private DelegateCommand _NewAggregator;
+        public Input.ICommand NewAggregator
+        {
+            get
+            {
+                if (_NewAggregator.IsNull())
+                {
+                    _NewAggregator = new DelegateCommand((o) => 
+                    {
+                        throw new NotImplementedException();
+                    });
+                }
+                return _NewAggregator;
+            }
+        }
+
+        private DelegateCommand _SaveStructure;
+        public Input.ICommand SaveStructure
+        {
+            get
+            {
+                if (_SaveStructure.IsNull())
+                {
+                    _SaveStructure = new DelegateCommand((o) => 
+                    {
+                        if (String.IsNullOrEmpty(StructureFileName))
+                        {
+                            SaveNewStructure();
+                        }
+                        else
+                        {
+                            SaveExistStructure();
+                        }
+                    });
+                }
+                return _SaveStructure;
+            }
+        }
+
+        private DelegateCommand _SaveStructureAs;
+        public Input.ICommand SaveStructureAs
+        {
+            get
+            {
+                if (_SaveStructureAs.IsNull())
+                {
+                    _SaveStructureAs = new DelegateCommand((o) => 
+                    {
+                        SaveNewStructure();
+                    });
+                }
+                return _SaveStructureAs;
+            }
+        }
+
+        private void SaveExistStructure()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void SaveNewStructure()
+        {
+            throw new NotImplementedException();
         }
 
         private DelegateCommand showDevicePlugin;
@@ -413,7 +562,21 @@ namespace KaLEDoscope
             return control;
         }
 
-
+        private DelegateCommand _ClearStructure;
+        public Input.ICommand ClearStructure
+        {
+            get
+            {
+                if (_ClearStructure.IsNull())
+                {
+                    _ClearStructure = new DelegateCommand((o) =>
+                      {
+                          StructureNodes.Clear();
+                      });
+                }
+                return _ClearStructure;
+            }
+        }
 
         private DelegateCommand _scanDevices;
         public Input.ICommand ScanDevices
