@@ -27,27 +27,21 @@ namespace KaLEDoscope
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
+        private DeviceNode _updatedNode;
+        private TabItem _tabItem;
+
 
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
+        public ObservableCollection<MenuItem> DeviceItems { get; set; } = new ObservableCollection<MenuItem>();
 
         public event EventHandler ShowOptions;
+        public event EventHandler QuitApplication;
 
-        private TabItem _selectedTabItem;
-        public TabItem SelectedTabItem
-        {
-            get
-            {
-                return _selectedTabItem;
-            }
-            set
-            {
-                _selectedTabItem = value;
-                OnPropertyChanged(nameof(SelectedTabItem));
-            }
-        }
-
+        public TabItem SelectedTabItem { get; set; }
         public string StructureFileName { get; set; } = string.Empty;
+        public bool IsScanEnabled { get; set; }
+        public NodeItem SelectedNode { get; set; }
 
         private StringBuilder _log = new StringBuilder();
         public string Log
@@ -63,8 +57,6 @@ namespace KaLEDoscope
             }
         }
 
-        public bool IsScanEnabled { get; set; }
-
         public MainViewModel(ILogger logger)
         {
             _logger = logger;
@@ -78,6 +70,17 @@ namespace KaLEDoscope
             _deviceFactory = new DeviceFactory(_logger);
             _deviceFactory.Builders.Add(new SevenSegmentDeviceBuilder());
             _deviceFactory.Builders.Add(new PixelDeviceBuilder());
+
+            foreach (var deviceBuilder in _deviceFactory.Builders)
+            {
+                DeviceItems.Add(new MenuItem
+                {
+                    Header = deviceBuilder.DisplayName,
+                    Command = AddNewDevice,
+                    CommandParameter = deviceBuilder.Model
+                });
+            }
+
 
             var folder = new Folder
             {
@@ -103,12 +106,12 @@ namespace KaLEDoscope
 
             StructureNodes.Add(folderNode);
             StructureNodes.Add(aggregationNode);
-            var id = int.MaxValue;
+            var id = 0;
             _deviceFactory.Builders.ForEach(builder =>
             {
                 var device = builder.UpdateCustomSettings(new Device
                 {
-                    Id = id--,
+                    Id = id++,
                     Model = builder.Model,
                     IsStandaloneConfiguration = true,
                     Folder = folder,
@@ -124,7 +127,7 @@ namespace KaLEDoscope
                 });
                 device = builder.UpdateCustomSettings(new Device
                 {
-                    Id = id--,
+                    Id = id++,
                     Model = builder.Model,
                     IsStandaloneConfiguration = true,
                     Aggregation = aggregation
@@ -140,7 +143,7 @@ namespace KaLEDoscope
                 });
                 device = builder.UpdateCustomSettings(new Device
                 {
-                    Id = id--,
+                    Id = id++,
                     Model = builder.Model,
                     IsStandaloneConfiguration = true
                 });
@@ -156,7 +159,7 @@ namespace KaLEDoscope
             });
         }
 
-        public void MakeNodes()
+        private void MakeNodes()
         {
             var directConnectDeviceScanner = new DeviceScanner(_logger, _deviceFactory);
             directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
@@ -185,110 +188,232 @@ namespace KaLEDoscope
             IsScanEnabled = true;
         }
 
-        private DelegateCommand _Options;
+        private DelegateCommand _options;
         public Input.ICommand Options
         {
             get
             {
-                if (_Options.IsNull())
+                if (_options.IsNull())
                 {
-                    _Options = new DelegateCommand((o) => 
+                    _options = new DelegateCommand((o) =>
                     {
                         ShowOptions?.Invoke(this, EventArgs.Empty);
                     });
                 }
-                return _Options;
+                return _options;
             }
         }
 
-        private DelegateCommand _Quit;
+        private DelegateCommand _quit;
         public Input.ICommand Quit
         {
             get
             {
-                if (_Quit.IsNull())
+                if (_quit.IsNull())
                 {
-                    _Quit = new DelegateCommand((o) => 
+                    _quit = new DelegateCommand((o) =>
                     {
-                        throw new NotImplementedException();
+                        QuitApplication?.Invoke(this, EventArgs.Empty);
                     });
                 }
-                return _Quit;
+                return _quit;
             }
         }
 
-        private DelegateCommand _OpenStructure;
+        private DelegateCommand _addNewDevice;
+        public Input.ICommand AddNewDevice
+        {
+            get
+            {
+                if (_addNewDevice.IsNull())
+                {
+                    _addNewDevice = new DelegateCommand((o) =>
+                    {
+                        var model = o.ToString();
+                        var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(model));
+                        var rootDevices = StructureNodes.OfType<DeviceNode>();
+                        var aggregations = StructureNodes.OfType<AggregationNode>();
+                        var folders = StructureNodes.OfType<FolderNode>();
+                        var maxId = 0;
+                        if (rootDevices.Any())
+                        {
+                            var maxDeviceId = rootDevices.Max(d => d.Device.Id);
+                            if (maxDeviceId > maxId)
+                                maxId = maxDeviceId;
+                        }
+                        if (aggregations.Any())
+                        {
+                            var maxDeviceId = 0;
+                            foreach (var aggregation in aggregations)
+                            {
+                                var maxAggregationDeviceId = 0;
+                                var devices = aggregation.Nodes.OfType<DeviceNode>();
+                                if (devices.Any())
+                                {
+                                    maxAggregationDeviceId = devices.Max(d => d.Device.Id);
+                                }
+                                if (maxAggregationDeviceId > maxDeviceId)
+                                    maxDeviceId = maxAggregationDeviceId;
+                            }
+                            if (maxDeviceId > maxId)
+                                maxId = maxDeviceId;
+                        }
+                        if (folders.Any())
+                        {
+                            var maxDeviceId = 0;
+                            foreach (var folder in folders)
+                            {
+                                var maxAggregationDeviceId = 0;
+                                var devices = folder.Nodes.OfType<DeviceNode>();
+                                if (devices.Any())
+                                {
+                                    maxAggregationDeviceId = devices.Max(d => d.Device.Id);
+                                }
+                                if (maxAggregationDeviceId > maxDeviceId)
+                                    maxDeviceId = maxAggregationDeviceId;
+                            }
+                            if (maxDeviceId > maxId)
+                                maxId = maxDeviceId;
+                        }
+                        var id = maxId + 1;
+                        var device = deviceBuilder.UpdateCustomSettings(new Device
+                        {
+                            Id = id,
+                            Name = $"{deviceBuilder.DisplayName}",
+                            Model = deviceBuilder.Model,
+                            IsStandaloneConfiguration = true
+                        });
+                        StructureNodes.Add(new DeviceNode
+                        {
+                            Device = device,
+                            Name = device.Name,
+                            AllowDownload = false,
+                            AllowLoad = true,
+                            AllowSave = true,
+                            AllowUpload = false
+                        });
+                    });
+                }
+                return _addNewDevice;
+            }
+        }
+
+        private DelegateCommand _openStructure;
         public Input.ICommand OpenStructure
         {
             get
             {
-                if (_OpenStructure.IsNull())
+                if (_openStructure.IsNull())
                 {
-                    _OpenStructure = new DelegateCommand((o) => 
+                    _openStructure = new DelegateCommand((o) =>
                     {
                         throw new NotImplementedException();
                     });
                 }
-                return _OpenStructure;
+                return _openStructure;
             }
         }
 
-        private DelegateCommand _RemoveNode;
+        private DelegateCommand _removeNode;
         public Input.ICommand RemoveNode
         {
             get
             {
-                if (_RemoveNode.IsNull())
+                if (_removeNode.IsNull())
                 {
-                    _RemoveNode = new DelegateCommand((o) => 
+                    _removeNode = new DelegateCommand((o) =>
                     {
-                        throw new NotImplementedException();
+                        var node = SelectedNode;
+                        if (node.IsNull())
+                            return;
+                        if (node.Parent.IsNull())
+                        {
+                            StructureNodes.Remove(node);
+                        }
+                        else
+                        {
+                            node.Parent.Nodes.Remove(node);
+                        }
                     });
                 }
-                return _RemoveNode;
+                return _removeNode;
             }
         }
 
-        private DelegateCommand _NewFolder;
+        private DelegateCommand _newFolder;
         public Input.ICommand NewFolder
         {
             get
             {
-                if (_NewFolder.IsNull())
+                if (_newFolder.IsNull())
                 {
-                    _NewFolder = new DelegateCommand((o) => 
+                    _newFolder = new DelegateCommand((o) =>
                     {
-                        throw new NotImplementedException();
+                        var folderNodes = StructureNodes.OfType<FolderNode>();
+                        var maxId = 0;
+                        if (folderNodes.Any())
+                        {
+                            maxId = folderNodes.Max(n => n.Folder.Id);
+                        }
+                        var id = maxId + 1;
+                        var name = $"Папка{id}";
+                        var newFolder = new FolderNode
+                        {
+                            Name = name,
+                            Folder = new Folder
+                            {
+                                Id = id,
+                                Name = name
+                            }
+                        };
+                        StructureNodes.Add(newFolder);
                     });
                 }
-                return _NewFolder;
+                return _newFolder;
             }
         }
 
-        private DelegateCommand _NewAggregator;
+        private DelegateCommand _newAggregator;
         public Input.ICommand NewAggregator
         {
             get
             {
-                if (_NewAggregator.IsNull())
+                if (_newAggregator.IsNull())
                 {
-                    _NewAggregator = new DelegateCommand((o) => 
+                    _newAggregator = new DelegateCommand((o) =>
                     {
-                        throw new NotImplementedException();
+                        var aggregatorNodes = StructureNodes.OfType<AggregationNode>();
+                        var maxId = 0;
+                        if (aggregatorNodes.Any())
+                        {
+                            maxId = aggregatorNodes.Max(n => n.Aggregation.Id);
+                        }
+                        var id = maxId + 1;
+                        var name = $"Аггрегатор{id}";
+                        var newAggregator = new AggregationNode
+                        {
+                            Name = name,
+                            Aggregation = new Aggregation
+                            {
+                                Id = id,
+                                Name = name
+                            }
+                        };
+                        StructureNodes.Add(newAggregator);
                     });
                 }
-                return _NewAggregator;
+                return _newAggregator;
             }
         }
 
-        private DelegateCommand _SaveStructure;
+        private DelegateCommand _saveStructure;
         public Input.ICommand SaveStructure
         {
             get
             {
-                if (_SaveStructure.IsNull())
+                if (_saveStructure.IsNull())
                 {
-                    _SaveStructure = new DelegateCommand((o) => 
+                    _saveStructure = new DelegateCommand((o) =>
                     {
                         if (String.IsNullOrEmpty(StructureFileName))
                         {
@@ -300,23 +425,23 @@ namespace KaLEDoscope
                         }
                     });
                 }
-                return _SaveStructure;
+                return _saveStructure;
             }
         }
 
-        private DelegateCommand _SaveStructureAs;
+        private DelegateCommand _saveStructureAs;
         public Input.ICommand SaveStructureAs
         {
             get
             {
-                if (_SaveStructureAs.IsNull())
+                if (_saveStructureAs.IsNull())
                 {
-                    _SaveStructureAs = new DelegateCommand((o) => 
+                    _saveStructureAs = new DelegateCommand((o) =>
                     {
                         SaveNewStructure();
                     });
                 }
-                return _SaveStructureAs;
+                return _saveStructureAs;
             }
         }
 
@@ -330,16 +455,16 @@ namespace KaLEDoscope
             throw new NotImplementedException();
         }
 
-        private DelegateCommand showDevicePlugin;
+        private DelegateCommand _showDevicePlugin;
         public Input.ICommand ShowDevicePlugin
         {
             get
             {
-                if (showDevicePlugin.IsNull())
+                if (_showDevicePlugin.IsNull())
                 {
-                    showDevicePlugin = new DelegateCommand((o) =>
+                    _showDevicePlugin = new DelegateCommand((o) =>
                     {
-                        var nodeItem = o as NodeItem;
+                        var nodeItem = SelectedNode;
                         if (nodeItem is AggregationNode aggregationNode)
                         {
                             ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
@@ -357,7 +482,7 @@ namespace KaLEDoscope
                         }
                     });
                 }
-                return showDevicePlugin;
+                return _showDevicePlugin;
             }
         }
 
@@ -419,7 +544,6 @@ namespace KaLEDoscope
             };
             DeviceTabs.Add(newTabItem);
             SelectedTabItem = newTabItem;
-
         }
 
         private UserControl GetAggregationGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
@@ -456,7 +580,7 @@ namespace KaLEDoscope
             {
                 Width = new GridLength(1, GridUnitType.Star)
             });
-            int column = 1;
+            var column = 1;
             foreach (var node in aggregationNode.Nodes)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition
@@ -520,7 +644,6 @@ namespace KaLEDoscope
             return $"{aggregationNode.Name}";
         }
 
-
         private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems)
         {
             var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _logger);
@@ -554,27 +677,29 @@ namespace KaLEDoscope
                   _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, previewControl, customizationComtrol, menuItems));
                   _tabItem.DataContext = device;
               });
-            var control = new CustomizationControl();
-            control.DataContext = model;
+            var control = new CustomizationControl
+            {
+                DataContext = model
+            };
             control.SetPreviewControl(previewControl);
             control.SetCustomizationControl(customizationControl);
             control.AddToolbarItems(toolbarItems);
             return control;
         }
 
-        private DelegateCommand _ClearStructure;
+        private DelegateCommand _clearStructure;
         public Input.ICommand ClearStructure
         {
             get
             {
-                if (_ClearStructure.IsNull())
+                if (_clearStructure.IsNull())
                 {
-                    _ClearStructure = new DelegateCommand((o) =>
+                    _clearStructure = new DelegateCommand((o) =>
                       {
                           StructureNodes.Clear();
                       });
                 }
-                return _ClearStructure;
+                return _clearStructure;
             }
         }
 
@@ -594,9 +719,6 @@ namespace KaLEDoscope
                 return _scanDevices;
             }
         }
-
-        private DeviceNode _updatedNode;
-        private TabItem _tabItem;
 
         private void LogMessage(string Message)
         {

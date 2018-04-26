@@ -70,9 +70,6 @@
                 </MenuItem>
                 <MenuItem Header="_Структура">
                     <MenuItem Header="_Добавить элемент">
-                        <MenuItem.Icon>
-                            <Image Source="Resources\HardDisk.png"/>
-                        </MenuItem.Icon>
                         <MenuItem Header="_Аггрегатор" Command="{Binding NewAggregator}">
                             <MenuItem.Icon>
                                 <Image Source="Resources\Aggregation.png"/>
@@ -83,7 +80,11 @@
                                 <Image Source="Resources\Folder.png"/>
                             </MenuItem.Icon>
                         </MenuItem>
-                        <Separator/>
+                        <MenuItem Header="_Устройство" ItemsSource="{Binding DeviceItems}">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\HardDisk.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
                     </MenuItem>
                     <MenuItem Header="Удалить элемент" Command="{Binding RemoveNode}">
                         <MenuItem.Icon>
@@ -128,10 +129,12 @@
                       VerticalAlignment="Center" HorizontalAlignment="Stretch"></GridSplitter>
         <TreeView Grid.Row="2" Grid.RowSpan="3" x:Name="trvMenu" ItemsSource="{Binding Path=StructureNodes}" Style="{StaticResource TreeViewStyle}"
                           dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}">
+            <i:Interaction.Behaviors>
+                <self:TreeViewBehaviour SelectedItem="{Binding SelectedNode, Mode=TwoWay}"/>
+            </i:Interaction.Behaviors>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding Path=ShowDevicePlugin}"
-                                   CommandParameter="{Binding ElementName=trvMenu,Path=SelectedItem}"/>
+                    <i:InvokeCommandAction Command="{Binding Path=ShowDevicePlugin}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <TreeView.Resources>

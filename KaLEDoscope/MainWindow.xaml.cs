@@ -14,11 +14,17 @@ namespace KaLEDoscope
         public MainWindow()
         {
             InitializeComponent();
-            ILogger logger = new SeviceLog();
+            var logger = new SeviceLog();
             var viewModel = new MainViewModel(logger);
             viewModel.ShowOptions += new EventHandler(OnShowOptions);
+            viewModel.QuitApplication += new EventHandler(OnQuitApplication);
             DataContext = trvMenu.DataContext = lbLog.DataContext = viewModel;
             _infrastructure.Tabs = tabControl.Items;
+        }
+
+        private void OnQuitApplication(object sender, EventArgs e)
+        {
+            Application.Current.Shutdown();
         }
 
         private void OnShowOptions(object sender, EventArgs e)

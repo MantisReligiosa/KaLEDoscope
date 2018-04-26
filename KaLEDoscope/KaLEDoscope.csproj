@@ -124,6 +124,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="TreeViewBehaviour.cs" />
     <Compile Include="ViewModel\CustomizationViewModel.cs" />
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>

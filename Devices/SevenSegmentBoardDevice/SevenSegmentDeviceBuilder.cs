@@ -12,6 +12,7 @@ namespace SevenSegmentBoardDevice
     public class SevenSegmentDeviceBuilder : IDeviceBuilder
     {
         public string Model => "boardClock";
+        public string DisplayName => "Семисегментные часы";
 
         public Device DeserializeDevice(string text)
         {
@@ -67,7 +68,7 @@ namespace SevenSegmentBoardDevice
                     ServerAddress = string.Empty
                 }
             };
-            sevenSegmentBoard.Name = String.IsNullOrEmpty(device.Name) ? "Семисегментные часы" : device.Name;
+            sevenSegmentBoard.Name = String.IsNullOrEmpty(device.Name) ? DisplayName : device.Name;
             return sevenSegmentBoard;
         }
     }

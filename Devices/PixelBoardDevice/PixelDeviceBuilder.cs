@@ -17,6 +17,7 @@ namespace PixelBoardDevice
     public class PixelDeviceBuilder : IDeviceBuilder
     {
         public string Model => "pixelBoard";
+        public string DisplayName => "Электронное табло";
 
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
@@ -111,7 +112,7 @@ namespace PixelBoardDevice
                         Zones = new List<Zone>()
                     }
                 },
-                Name = String.IsNullOrEmpty(device.Name) ? "Электронное табло" : device.Name
+                Name = String.IsNullOrEmpty(device.Name) ? DisplayName : device.Name
             };
             return pixelBoard;
         }

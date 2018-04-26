@@ -1,8 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using Abstractions;
+using System.Collections.ObjectModel;
 
 namespace KaLEDoscope
 {
-    public abstract class NodeItem
+    public abstract class NodeItem : Notified
     {
         public virtual string Name { get; set; }
 
