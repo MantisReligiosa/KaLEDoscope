@@ -1,6 +1,8 @@
 ﻿using BaseDevice;
 using DeviceBuilding;
+using Newtonsoft.Json;
 using ServiceInterfaces;
+using SevenSegmentBoardDevice.Serialization;
 using SevenSegmentBoardDevice.UI;
 using System;
 using System.Collections.Generic;
@@ -13,11 +15,6 @@ namespace SevenSegmentBoardDevice
     {
         public string Model => "boardClock";
         public string DisplayName => "Семисегментные часы";
-
-        public Device DeserializeDevice(string text)
-        {
-            throw new NotImplementedException();
-        }
 
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
@@ -38,11 +35,6 @@ namespace SevenSegmentBoardDevice
                 }
             };
             return pack;
-        }
-
-        public string SerializeDevice(Device device)
-        {
-            throw new NotImplementedException();
         }
 
         public Device UpdateCustomSettings(Device device)
@@ -71,5 +63,21 @@ namespace SevenSegmentBoardDevice
             sevenSegmentBoard.Name = String.IsNullOrEmpty(device.Name) ? DisplayName : device.Name;
             return sevenSegmentBoard;
         }
+
+        public string SerializeDevice(Device device)
+        {
+            var serializablePixelDevice = GetSerializable(device);
+            return JsonConvert.SerializeObject(serializablePixelDevice);
+        }
+
+        public Device DeserializeDevice(string text)
+        {
+            var serializablePixelDevice = JsonConvert.DeserializeObject<SerializableSevenSegmentDevice>(text);
+            return FromSerializable(serializablePixelDevice);
+        }
+
+        public object GetSerializable(Device device) => (SerializableSevenSegmentDevice)(SevenSegmentBoard)device;
+
+        public Device FromSerializable(object serializableDevice) => (SevenSegmentBoard)(SerializableSevenSegmentDevice)serializableDevice;
     }
 }

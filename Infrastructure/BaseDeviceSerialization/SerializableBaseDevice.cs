@@ -7,11 +7,11 @@ namespace BaseDeviceSerialization
         public SerializableBaseDevice() { }
 
         public SerializableBaseDevice(Device device)
-            :this()
+            : this()
         {
-            AggregationId = device.Aggregation?.Id;
+            AggregationId = device?.AggregationId;
             Brightness = (SerializableBrightness)device.Brightness;
-            FolderId = device.Folder?.Id;
+            FolderId = device?.FolderId;
             Id = device.Id;
             Model = device.Model;
             Name = device.Name;
@@ -27,5 +27,18 @@ namespace BaseDeviceSerialization
         public string Name { get; set; }
         public SerializableNetwork Network { get; set; }
         public SerializableWorkSchedule WorkSchedule { get; set; }
+
+        public void FillBasicParameters(Device device)
+        {
+            device.AggregationId = AggregationId;
+            device.Brightness = (Brightness)Brightness;
+            device.FolderId = FolderId;
+            device.Id = Id;
+            device.Model = Model;
+            device.Name = Name;
+            device.Network = (Network)Network;
+            device.WorkSchedule = (WorkSchedule)WorkSchedule;
+        }
     }
+    
 }

@@ -77,6 +77,11 @@
     <Compile Include="Commands\DirectConnectStopResetTimer.cs" />
     <Compile Include="Commands\DTO\SevenSegmentBoardDeviceRequest.cs" />
     <Compile Include="DomainObjects\Alarm.cs" />
+    <Compile Include="Serialization\SerializableAlarm.cs" />
+    <Compile Include="Serialization\SerializableBoardType.cs" />
+    <Compile Include="Serialization\SerializableSevenSegmentDevice.cs" />
+    <Compile Include="Serialization\SerializableStopWatchParameters.cs" />
+    <Compile Include="Serialization\SerializableTimeSyncParameters.cs" />
     <Compile Include="SevenSegmentDeviceBuilder.cs" />
     <Compile Include="DomainObjects\SevenSegmentBoard.cs" />
     <Compile Include="DomainObjects\BoardType.cs" />
@@ -114,6 +119,10 @@
     <ProjectReference Include="..\..\Domain\Extensions\Extensions.csproj">
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
       <Name>Extensions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\BaseDeviceSerialization\BaseDeviceSerialization.csproj">
+      <Project>{802F2818-55B8-43E0-80E8-A72FB8E15054}</Project>
+      <Name>BaseDeviceSerialization</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\Resources\Resources.csproj">
       <Project>{d00400bb-008f-4d07-90f8-5cefb1ffc585}</Project>

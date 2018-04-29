@@ -23,5 +23,18 @@ namespace PixelBoardDevice.Serialization
                 Source = font.Source
             };
         }
+
+        public static explicit operator BinaryFont(SerializableFont font)
+        {
+            return new BinaryFont
+            {
+                Base64Bitmap = font.Base64Bitmap,
+                Bold = font.Bold,
+                Height = font.Height,
+                Id = font.Id,
+                Italic = font.Italic,
+                Source = font.Source
+            };
+        }
     }
 }

@@ -15,5 +15,14 @@ namespace PixelBoardDevice.Serialization
                 Width = boardSize.Width
             };
         }
+
+        public static explicit operator BoardSize(SerializableBoardSize serializableBoardSize)
+        {
+            return new BoardSize
+            {
+                Height = serializableBoardSize.Height,
+                Width = serializableBoardSize.Width
+            };
+        }
     }
 }

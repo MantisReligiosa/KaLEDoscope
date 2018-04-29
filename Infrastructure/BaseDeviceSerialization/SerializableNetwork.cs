@@ -23,5 +23,18 @@ namespace BaseDeviceSerialization
                 SubnetMask = network.SubnetMask
             };
         }
+
+        public static explicit operator Network(SerializableNetwork serializableNetwork)
+        {
+            return new Network
+            {
+                AlternativeDnsServer = serializableNetwork.AlternativeDnsServer,
+                DnsServer = serializableNetwork.DnsServer,
+                Gateway = serializableNetwork.Gateway,
+                IpAddress = serializableNetwork.IpAddress,
+                Port = serializableNetwork.Port,
+                SubnetMask = serializableNetwork.SubnetMask
+            };
+        }
     }
 }

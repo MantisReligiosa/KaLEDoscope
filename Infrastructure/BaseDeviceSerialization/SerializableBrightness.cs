@@ -20,6 +20,16 @@ namespace BaseDeviceSerialization
                 Mode = (int)brightness.Mode
             };
         }
+
+        public static explicit operator Brightness(SerializableBrightness serializableBrightness)
+        {
+            return new Brightness
+            {
+                BrightnessPeriods = serializableBrightness.BrightnessPeriods.Select(p => (BrightnessPeriod)p).ToList(),
+                ManualValue = serializableBrightness.ManualValue,
+                Mode = (Mode)serializableBrightness.Mode
+            };
+        }
     }
 
     public class SerializableBrightnessPeriod
@@ -35,6 +45,16 @@ namespace BaseDeviceSerialization
                 From = period.From,
                 To = period.To,
                 Value = period.Value
+            };
+        }
+
+        public static explicit operator BrightnessPeriod(SerializableBrightnessPeriod serializableBrightnessPeriod)
+        {
+            return new BrightnessPeriod
+            {
+                From = serializableBrightnessPeriod.From,
+                To = serializableBrightnessPeriod.To,
+                Value = serializableBrightnessPeriod.Value
             };
         }
     }

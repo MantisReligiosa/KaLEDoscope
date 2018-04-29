@@ -1,4 +1,5 @@
 ﻿using PixelBoardDevice.DomainObjects;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PixelBoardDevice.Serialization
@@ -9,7 +10,7 @@ namespace PixelBoardDevice.Serialization
         public string Name { get; set; }
         public int Order { get; set; }
         public int Period { get; set; }
-        public object Zones { get; set; }
+        public List<SeriazableZone> Zones { get; set; }
 
         public static explicit operator SerializableProgram(Program program)
         {
@@ -20,6 +21,18 @@ namespace PixelBoardDevice.Serialization
                 Order = program.Order,
                 Period = program.Period,
                 Zones = program.Zones.Select(z => (SeriazableZone)z).ToList()
+            };
+        }
+
+        public static explicit operator Program(SerializableProgram serializableProgram)
+        {
+            return new Program
+            {
+                Id = serializableProgram.Id,
+                Name = serializableProgram.Name,
+                Order = serializableProgram.Order,
+                Period = serializableProgram.Period,
+                Zones = serializableProgram.Zones.Select(z => (Zone)z).ToList()
             };
         }
     }

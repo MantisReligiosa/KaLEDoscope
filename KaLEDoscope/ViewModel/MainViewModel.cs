@@ -114,7 +114,7 @@ namespace KaLEDoscope
                     Id = id++,
                     Model = builder.Model,
                     IsStandaloneConfiguration = true,
-                    Folder = folder,
+                    FolderId = folder.Id,
                 });
                 folderNode.AddChildNode(new DeviceNode
                 {
@@ -130,7 +130,7 @@ namespace KaLEDoscope
                     Id = id++,
                     Model = builder.Model,
                     IsStandaloneConfiguration = true,
-                    Aggregation = aggregation
+                    AggregationId = aggregation.Id
                 });
                 aggregationNode.AddChildNode(new DeviceNode
                 {
@@ -744,8 +744,8 @@ namespace KaLEDoscope
         public void Drop(IDropInfo dropInfo)
         {
             var deviceNode = dropInfo.Data as DeviceNode;
-            deviceNode.Device.Aggregation = null;
-            deviceNode.Device.Folder = null;
+            deviceNode.Device.AggregationId = null;
+            deviceNode.Device.FolderId = null;
             var parentNode = deviceNode.Parent;
             if (parentNode.IsNull())
             {
@@ -766,7 +766,7 @@ namespace KaLEDoscope
             deviceNode.Parent = targetNode;
             if (targetNode is AggregationNode aggregationNode)
             {
-                deviceNode.Device.Aggregation = aggregationNode.Aggregation;
+                deviceNode.Device.AggregationId = aggregationNode.Aggregation.Id;
                 if (DeviceTabs.Any(t => t.DataContext == aggregationNode))
                 {
                     ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
@@ -774,7 +774,7 @@ namespace KaLEDoscope
             }
             if (targetNode is FolderNode folderNode)
             {
-                deviceNode.Device.Folder = folderNode.Folder;
+                deviceNode.Device.FolderId = folderNode.Folder.Id;
             }
         }
     }

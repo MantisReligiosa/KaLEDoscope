@@ -1,4 +1,5 @@
-﻿using BaseDeviceSerialization;
+﻿using BaseDevice;
+using BaseDeviceSerialization;
 using PixelBoardDevice.DomainObjects;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,17 @@ namespace PixelBoardDevice.Serialization
         public static explicit operator SerializablePixelDevice(PixelBoard device)
         {
             return new SerializablePixelDevice(device);
+        }
+
+        public static explicit operator PixelBoard(SerializablePixelDevice serializableDevice)
+        {
+            var pixelBoard = new PixelBoard();
+            serializableDevice.FillBasicParameters(pixelBoard);
+            pixelBoard.Alphabet = serializableDevice.Alphabet;
+            pixelBoard.BoardSize = (BoardSize)serializableDevice.BoardSize;
+            pixelBoard.Fonts = serializableDevice.Fonts.Select(f => (BinaryFont)f).ToList();
+            pixelBoard.Programs = serializableDevice.Programs.Select(p => (Program)p).ToList();
+            return pixelBoard;
         }
     }
 }

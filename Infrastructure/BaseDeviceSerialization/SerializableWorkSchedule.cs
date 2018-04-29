@@ -34,5 +34,23 @@ namespace BaseDeviceSerialization
                 StartFrom = workSchedule.StartFrom
             };
         }
+
+        public static explicit operator WorkSchedule(SerializableWorkSchedule serializableWorkSchedule)
+        {
+            return new WorkSchedule
+            {
+                AllWeek = serializableWorkSchedule.AllWeek,
+                AroundTheClock = serializableWorkSchedule.AroundTheClock,
+                FinishTo = serializableWorkSchedule.FinishTo,
+                RunInFri = serializableWorkSchedule.RunInFri,
+                RunInMon = serializableWorkSchedule.RunInMon,
+                RunInSat = serializableWorkSchedule.RunInSat,
+                RunInSun = serializableWorkSchedule.RunInSun,
+                RunInThu = serializableWorkSchedule.RunInThu,
+                RunInTue = serializableWorkSchedule.RunInTue,
+                RunInWed = serializableWorkSchedule.RunInWed,
+                StartFrom = serializableWorkSchedule.StartFrom
+            };
+        }
     }
 }

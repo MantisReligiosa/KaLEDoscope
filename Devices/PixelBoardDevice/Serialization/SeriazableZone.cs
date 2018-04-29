@@ -40,5 +40,26 @@ namespace PixelBoardDevice.Serialization
             };
         }
 
+        public static explicit operator Zone(SeriazableZone seriazableZone)
+        {
+            return new Zone
+            {
+                BitmapBase64 = seriazableZone.BitmapBase64,
+                BitmapHeight = seriazableZone.BitmapHeight,
+                ClockFormat = seriazableZone.ClockFormat,
+                ClockType = seriazableZone.ClockType,
+                ExternalSourceTag = seriazableZone.ExternalSourceTag,
+                FontId = seriazableZone.FontId,
+                Height = seriazableZone.Height,
+                Id = seriazableZone.Id,
+                Name = seriazableZone.Name,
+                Text = seriazableZone.Text,
+                Width = seriazableZone.Width,
+                X = seriazableZone.X,
+                Y = seriazableZone.Y,
+                ZoneType = seriazableZone.ZoneType
+            };
+        }
+
     }
 }
