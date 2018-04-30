@@ -18,6 +18,9 @@ using PixelBoardDevice;
 using GongSolutions.Wpf.DragDrop;
 using Extensions;
 using System;
+using Microsoft.Win32;
+using KaLEDoscope.Serialization;
+using Newtonsoft.Json;
 
 namespace KaLEDoscope
 {
@@ -80,83 +83,6 @@ namespace KaLEDoscope
                     CommandParameter = deviceBuilder.Model
                 });
             }
-
-
-            var folder = new Folder
-            {
-                Id = 1,
-                Name = "Папка"
-            };
-            var folderNode = new FolderNode
-            {
-                Name = folder.Name,
-                Folder = folder
-            };
-
-            var aggregation = new Aggregation
-            {
-                Id = 1,
-                Name = "Агрегатор"
-            };
-            var aggregationNode = new AggregationNode
-            {
-                Name = aggregation.Name,
-                Aggregation = aggregation
-            };
-
-            StructureNodes.Add(folderNode);
-            StructureNodes.Add(aggregationNode);
-            var id = 0;
-            _deviceFactory.Builders.ForEach(builder =>
-            {
-                var device = builder.UpdateCustomSettings(new Device
-                {
-                    Id = id++,
-                    Model = builder.Model,
-                    IsStandaloneConfiguration = true,
-                    FolderId = folder.Id,
-                });
-                folderNode.AddChildNode(new DeviceNode
-                {
-                    Device = device,
-                    Name = device.Name,
-                    AllowDownload = false,
-                    AllowLoad = true,
-                    AllowSave = true,
-                    AllowUpload = false
-                });
-                device = builder.UpdateCustomSettings(new Device
-                {
-                    Id = id++,
-                    Model = builder.Model,
-                    IsStandaloneConfiguration = true,
-                    AggregationId = aggregation.Id
-                });
-                aggregationNode.AddChildNode(new DeviceNode
-                {
-                    Device = device,
-                    Name = device.Name,
-                    AllowDownload = false,
-                    AllowLoad = true,
-                    AllowSave = true,
-                    AllowUpload = false
-                });
-                device = builder.UpdateCustomSettings(new Device
-                {
-                    Id = id++,
-                    Model = builder.Model,
-                    IsStandaloneConfiguration = true
-                });
-                StructureNodes.Add(new DeviceNode
-                {
-                    Device = device,
-                    Name = device.Name,
-                    AllowDownload = false,
-                    AllowLoad = true,
-                    AllowSave = true,
-                    AllowUpload = false
-                });
-            });
         }
 
         private void MakeNodes()
@@ -447,12 +373,72 @@ namespace KaLEDoscope
 
         private void SaveExistStructure()
         {
-            throw new NotImplementedException();
+            var serializableStructure = new List<SerializableContainer>();
+            foreach (var node in StructureNodes)
+            {
+                var deviceNode = node as DeviceNode;
+                var folderNode = node as FolderNode;
+                var aggregationNode = node as AggregationNode;
+                if (!deviceNode.IsNull())
+                {
+                    serializableStructure.Add(GetDeviceSerializableContainer(deviceNode));
+                }
+                else if (!folderNode.IsNull())
+                {
+                    serializableStructure.Add(
+                        new SerializableContainer
+                        {
+                            ContentType = ContentType.Folder,
+                            Content = (SerializableFolder)folderNode.Folder
+                        });
+                    foreach (var deviceSubNode in folderNode.Nodes)
+                    {
+                        serializableStructure.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
+                    }
+                }
+                else if (!aggregationNode.IsNull())
+                {
+                    serializableStructure.Add(
+                        new SerializableContainer
+                        {
+                            ContentType = ContentType.Aggregator,
+                            Content = (SerializableAggregation)aggregationNode.Aggregation
+                        });
+                    foreach (var deviceSubNode in aggregationNode.Nodes)
+                    {
+                        serializableStructure.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
+                    }
+                }
+            }
+            var serialized = JsonConvert.SerializeObject(serializableStructure);
+            System.IO.File.WriteAllText(StructureFileName, serialized);
+
+        }
+
+        private SerializableContainer GetDeviceSerializableContainer(DeviceNode node)
+        {
+            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(node.Device.Model));
+            var deviceSerializableContainer = new SerializableContainer
+            {
+                ContentType = ContentType.Device,
+                Content = deviceBuilder.GetSerializable(node.Device)
+            };
+            return deviceSerializableContainer;
         }
 
         private void SaveNewStructure()
         {
-            throw new NotImplementedException();
+            var dialog = new SaveFileDialog
+            {
+                FileName = "Структура",
+                DefaultExt = ".json",
+                Filter = "JSON configuration (.json)|*.json"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                StructureFileName = dialog.FileName;
+            }
+            SaveExistStructure();
         }
 
         private DelegateCommand _showDevicePlugin;
@@ -649,7 +635,7 @@ namespace KaLEDoscope
             var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _logger);
             model.OnNodeRenamed += ((sender, node) =>
             {
-                var tab = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == node.Device);
+                var tab = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);
                 if (!tab.IsNull())
                 {
                     ((ClosableTab)tab).Title = GetDeviceTabItemTitle(node);
