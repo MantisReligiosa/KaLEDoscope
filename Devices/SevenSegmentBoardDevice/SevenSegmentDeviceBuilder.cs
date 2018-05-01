@@ -1,6 +1,7 @@
 ﻿using BaseDevice;
 using DeviceBuilding;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ServiceInterfaces;
 using SevenSegmentBoardDevice.Serialization;
 using SevenSegmentBoardDevice.UI;
@@ -78,6 +79,17 @@ namespace SevenSegmentBoardDevice
 
         public object GetSerializable(Device device) => (SerializableSevenSegmentDevice)(SevenSegmentBoard)device;
 
-        public Device FromSerializable(object serializableDevice) => (SevenSegmentBoard)(SerializableSevenSegmentDevice)serializableDevice;
+        public Device FromSerializable(object serializableDevice)
+        {
+            if (serializableDevice is SerializableSevenSegmentDevice)
+            {
+                return (SevenSegmentBoard)(SerializableSevenSegmentDevice)serializableDevice;
+            }
+            if (serializableDevice is JObject)
+            {
+                return (SevenSegmentBoard)(((JObject)serializableDevice).ToObject<SerializableSevenSegmentDevice>());
+            }
+            return null;
+        }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Logger;
-using ServiceInterfaces;
+﻿using Compression;
+using Logger;
 using System;
 using System.Windows;
 
@@ -15,7 +15,8 @@ namespace KaLEDoscope
         {
             InitializeComponent();
             var logger = new SeviceLog();
-            var viewModel = new MainViewModel(logger);
+            var compressor = new Compressor();
+            var viewModel = new MainViewModel(logger, compressor);
             viewModel.ShowOptions += new EventHandler(OnShowOptions);
             viewModel.QuitApplication += new EventHandler(OnQuitApplication);
             DataContext = trvMenu.DataContext = lbLog.DataContext = viewModel;

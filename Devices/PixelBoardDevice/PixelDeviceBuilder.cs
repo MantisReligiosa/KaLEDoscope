@@ -10,6 +10,7 @@ using PixelBoardDevice.Serialization;
 using Newtonsoft.Json;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Newtonsoft.Json.Linq;
 
 namespace PixelBoardDevice
 {
@@ -130,6 +131,17 @@ namespace PixelBoardDevice
 
         public object GetSerializable(Device device) => (SerializablePixelDevice)(PixelBoard)device;
 
-        public Device FromSerializable(object serializableDevice) => (PixelBoard)(SerializablePixelDevice)serializableDevice;
+        public Device FromSerializable(object serializableDevice)
+        {
+            if (serializableDevice is SerializablePixelDevice)
+            {
+                return (PixelBoard)(SerializablePixelDevice)serializableDevice;
+            }
+            if (serializableDevice is JObject)
+            {
+                return (PixelBoard)(((JObject)serializableDevice).ToObject<SerializablePixelDevice>());
+            }
+            return null;
+        }
     }
 }

@@ -10,7 +10,7 @@
             <RowDefinition Height="100"/>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="1*" MinHeight="100"/>
         </Grid.RowDefinitions>
         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
         <ToolBar x:Name="toolbar" Grid.Row="2" Height="27">

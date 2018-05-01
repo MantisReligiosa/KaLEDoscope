@@ -235,6 +235,14 @@
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
       <Name>Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\BaseDeviceSerialization\BaseDeviceSerialization.csproj">
+      <Project>{802F2818-55B8-43E0-80E8-A72FB8E15054}</Project>
+      <Name>BaseDeviceSerialization</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\Compression\Compression.csproj">
+      <Project>{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}</Project>
+      <Name>Compression</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Logger\Logger.csproj">
       <Project>{F5C748BA-65E1-430D-8385-CFD198FE850E}</Project>
       <Name>Logger</Name>

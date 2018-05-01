@@ -21,12 +21,15 @@ using System;
 using Microsoft.Win32;
 using KaLEDoscope.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using BaseDeviceSerialization;
 
 namespace KaLEDoscope
 {
     public class MainViewModel : Notified, IDropTarget
     {
         private ILogger _logger { get; set; }
+        private ICompressor _compressor { get; set; }
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
@@ -60,9 +63,10 @@ namespace KaLEDoscope
             }
         }
 
-        public MainViewModel(ILogger logger)
+        public MainViewModel(ILogger logger, ICompressor compressor)
         {
             _logger = logger;
+            _compressor = compressor;
             _logger.InfoRaised += (sender, message) => LogMessage($"{sender}: Info: {message}");
             _logger.DebugRaised += (sender, message) => LogMessage($"{sender}: Debug: {message}");
             _logger.WarnRaised += (sender, message) => LogMessage($"{sender}: Warn: {message}");
@@ -224,22 +228,6 @@ namespace KaLEDoscope
             }
         }
 
-        private DelegateCommand _openStructure;
-        public Input.ICommand OpenStructure
-        {
-            get
-            {
-                if (_openStructure.IsNull())
-                {
-                    _openStructure = new DelegateCommand((o) =>
-                    {
-                        throw new NotImplementedException();
-                    });
-                }
-                return _openStructure;
-            }
-        }
-
         private DelegateCommand _removeNode;
         public Input.ICommand RemoveNode
         {
@@ -371,9 +359,102 @@ namespace KaLEDoscope
             }
         }
 
+        private DelegateCommand _openStructure;
+        public Input.ICommand OpenStructure
+        {
+            get
+            {
+                if (_openStructure.IsNull())
+                {
+                    _openStructure = new DelegateCommand((o) =>
+                    {
+                        var dialog = new OpenFileDialog
+                        {
+                            DefaultExt = ".json",
+                            Filter = "JSON configuration (.json)|*.json"
+                        };
+                        if (dialog.ShowDialog() != true)
+                            return;
+                        DeviceTabs.Clear();
+                        StructureNodes.Clear();
+                        StructureFileName = dialog.FileName;
+                        var text = System.IO.File.ReadAllText(StructureFileName);
+                        var serializableContainers = JsonConvert.DeserializeObject<List<SerializableContainer>>(text);
+                        foreach (var serializableContainer in serializableContainers)
+                        {
+                            if (serializableContainer.ContentType == ContentType.Folder)
+                            {
+                                var serializableFolder = (serializableContainer.Content as JObject)
+                                    .ToObject<SerializableFolder>();
+                                StructureNodes.Add(new FolderNode
+                                {
+                                    Folder = new Folder
+                                    {
+                                        Id = serializableFolder.Id,
+                                        Name = serializableFolder.Name
+                                    },
+                                    Name = serializableFolder.Name
+                                });
+                            }
+                            if (serializableContainer.ContentType == ContentType.Aggregator)
+                            {
+                                var serializableAggregation = (serializableContainer.Content as JObject)
+                                    .ToObject<SerializableAggregation>();
+                                StructureNodes.Add(new AggregationNode
+                                {
+                                    Aggregation = new Aggregation
+                                    {
+                                        Id = serializableAggregation.Id,
+                                        Name = serializableAggregation.Name
+                                    },
+                                    Name = serializableAggregation.Name
+                                });
+                            }
+                            if (serializableContainer.ContentType == ContentType.Device)
+                            {
+                                var baseDevice = (serializableContainer.Content as JObject)
+                                    .ToObject<SerializableBaseDevice>();
+                                var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(baseDevice.Model));
+                                var device = deviceBuilder.FromSerializable(serializableContainer.Content);
+                                var deviceNode = new DeviceNode
+                                {
+                                    Device = device,
+                                    Name = device.Name,
+                                    AllowDownload = false,
+                                    AllowLoad = true,
+                                    AllowSave = true,
+                                    AllowUpload = false,
+                                };
+                                if (device.AggregationId.HasValue)
+                                {
+                                    var aggregationNode = StructureNodes.OfType<AggregationNode>()
+                                        .FirstOrDefault(n => n.Aggregation.Id == device.AggregationId);
+                                    deviceNode.Parent = aggregationNode;
+                                    aggregationNode.Nodes.Add(deviceNode);
+                                }
+                                else if (device.FolderId.HasValue)
+                                {
+                                    var folderNode = StructureNodes.OfType<FolderNode>()
+                                        .FirstOrDefault(n => n.Folder.Id == device.FolderId);
+                                    deviceNode.Parent = folderNode;
+                                    folderNode.Nodes.Add(deviceNode);
+                                }
+                                else
+                                {
+                                    StructureNodes.Add(deviceNode);
+                                }
+                            }
+                        }
+                    });
+                }
+                return _openStructure;
+            }
+        }
+
         private void SaveExistStructure()
         {
-            var serializableStructure = new List<SerializableContainer>();
+#warning Применить компрессию
+            var serializableContainers = new List<SerializableContainer>();
             foreach (var node in StructureNodes)
             {
                 var deviceNode = node as DeviceNode;
@@ -381,11 +462,11 @@ namespace KaLEDoscope
                 var aggregationNode = node as AggregationNode;
                 if (!deviceNode.IsNull())
                 {
-                    serializableStructure.Add(GetDeviceSerializableContainer(deviceNode));
+                    serializableContainers.Add(GetDeviceSerializableContainer(deviceNode));
                 }
                 else if (!folderNode.IsNull())
                 {
-                    serializableStructure.Add(
+                    serializableContainers.Add(
                         new SerializableContainer
                         {
                             ContentType = ContentType.Folder,
@@ -393,12 +474,12 @@ namespace KaLEDoscope
                         });
                     foreach (var deviceSubNode in folderNode.Nodes)
                     {
-                        serializableStructure.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
+                        serializableContainers.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
                     }
                 }
                 else if (!aggregationNode.IsNull())
                 {
-                    serializableStructure.Add(
+                    serializableContainers.Add(
                         new SerializableContainer
                         {
                             ContentType = ContentType.Aggregator,
@@ -406,13 +487,12 @@ namespace KaLEDoscope
                         });
                     foreach (var deviceSubNode in aggregationNode.Nodes)
                     {
-                        serializableStructure.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
+                        serializableContainers.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
                     }
                 }
             }
-            var serialized = JsonConvert.SerializeObject(serializableStructure);
+            var serialized = JsonConvert.SerializeObject(serializableContainers);
             System.IO.File.WriteAllText(StructureFileName, serialized);
-
         }
 
         private SerializableContainer GetDeviceSerializableContainer(DeviceNode node)
