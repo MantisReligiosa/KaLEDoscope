@@ -70,7 +70,10 @@
                 </MenuItem>
                 <MenuItem Header="_Структура">
                     <MenuItem Header="_Добавить элемент">
-                        <MenuItem Header="_Аггрегатор" Command="{Binding NewAggregator}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\edit_add.png"/>
+                        </MenuItem.Icon>
+                        <MenuItem Header="_Агрегатор" Command="{Binding NewAggregator}">
                             <MenuItem.Icon>
                                 <Image Source="Resources\Aggregation.png"/>
                             </MenuItem.Icon>
@@ -86,12 +89,17 @@
                             </MenuItem.Icon>
                         </MenuItem>
                     </MenuItem>
+                    <MenuItem Header="Переименовать элемент" Command="{Binding RenameNode}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\edit_small.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
                     <MenuItem Header="Удалить элемент" Command="{Binding RemoveNode}">
                         <MenuItem.Icon>
                             <Image Source="Resources\trashBin.png"/>
                         </MenuItem.Icon>
                     </MenuItem>
-                    <MenuItem Header="Сканировать" InputGestureText="F5" Command="{Binding ScanDevices}">
+                    <MenuItem Header="Сканировать" InputGestureText="F5" Command="{Binding ScanDevices}" IsEnabled="{Binding IsScanEnabled}">
                         <MenuItem.Icon>
                             <Image Source="Resources\Search.png"/>
                         </MenuItem.Icon>
@@ -118,7 +126,39 @@
                     <Image Source="Resources\Save.png"/>
                 </Button>
                 <Separator/>
-                <Button Command="{Binding ScanDevices}" VerticalAlignment="Bottom">
+                <Button>
+                    <i:Interaction.Behaviors>
+                        <self:DropDownButtonBehavior/>
+                    </i:Interaction.Behaviors>
+                    <Image Source="Resources\edit_add.png"/>
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="_Агрегатор" Command="{Binding NewAggregator}">
+                                <MenuItem.Icon>
+                                    <Image Source="Resources\Aggregation.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="_Папку" Command="{Binding NewFolder}">
+                                <MenuItem.Icon>
+                                    <Image Source="Resources\Folder.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="_Устройство" ItemsSource="{Binding DeviceItems}">
+                                <MenuItem.Icon>
+                                    <Image Source="Resources\HardDisk.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+                <Button Command="{Binding RenameNode}">
+                    <Image Source="Resources\edit_small.png"/>
+                </Button>
+                <Button Command="{Binding RemoveNode}">
+                    <Image Source="Resources\trashBin.png"/>
+                </Button>
+                <Separator/>
+                <Button Command="{Binding ScanDevices}" VerticalAlignment="Bottom" IsEnabled="{Binding IsScanEnabled}">
                     <Image Source="Resources\Search.png"/>
                 </Button>
             </ToolBar.Items>

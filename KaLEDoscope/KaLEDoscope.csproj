@@ -122,6 +122,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ApplicationInfrastructure.cs" />
+    <Compile Include="DropDownButtonBehavior.cs" />
     <Compile Include="Models\AggregationNode.cs" />
     <Compile Include="Models\DeviceNode.cs" />
     <Compile Include="Models\FolderNode.cs" />
@@ -320,6 +321,15 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Aggregation.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit_small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\edit_add.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.2.4.4\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.4\build\Fody.targets')" />

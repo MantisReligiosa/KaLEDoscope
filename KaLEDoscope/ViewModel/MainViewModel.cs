@@ -138,6 +138,24 @@ namespace KaLEDoscope
             }
         }
 
+        private DelegateCommand _renameNode;
+        public Input.ICommand RenameNode
+        {
+            get
+            {
+                if (_renameNode.IsNull())
+                {
+                    _renameNode = new DelegateCommand((o) =>
+                    {
+                        if (SelectedNode.IsNull())
+                            return;
+#warning Дописать!!!!
+                    });
+                }
+                return _renameNode;
+            }
+        }
+
         private DelegateCommand _quit;
         public Input.ICommand Quit
         {
@@ -307,7 +325,7 @@ namespace KaLEDoscope
                             maxId = aggregatorNodes.Max(n => n.Aggregation.Id);
                         }
                         var id = maxId + 1;
-                        var name = $"Аггрегатор{id}";
+                        var name = $"Агрегатор{id}";
                         var newAggregator = new AggregationNode
                         {
                             Name = name,
