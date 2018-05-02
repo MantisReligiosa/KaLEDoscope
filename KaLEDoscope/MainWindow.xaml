@@ -89,7 +89,7 @@
                             </MenuItem.Icon>
                         </MenuItem>
                     </MenuItem>
-                    <MenuItem Header="Переименовать элемент" Command="{Binding RenameNode}">
+                    <MenuItem Header="Редактировать элемент" Command="{Binding EditNode}">
                         <MenuItem.Icon>
                             <Image Source="Resources\edit_small.png"/>
                         </MenuItem.Icon>
@@ -151,7 +151,7 @@
                         </ContextMenu>
                     </Button.ContextMenu>
                 </Button>
-                <Button Command="{Binding RenameNode}">
+                <Button Command="{Binding EditNode}">
                     <Image Source="Resources\edit_small.png"/>
                 </Button>
                 <Button Command="{Binding RemoveNode}">

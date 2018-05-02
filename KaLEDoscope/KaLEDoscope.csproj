@@ -138,6 +138,7 @@
     <Compile Include="Serialization\SerializableFolder.cs" />
     <Compile Include="TreeViewBehaviour.cs" />
     <Compile Include="ViewModel\CustomizationViewModel.cs" />
+    <Compile Include="ViewModel\RenameDialogViewModel.cs" />
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>
     </Compile>
@@ -153,6 +154,9 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="Views\CustomizationControl.xaml.cs">
       <DependentUpon>CustomizationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RenameDialog.xaml.cs">
+      <DependentUpon>RenameDialog.xaml</DependentUpon>
     </Compile>
     <Page Include="Views\BaseDeviceControl.xaml">
       <SubType>Designer</SubType>
@@ -179,6 +183,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\CustomizationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RenameDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

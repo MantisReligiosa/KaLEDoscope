@@ -138,21 +138,41 @@ namespace KaLEDoscope
             }
         }
 
-        private DelegateCommand _renameNode;
-        public Input.ICommand RenameNode
+        private DelegateCommand _editNode;
+        public Input.ICommand EditNode
         {
             get
             {
-                if (_renameNode.IsNull())
+                if (_editNode.IsNull())
                 {
-                    _renameNode = new DelegateCommand((o) =>
+                    _editNode = new DelegateCommand((o) =>
                     {
                         if (SelectedNode.IsNull())
                             return;
-#warning Дописать!!!!
+                        var renameDialog = new RenameDialog();
+                        if (!(SelectedNode as FolderNode).IsNull())
+                        {
+                            var folderNode = SelectedNode as FolderNode;
+                            renameDialog.NameField = folderNode.Name;
+                            if (renameDialog.ShowDialog()==true)
+                            {
+                                folderNode.Name = renameDialog.NameField;
+                                folderNode.Folder.Name = renameDialog.NameField;
+                            }
+                        }
+                        else if (!(SelectedNode as AggregationNode).IsNull())
+                        {
+                            var aggregationNode = SelectedNode as AggregationNode;
+                            renameDialog.NameField = aggregationNode.Name;
+                            if (renameDialog.ShowDialog() == true)
+                            {
+                                aggregationNode.Name = renameDialog.NameField;
+                                aggregationNode.Aggregation.Name = renameDialog.NameField;
+                            }
+                        }
                     });
                 }
-                return _renameNode;
+                return _editNode;
             }
         }
 
@@ -697,11 +717,20 @@ namespace KaLEDoscope
                 devicePreview.VerticalAlignment = VerticalAlignment.Stretch;
                 if (selectedDeviceNode == node)
                 {
-                    devicePreview.BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0));
-                    devicePreview.BorderThickness = new Thickness(2);
+                    var controlWrapper = new UserControl
+                    {
+                        BorderBrush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 255, 0)),
+                        BorderThickness = new Thickness(2),
+                        Content = devicePreview
+                    };
+                    grid.Children.Add(controlWrapper);
+                    Grid.SetColumn(controlWrapper, column++);
                 }
-                grid.Children.Add(devicePreview);
-                Grid.SetColumn(devicePreview, column++);
+                else
+                {
+                    grid.Children.Add(devicePreview);
+                    Grid.SetColumn(devicePreview, column++);
+                }
             }
             grid.ColumnDefinitions.Add(new ColumnDefinition
             {
@@ -747,7 +776,7 @@ namespace KaLEDoscope
             model.BeforeGettingSettings += ((sender, node) =>
             {
                 _updatedNode = node;
-                _tabItem = DeviceTabs.FirstOrDefault(t => (Device)t.DataContext == node.Device);
+                _tabItem = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);
             });
             model.AfterGetingSettings += ((sender, device) =>
               {
