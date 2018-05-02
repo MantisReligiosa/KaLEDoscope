@@ -36,6 +36,10 @@ namespace KaLEDoscope
         private DeviceNode _updatedNode;
         private TabItem _tabItem;
 
+        private const string _defaultStructureFileName = "Структура";
+        private const string _defaultStructureFileExtension = ".struct";
+        private const string _defaultStructureFilter = "Structure file (.struct)|*.struct|All files (*.*)|*.*";
+
 
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
@@ -370,15 +374,16 @@ namespace KaLEDoscope
                     {
                         var dialog = new OpenFileDialog
                         {
-                            DefaultExt = ".json",
-                            Filter = "JSON configuration (.json)|*.json"
+                            DefaultExt = _defaultStructureFileExtension,
+                            Filter = _defaultStructureFilter
                         };
                         if (dialog.ShowDialog() != true)
                             return;
                         DeviceTabs.Clear();
                         StructureNodes.Clear();
                         StructureFileName = dialog.FileName;
-                        var text = System.IO.File.ReadAllText(StructureFileName);
+                        var bytes = System.IO.File.ReadAllBytes(StructureFileName);
+                        var text = _compressor.Unzip(bytes);
                         var serializableContainers = JsonConvert.DeserializeObject<List<SerializableContainer>>(text);
                         foreach (var serializableContainer in serializableContainers)
                         {
@@ -453,7 +458,6 @@ namespace KaLEDoscope
 
         private void SaveExistStructure()
         {
-#warning Применить компрессию
             var serializableContainers = new List<SerializableContainer>();
             foreach (var node in StructureNodes)
             {
@@ -492,7 +496,8 @@ namespace KaLEDoscope
                 }
             }
             var serialized = JsonConvert.SerializeObject(serializableContainers);
-            System.IO.File.WriteAllText(StructureFileName, serialized);
+            var datas = _compressor.Zip(serialized);
+            System.IO.File.WriteAllBytes(StructureFileName, datas);
         }
 
         private SerializableContainer GetDeviceSerializableContainer(DeviceNode node)
@@ -510,9 +515,9 @@ namespace KaLEDoscope
         {
             var dialog = new SaveFileDialog
             {
-                FileName = "Структура",
-                DefaultExt = ".json",
-                Filter = "JSON configuration (.json)|*.json"
+                FileName = _defaultStructureFileName,
+                DefaultExt = _defaultStructureFileExtension,
+                Filter = _defaultStructureFilter
             };
             if (dialog.ShowDialog() == true)
             {
@@ -712,7 +717,7 @@ namespace KaLEDoscope
 
         private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems)
         {
-            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _logger);
+            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _logger);
             model.OnNodeRenamed += ((sender, node) =>
             {
                 var tab = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);

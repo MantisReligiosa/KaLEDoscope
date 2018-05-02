@@ -22,17 +22,26 @@ namespace KaLEDoscope.ViewModel
         private readonly ILogger _logger;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
+        private readonly ICompressor _compressor;
+        private const string _defaultStructureFileExtension = ".device";
+        private const string _defaultStructureFilter = "Device file (.device)|*.device|All files (*.*)|*.*";
 
         public event EventHandler<DeviceNode> OnNodeRenamed;
         public event EventHandler<DeviceNode> BeforeGettingSettings;
         public event EventHandler<Device> AfterGetingSettings;
 
-        public CustomizationViewModel(DeviceNode deviceNode, DeviceFactory deviceFactory, Invoker invoker, ILogger logger)
+        public CustomizationViewModel(
+            DeviceNode deviceNode, 
+            DeviceFactory deviceFactory, 
+            Invoker invoker, 
+            ICompressor compressor, 
+            ILogger logger)
         {
             DeviceNode = deviceNode;
             _logger = logger;
             _deviceFactory = deviceFactory;
             _invoker = invoker;
+            _compressor = compressor;
         }
 
         private DelegateCommand _commonSettings;
@@ -108,14 +117,15 @@ namespace KaLEDoscope.ViewModel
                         var dialog = new SaveFileDialog
                         {
                             FileName = d.Device.Name,
-                            DefaultExt = ".json",
-                            Filter = "JSON configuration (.json)|*.json"
+                            DefaultExt = _defaultStructureFileExtension,
+                            Filter = _defaultStructureFilter
                         };
                         if (dialog.ShowDialog() == true)
                         {
                             var fileName = dialog.FileName;
                             var serialized = _deviceFactory.SerializeDevice(d.Device);
-                            System.IO.File.WriteAllText(fileName, serialized);
+                            var bytes = _compressor.Zip(serialized);
+                            System.IO.File.WriteAllBytes(fileName, bytes);
                         }
                     });
                 }
@@ -136,13 +146,14 @@ namespace KaLEDoscope.ViewModel
                         d.AllowUpload = true;
                         var dialog = new OpenFileDialog
                         {
-                            DefaultExt = ".json",
-                            Filter = "JSON configuration (.json)|*.json"
+                            DefaultExt = _defaultStructureFileExtension,
+                            Filter = _defaultStructureFilter
                         };
                         if (dialog.ShowDialog() == true)
                         {
                             var fileName = dialog.FileName;
-                            var text = System.IO.File.ReadAllText(fileName);
+                            var bytes = System.IO.File.ReadAllBytes(fileName);
+                            var text = _compressor.Unzip(bytes);
                             d.Device = _deviceFactory.DeserializeDevice(text);
                             AfterGetingSettings?.Invoke(this, d.Device);
                         }
