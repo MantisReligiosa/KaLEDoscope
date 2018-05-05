@@ -1,4 +1,5 @@
 ﻿using Extensions;
+using System;
 using System.Linq;
 
 namespace PixelBoardDevice.DomainObjects
@@ -28,6 +29,10 @@ namespace PixelBoardDevice.DomainObjects
         public string BitmapBase64 { get; internal set; }
         public int ClockType { get; set; }
         public int ClockFormat { get; internal set; }
+        public bool AllowPeriodicTimeSync { get; set; }
+        public bool AllowScheduledSync { get; set; }
+        public int PeriodicSyncInterval { get; set; }
+        public TimeSpan ScheduledTimeSync { get; set; }
 
         public bool IntersectWith(Zone z)
         {

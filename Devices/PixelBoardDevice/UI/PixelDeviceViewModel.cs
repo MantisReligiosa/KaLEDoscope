@@ -69,8 +69,9 @@ namespace PixelBoardDevice.UI
                 AllowAnimation = false,
                 AllowBitmap = false,
                 AllowFont = true,
-                AllowText = false,
+                AllowText = true,
                 AllowMQTT = true,
+                AllowTextEditing=false,
                 AllowClock = false,
                 ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.MQTT,
                 Customize = () => new Zone{
@@ -194,6 +195,7 @@ namespace PixelBoardDevice.UI
             AllowFont = false;
             AllowExternalTag(false);
             AllowText(false);
+            AllowClock(false);
         }
 
         private void ValidateAndInvokePreview()
@@ -256,6 +258,83 @@ namespace PixelBoardDevice.UI
                     deviceZone.Y = value;
                 }
                 OnPropertyChanged(nameof(ZoneTop));
+            }
+        }
+
+        private bool? _allowPeriodicSync;
+        public bool? AllowPeriodicSync
+        {
+            get => _allowPeriodicSync;
+            set
+            {
+                if (_allowPeriodicSync == value)
+                    return;
+                _allowPeriodicSync = value;
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                if (!deviceZone.IsNull())
+                {
+                    deviceZone.AllowPeriodicTimeSync = value.Value;
+                }
+                OnPropertyChanged(nameof(AllowPeriodicSync));
+                AllowScheduledSync = !value.Value;
+            }
+        }
+
+        private int _PeriodSyncInterval;
+        public int PeriodicSyncInterval
+        {
+            get => _PeriodSyncInterval;
+            set
+            {
+                _PeriodSyncInterval = value;
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                if (!deviceZone.IsNull())
+                {
+                    deviceZone.PeriodicSyncInterval = value;
+                }
+                OnPropertyChanged(nameof(PeriodicSyncInterval));
+            }
+        }
+
+        private bool? _allowScheduledSync;
+        public bool? AllowScheduledSync
+        {
+            get => _allowScheduledSync;
+            set
+            {
+                if (_allowScheduledSync == value)
+                    return;
+                _allowScheduledSync = value;
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                if (!deviceZone.IsNull())
+                {
+                    deviceZone.AllowScheduledSync = value.Value;
+                }
+                OnPropertyChanged(nameof(AllowScheduledSync));
+                AllowPeriodicSync = !value.Value;
+            }
+        }
+
+        private string _scheduledTimeSync;
+        public string ScheduledTimeSync
+        {
+            get
+            {
+                return _scheduledTimeSync;
+            }
+            set
+            {
+                if (!TimeSpan.TryParse(value, out TimeSpan timeSpan))
+                {
+                    timeSpan = new TimeSpan(0, 0, 0);
+                }
+                _scheduledTimeSync = timeSpan.ToString(@"hh\:mm");
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                if (!deviceZone.IsNull())
+                {
+                    deviceZone.ScheduledTimeSync = timeSpan;
+                }
+                OnPropertyChanged(nameof(ScheduledTimeSync));
             }
         }
 
@@ -347,13 +426,36 @@ namespace PixelBoardDevice.UI
             return Device?.Programs?.FirstOrDefault(s => s.Id == programId)?.Zones?.FirstOrDefault(z => z.Id == zoneId);
         }
 
+        private string _selectedFontSizeStr;
+        public string SelectedFontSizeStr
+        {
+            get
+            {
+                return _selectedFontSizeStr;
+            }
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(_selectedFontSizeStr) && _selectedFontSizeStr.Equals(value))
+                    return;
+                if (int.TryParse(value, out int fontSize))
+                {
+                    _selectedFontSizeStr = value;
+                    SelectedFontSize = fontSize;
+                    OnPropertyChanged(nameof(SelectedFontSizeStr));
+                }
+            }
+        }
+
         private int _selectedFontSize;
         public int SelectedFontSize
         {
             get => _selectedFontSize;
             set
             {
+                if (_selectedFontSize == value)
+                    return;
                 _selectedFontSize = value;
+                SelectedFontSizeStr = value.ToString();
                 if (!SelectedFont.IsNull() && _selectedFontSize != 0)
                 {
                     UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, value, IsItalic, IsBold);
@@ -536,10 +638,14 @@ namespace PixelBoardDevice.UI
                     {
                         SelectedClockType = _clockTypes.FirstOrDefault(ct => ct.Id == _selectedZone.ClockType);
                         SelectedClockFormat = _clockFormats.FirstOrDefault(cf => cf.Id == _selectedZone.ClockFormat);
+                        AllowPeriodicSync = _selectedZone.AllowPeriodicTimeSync;
+                        AllowScheduledSync = _selectedZone.AllowScheduledSync;
+                        PeriodicSyncInterval = _selectedZone.PeriodicSyncInterval;
+                        ScheduledTimeSync = _selectedZone.ScheduledTimeSync.ToString(@"hh\:mm");
                     }
-                    else
+                    if (_selectedZone.ZoneType==(int)DomainObjects.ZoneTypes.MQTT)
                     {
-                        ExternalSourceTag = string.Empty;
+                        ExternalSourceTag = _selectedZone.ExternalSourceTag;
                     }
 
                 }
@@ -695,7 +801,7 @@ namespace PixelBoardDevice.UI
             {
                 if (_invertBitmap.IsNull())
                 {
-                    _invertBitmap = new DelegateCommand((o) => 
+                    _invertBitmap = new DelegateCommand((o) =>
                     {
                         var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                         var base64String = deviceZone.BitmapBase64;

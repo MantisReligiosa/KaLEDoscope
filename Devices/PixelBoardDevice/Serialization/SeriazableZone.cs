@@ -1,4 +1,5 @@
-﻿using PixelBoardDevice.DomainObjects;
+﻿using System;
+using PixelBoardDevice.DomainObjects;
 
 namespace PixelBoardDevice.Serialization
 {
@@ -18,6 +19,10 @@ namespace PixelBoardDevice.Serialization
         public int X { get; set; }
         public int Y { get; set; }
         public int ZoneType { get; set; }
+        public bool AllowPeriodicTimeSync { get; set; }
+        public bool AllowScheduledSync { get; set; }
+        public int PeriodicSyncInterval { get; set; }
+        public TimeSpan ScheduledTimeSync { get; set; }
 
         public static explicit operator SeriazableZone(Zone zone)
         {
@@ -36,30 +41,37 @@ namespace PixelBoardDevice.Serialization
                 Width = zone.Width,
                 X = zone.X,
                 Y = zone.Y,
-                ZoneType = zone.ZoneType
+                ZoneType = zone.ZoneType,
+                AllowPeriodicTimeSync = zone.AllowPeriodicTimeSync,
+                AllowScheduledSync = zone.AllowScheduledSync,
+                PeriodicSyncInterval = zone.PeriodicSyncInterval,
+                ScheduledTimeSync = zone.ScheduledTimeSync
             };
         }
 
-        public static explicit operator Zone(SeriazableZone seriazableZone)
+        public static explicit operator Zone(SeriazableZone zone)
         {
             return new Zone
             {
-                BitmapBase64 = seriazableZone.BitmapBase64,
-                BitmapHeight = seriazableZone.BitmapHeight,
-                ClockFormat = seriazableZone.ClockFormat,
-                ClockType = seriazableZone.ClockType,
-                ExternalSourceTag = seriazableZone.ExternalSourceTag,
-                FontId = seriazableZone.FontId,
-                Height = seriazableZone.Height,
-                Id = seriazableZone.Id,
-                Name = seriazableZone.Name,
-                Text = seriazableZone.Text,
-                Width = seriazableZone.Width,
-                X = seriazableZone.X,
-                Y = seriazableZone.Y,
-                ZoneType = seriazableZone.ZoneType
+                BitmapBase64 = zone.BitmapBase64,
+                BitmapHeight = zone.BitmapHeight,
+                ClockFormat = zone.ClockFormat,
+                ClockType = zone.ClockType,
+                ExternalSourceTag = zone.ExternalSourceTag,
+                FontId = zone.FontId,
+                Height = zone.Height,
+                Id = zone.Id,
+                Name = zone.Name,
+                Text = zone.Text,
+                Width = zone.Width,
+                X = zone.X,
+                Y = zone.Y,
+                ZoneType = zone.ZoneType,
+                AllowPeriodicTimeSync = zone.AllowPeriodicTimeSync,
+                AllowScheduledSync = zone.AllowScheduledSync,
+                PeriodicSyncInterval = zone.PeriodicSyncInterval,
+                ScheduledTimeSync = zone.ScheduledTimeSync
             };
         }
-
     }
 }

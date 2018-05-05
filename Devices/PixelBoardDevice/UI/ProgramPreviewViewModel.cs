@@ -65,7 +65,8 @@ namespace PixelBoardDevice.UI
                 {
                     if (zone.Id == (_model.SelectedZone?.Id ?? int.MinValue))
                     {
-                        rect.Stroke = Brushes.Green;
+                        rect.Stroke = Brushes.Yellow;
+                        rect.StrokeThickness = 2;
                     }
                     else
                     {
@@ -435,7 +436,7 @@ namespace PixelBoardDevice.UI
             PutBitmapOnCanvas(bitmap, canvas, x, y, width, height, scale);
         }
 
-        private static void PutBitmapOnCanvas(System.Drawing.Bitmap bitmap, Canvas canvas,int x, int y, int width, int height, double scale)
+        private static void PutBitmapOnCanvas(System.Drawing.Bitmap bitmap, Canvas canvas, int x, int y, int width, int height, double scale)
         {
             var imageWidth = bitmap.Width;
             var imageHeight = bitmap.Height;

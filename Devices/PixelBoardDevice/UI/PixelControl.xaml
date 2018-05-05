@@ -188,7 +188,12 @@
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
                             <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}"  DisplayMemberPath="Source"></ComboBox>
-                            <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding FontSizes}" Width="45" SelectedValue="{Binding SelectedFontSize}"/>
+                            <ComboBox Grid.Row="0" Grid.Column="1" 
+                                      ItemsSource="{Binding FontSizes}" 
+                                      Width="45" 
+                                      Text="{Binding SelectedFontSizeStr}" 
+                                      IsEditable="True" 
+                                      IsSynchronizedWithCurrentItem="False" StaysOpenOnEdit="True"/>
                             <ToggleButton Grid.Row="0" Grid.Column="2" IsChecked="{Binding IsBold}" Width="22" FontWeight="Bold">B</ToggleButton>
                             <ToggleButton Grid.Row="0" Grid.Column="3" IsChecked="{Binding IsItalic}" Width="22" FontStyle="Italic" >I</ToggleButton>
                             <TextBox Grid.Row="1" Grid.ColumnSpan="100" AcceptsReturn="True" 
@@ -234,9 +239,26 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox Grid.Column="0" ItemsSource="{Binding ClockTypes}" SelectedItem="{Binding SelectedClockType}" DisplayMemberPath="Name"/>
-                            <ComboBox Grid.Column="1" IsEnabled="{Binding AllowClockFormat}" ItemsSource="{Binding ClockFormats}" SelectedItem="{Binding SelectedClockFormat}" DisplayMemberPath="Name"/>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <ComboBox Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding ClockTypes}" SelectedItem="{Binding SelectedClockType}" DisplayMemberPath="Name"/>
+                            <ComboBox Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2" IsEnabled="{Binding AllowClockFormat}" ItemsSource="{Binding ClockFormats}" SelectedItem="{Binding SelectedClockFormat}" DisplayMemberPath="Name"/>
+                            <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">Синхронизация:</Label>
+                            <RadioButton Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3" IsChecked="{Binding AllowPeriodicSync}">Периодическая, интервал (час):</RadioButton>
+                            <RadioButton Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" IsChecked="{Binding AllowScheduledSync}">В установленное время:</RadioButton>
+                            <xctk:IntegerUpDown Grid.Column="3" Grid.Row="2" Text="{Binding PeriodicSyncInterval}" Minimum="1" IsEnabled="{Binding AllowPeriodicSync}"/>
+                            <xctk:TimePicker Grid.Row="3" 
+                                         Grid.Column="4"
+                                         Text="{Binding ScheduledTimeSync}"
+                                         IsEnabled="{Binding AllowScheduledSync}"
+                                         Format="ShortTime"/>
                         </Grid>
                     </GroupBox>
                 </Grid>
