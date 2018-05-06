@@ -114,7 +114,7 @@
                 </MenuItem>
             </Menu>
         </DockPanel>
-        <ToolBar x:Name="toolbar" Grid.Row="1" Grid.ColumnSpan="10" Height="27">
+        <ToolBar x:Name="toolbar" Grid.Row="1" Grid.ColumnSpan="10" Height="27" ToolBarTray.IsLocked="True">
             <ToolBar.Items>
                 <Button Command="{Binding ClearStructure}">
                     <Image Source="Resources\New.png"/>
@@ -198,15 +198,78 @@
                 </DataTemplate>
             </TreeView.Resources>
         </TreeView>
-        <TextBox Name="lbLog" Grid.Column="2" Grid.Row="4" Text="{Binding Log}" IsReadOnly="True">
-
-        </TextBox>
+        <Grid Grid.Column="2" Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ToolBar Grid.Row="0" ToolBarTray.IsLocked="True">
+                <ToolBar.Items>
+                    <CheckBox IsChecked="{Binding AllowDebugLog}" Command="{Binding ApplyLogFilter}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\Debug.png" Margin="0,0,5,0" Height="16"/>
+                            <TextBlock Text="{Binding Debugs}"/>
+                            <TextBlock Text=" Debugs"/>
+                        </StackPanel>
+                    </CheckBox>
+                    <Separator/>
+                    <CheckBox IsChecked="{Binding AllowInfoLog}" Command="{Binding ApplyLogFilter}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\Info.png" Margin="0,0,5,0" Height="16"/>
+                            <TextBlock Text="{Binding Infos}"/>
+                            <TextBlock Text=" Infos"/>
+                        </StackPanel>
+                    </CheckBox>
+                    <Separator/>
+                    <CheckBox IsChecked="{Binding AllowWarnLog}" Command="{Binding ApplyLogFilter}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\Warning.png" Margin="0,0,5,0" Height="16"/>
+                            <TextBlock Text="{Binding Warnings}"/>
+                            <TextBlock Text=" Warnings"/>
+                        </StackPanel>
+                    </CheckBox>
+                    <Separator/>
+                    <CheckBox IsChecked="{Binding AllowErrorLog}" Command="{Binding ApplyLogFilter}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\Error.png" Margin="0,0,5,0" Height="16"/>
+                            <TextBlock Text="{Binding Errors}"/>
+                            <TextBlock Text=" Errors"/>
+                        </StackPanel>
+                    </CheckBox>
+                </ToolBar.Items>
+            </ToolBar>
+            <DataGrid Grid.Row="1" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding FilteredLogItems}" CanUserReorderColumns="False" CanUserResizeRows="False" HorizontalGridLinesBrush="#FFE0E0E0" VerticalGridLinesBrush="#FFE0E0E0">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Name="Level" Source="Resources\Debug.png" Height="16"/>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding LogLevel}" Value="Info">
+                                        <Setter TargetName="Level" Property="Source" Value="Resources\Info.png"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LogLevel}" Value="Warn">
+                                        <Setter TargetName="Level" Property="Source" Value="Resources\Warning.png"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LogLevel}" Value="Error">
+                                        <Setter TargetName="Level" Property="Source" Value="Resources\Error.png"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Время" Binding="{Binding TimeSpanStr}" SortDirection="Descending"/>
+                    <DataGridTextColumn Header="Сообщение" Width="*" Binding="{Binding Message}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
         <TabControl 
                 x:Name="tabControl" 
                 Grid.Column="2" 
                 Grid.Row="2" 
                 ItemsSource="{Binding Path=DeviceTabs}" 
                 SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
+
         </TabControl>
     </Grid>
 </Window>

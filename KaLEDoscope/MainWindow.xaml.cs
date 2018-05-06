@@ -19,7 +19,7 @@ namespace KaLEDoscope
             var viewModel = new MainViewModel(logger, compressor);
             viewModel.ShowOptions += new EventHandler(OnShowOptions);
             viewModel.QuitApplication += new EventHandler(OnQuitApplication);
-            DataContext = trvMenu.DataContext = lbLog.DataContext = viewModel;
+            DataContext = trvMenu.DataContext = viewModel;
             _infrastructure.Tabs = tabControl.Items;
         }
 

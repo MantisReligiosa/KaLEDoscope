@@ -35,6 +35,7 @@ namespace KaLEDoscope
         private readonly Invoker _invoker;
         private DeviceNode _updatedNode;
         private TabItem _tabItem;
+        private readonly ObservableCollection<LogItem> _logItems = new ObservableCollection<LogItem>();
 
         private const string _defaultStructureFileName = "Структура";
         private const string _defaultStructureFileExtension = ".struct";
@@ -44,6 +45,7 @@ namespace KaLEDoscope
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
         public ObservableCollection<MenuItem> DeviceItems { get; set; } = new ObservableCollection<MenuItem>();
+        public ObservableCollection<LogItem> FilteredLogItems { get; set; } = new ObservableCollection<LogItem>();
 
         public event EventHandler ShowOptions;
         public event EventHandler QuitApplication;
@@ -52,35 +54,48 @@ namespace KaLEDoscope
         public string StructureFileName { get; set; } = string.Empty;
         public bool IsScanEnabled { get; set; }
         public NodeItem SelectedNode { get; set; }
+        public bool AllowDebugLog { get; set; } = false;
+        public int Debugs { get; set; }
+        public bool AllowInfoLog { get; set; } = true;
+        public int Infos { get; set; }
+        public bool AllowWarnLog { get; set; } = true;
+        public int Warnings { get; set; }
+        public bool AllowErrorLog { get; set; } = true;
+        public int Errors { get; set; }
 
-        private StringBuilder _log = new StringBuilder();
-        public string Log
-        {
-            get
-            {
-                return _log.ToString();
-            }
-            set
-            {
-                _log = new StringBuilder(value);
-                OnPropertyChanged(nameof(Log));
-            }
-        }
 
         public MainViewModel(ILogger logger, ICompressor compressor)
         {
             _logger = logger;
             _compressor = compressor;
-            _logger.InfoRaised += (sender, message) => LogMessage($"{sender}: Info: {message}");
-            _logger.DebugRaised += (sender, message) => LogMessage($"{sender}: Debug: {message}");
-            _logger.WarnRaised += (sender, message) => LogMessage($"{sender}: Warn: {message}");
-            _logger.ErrorRaised += (sender, message) => LogMessage($"{sender}: Error: {message}");
+            _logger.InfoRaised += (sender, message) => LogMessage(new LogItem
+            {
+                LogLevel = LogLevel.Info,
+                Message = message
+            });
+            _logger.DebugRaised += (sender, message) => LogMessage(new LogItem
+            {
+                LogLevel = LogLevel.Debug,
+                Message = message
+            });
+            _logger.WarnRaised += (sender, message) => LogMessage(new LogItem
+            {
+                LogLevel = LogLevel.Warn,
+                Message = message
+            });
+            _logger.ErrorRaised += (sender, message) => LogMessage(new LogItem
+            {
+                LogLevel = LogLevel.Error,
+                Message = message
+            });
             _dispatcher = Dispatcher.CurrentDispatcher;
             _invoker = new Invoker(_logger);
             IsScanEnabled = true;
             _deviceFactory = new DeviceFactory(_logger);
             _deviceFactory.Builders.Add(new SevenSegmentDeviceBuilder());
             _deviceFactory.Builders.Add(new PixelDeviceBuilder());
+
+            _logger.Info(this, "Started");
 
             foreach (var deviceBuilder in _deviceFactory.Builders)
             {
@@ -154,7 +169,7 @@ namespace KaLEDoscope
                         {
                             var folderNode = SelectedNode as FolderNode;
                             renameDialog.NameField = folderNode.Name;
-                            if (renameDialog.ShowDialog()==true)
+                            if (renameDialog.ShowDialog() == true)
                             {
                                 folderNode.Name = renameDialog.NameField;
                                 folderNode.Folder.Name = renameDialog.NameField;
@@ -169,6 +184,10 @@ namespace KaLEDoscope
                                 aggregationNode.Name = renameDialog.NameField;
                                 aggregationNode.Aggregation.Name = renameDialog.NameField;
                             }
+                        }
+                        else if (!(SelectedNode as DeviceNode).IsNull())
+                        {
+                            ShowDevicePlugin.Execute(null);
                         }
                     });
                 }
@@ -264,6 +283,7 @@ namespace KaLEDoscope
                             AllowSave = true,
                             AllowUpload = false
                         });
+                        _logger.Debug(this, $"Добавлено устройство типа {device.Model}. ID {device.Id}");
                     });
                 }
                 return _addNewDevice;
@@ -488,6 +508,7 @@ namespace KaLEDoscope
                                 }
                             }
                         }
+                        _logger.Info(this, "Структура загружена успешно");
                     });
                 }
                 return _openStructure;
@@ -536,6 +557,7 @@ namespace KaLEDoscope
             var serialized = JsonConvert.SerializeObject(serializableContainers);
             var datas = _compressor.Zip(serialized);
             System.IO.File.WriteAllBytes(StructureFileName, datas);
+            _logger.Info(this, $"Структура сохранена в {StructureFileName}");
         }
 
         private SerializableContainer GetDeviceSerializableContainer(DeviceNode node)
@@ -838,10 +860,43 @@ namespace KaLEDoscope
             }
         }
 
-        private void LogMessage(string Message)
+        private void LogMessage(LogItem logItem)
         {
-            _log.AppendLine(Message);
-            OnPropertyChanged(nameof(Log));
+            _logItems.Insert(0, logItem);
+            if (LogItemCanBeShown(logItem))
+            {
+                _dispatcher.Invoke(() => FilteredLogItems.Insert(0, logItem));
+            }
+            Debugs = _logItems.Count(i => i.LogLevel == LogLevel.Debug);
+            Infos = _logItems.Count(i => i.LogLevel == LogLevel.Info);
+            Warnings = _logItems.Count(i => i.LogLevel == LogLevel.Warn);
+            Errors = _logItems.Count(i => i.LogLevel == LogLevel.Error);
+        }
+
+        private bool LogItemCanBeShown(LogItem logItem) => (logItem.LogLevel == LogLevel.Debug && AllowDebugLog) ||
+                            (logItem.LogLevel == LogLevel.Info && AllowInfoLog) ||
+                            (logItem.LogLevel == LogLevel.Warn && AllowWarnLog) ||
+                            (logItem.LogLevel == LogLevel.Error && AllowErrorLog);
+
+        private DelegateCommand _ApplyLogFilter;
+        public Input.ICommand ApplyLogFilter
+        {
+            get
+            {
+                if (_ApplyLogFilter.IsNull())
+                    _ApplyLogFilter = new DelegateCommand((o) =>
+                    {
+                        FilteredLogItems.Clear();
+                        foreach (var logItem in _logItems)
+                        {
+                            if (LogItemCanBeShown(logItem))
+                            {
+                                FilteredLogItems.Add(logItem);
+                            }
+                        }
+                    });
+                return _ApplyLogFilter;
+            }
         }
 
         public void DragOver(IDropInfo dropInfo)
