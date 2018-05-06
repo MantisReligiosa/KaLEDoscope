@@ -23,6 +23,8 @@ namespace PixelBoardDevice.Serialization
         public bool AllowScheduledSync { get; set; }
         public int PeriodicSyncInterval { get; set; }
         public TimeSpan ScheduledTimeSync { get; set; }
+        public int TickerType { get; set; }
+        public TimeSpan TickerCountDownStartValue { get; set; }
 
         public static explicit operator SeriazableZone(Zone zone)
         {
@@ -45,7 +47,9 @@ namespace PixelBoardDevice.Serialization
                 AllowPeriodicTimeSync = zone.AllowPeriodicTimeSync,
                 AllowScheduledSync = zone.AllowScheduledSync,
                 PeriodicSyncInterval = zone.PeriodicSyncInterval,
-                ScheduledTimeSync = zone.ScheduledTimeSync
+                ScheduledTimeSync = zone.ScheduledTimeSync,
+                TickerType = zone.TickerType,
+                TickerCountDownStartValue=zone.TickerCountDownStartValue
             };
         }
 
@@ -70,7 +74,9 @@ namespace PixelBoardDevice.Serialization
                 AllowPeriodicTimeSync = zone.AllowPeriodicTimeSync,
                 AllowScheduledSync = zone.AllowScheduledSync,
                 PeriodicSyncInterval = zone.PeriodicSyncInterval,
-                ScheduledTimeSync = zone.ScheduledTimeSync
+                ScheduledTimeSync = zone.ScheduledTimeSync,
+                TickerType = zone.TickerType,
+                TickerCountDownStartValue = zone.TickerCountDownStartValue
             };
         }
     }

@@ -350,7 +350,14 @@ namespace PixelBoardDevice.UI
                     {
                         DrawClockPicture(canvas, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
-                }
+                },
+                {
+                    (z) => z.ZoneType==(int)ZoneTypes.Ticker,
+                    (zone, canvas, font, scale) =>
+                    {
+                        RenderText(canvas, font, "00:00.0000", zone.X, zone.Y, zone.Width, zone.Height, scale);
+                    }
+                },
 
             };
 

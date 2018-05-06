@@ -51,6 +51,14 @@
               <File Id="CommandProcessing.pdb_1340639843" Source="..\_publish\KaLEDoscope\CommandProcessing.pdb" />
             </Component>
 
+            <Component Id="Component.Compression.dll_1533433587" Guid="6f330b47-2577-43ad-9095-1861f851fa3b">
+              <File Id="Compression.dll_1533433587" Source="..\_publish\KaLEDoscope\Compression.dll" />
+            </Component>
+
+            <Component Id="Component.Compression.pdb_1609052607" Guid="6f330b47-2577-43ad-9095-1861cd95df11">
+              <File Id="Compression.pdb_1609052607" Source="..\_publish\KaLEDoscope\Compression.pdb" />
+            </Component>
+
             <Component Id="Component.DeviceBuilding.dll_264208885" Guid="6f330b47-2577-43ad-9095-1861f70ee24a">
               <File Id="DeviceBuilding.dll_264208885" Source="..\_publish\KaLEDoscope\DeviceBuilding.dll" />
             </Component>
@@ -297,6 +305,8 @@
       <ComponentRef Id="Component.BitmapProcessing.dll_1654898977" />
       <ComponentRef Id="Component.CommandProcessing.dll_1790454261" />
       <ComponentRef Id="Component.CommandProcessing.pdb_1340639843" />
+      <ComponentRef Id="Component.Compression.dll_1533433587" />
+      <ComponentRef Id="Component.Compression.pdb_1609052607" />
       <ComponentRef Id="Component.DeviceBuilding.dll_264208885" />
       <ComponentRef Id="Component.DeviceBuilding.pdb_1761532211" />
       <ComponentRef Id="Component.Extensions.dll_1011475587" />

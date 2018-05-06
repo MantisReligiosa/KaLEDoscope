@@ -16,5 +16,6 @@ namespace PixelBoardDevice.UI.POCO
         public Func<Zone> Customize { get; set; }
         public bool AllowClock { get; set; }
         public bool AllowTextEditing { get; set; }
+        public bool AllowTicker { get; set; }
     }
 }

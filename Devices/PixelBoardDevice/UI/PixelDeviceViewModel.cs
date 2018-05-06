@@ -112,6 +112,38 @@ namespace PixelBoardDevice.UI
                     Name = "Часы",
                 }
             },
+            new ZoneType
+            {
+                Id = 6,
+                Name = "Таймер",
+                AllowAnimation = false,
+                AllowBitmap = false,
+                AllowFont = true,
+                AllowText = false,
+                AllowClock = false,
+                AllowTicker=true,
+                ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.Ticker,
+                Customize = () => new Zone{
+                    IsValid=true,
+                    ZoneType=(int)DomainObjects.ZoneTypes.Ticker,
+                    Name = "Таймер",
+                }
+            },
+        };
+        private static readonly List<TickerType> _tickerTypes = new List<TickerType>
+        {
+            new TickerType
+            {
+                Id=1,
+                Name="Секундомер",
+                AllowStartValue=false
+            },
+            new TickerType
+            {
+                Id=2,
+                Name="Обратный отсчёт",
+                AllowStartValue=true
+            }
         };
         private static readonly List<ClockType> _clockTypes = new List<ClockType>
         {
@@ -168,6 +200,7 @@ namespace PixelBoardDevice.UI
         public ObservableCollection<int> FontSizes { get; set; }
         public ObservableCollection<ClockFormat> ClockFormats { get; set; }
         public ObservableCollection<ClockType> ClockTypes { get; set; }
+        public ObservableCollection<TickerType> TickerTypes { get; set; }
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
         {
@@ -180,6 +213,7 @@ namespace PixelBoardDevice.UI
             Zones = new ObservableCollection<Zone>();
             ClockFormats = new ObservableCollection<ClockFormat>(_clockFormats);
             ClockTypes = new ObservableCollection<ClockType>(_clockTypes);
+            TickerTypes = new ObservableCollection<TickerType>(_tickerTypes);
             Zones.CollectionChanged += (s, e) => ValidateAndInvokePreview();
             SelectedProgram = Programs.FirstOrDefault();
             FontSizes = new ObservableCollection<int>(_fontSizes);
@@ -196,6 +230,7 @@ namespace PixelBoardDevice.UI
             AllowExternalTag(false);
             AllowText(false);
             AllowClock(false);
+            AllowTicker(false);
         }
 
         private void ValidateAndInvokePreview()
@@ -335,6 +370,29 @@ namespace PixelBoardDevice.UI
                     deviceZone.ScheduledTimeSync = timeSpan;
                 }
                 OnPropertyChanged(nameof(ScheduledTimeSync));
+            }
+        }
+
+        private string _tickerCountDownStartValue;
+        public string TickerCountDownStartValue
+        {
+            get
+            {
+                return _tickerCountDownStartValue;
+            }
+            set
+            {
+                if (!TimeSpan.TryParse(value, out TimeSpan timeSpan))
+                {
+                    timeSpan = new TimeSpan(0, 0, 0);
+                }
+                _tickerCountDownStartValue = timeSpan.ToString(@"mm\:ss\.ffff");
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                if (!deviceZone.IsNull())
+                {
+                    deviceZone.TickerCountDownStartValue = timeSpan;
+                }
+                OnPropertyChanged(nameof(TickerCountDownStartValue));
             }
         }
 
@@ -540,6 +598,12 @@ namespace PixelBoardDevice.UI
             ClockVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        public Visibility TickerVisibility { get; set; }
+        public void AllowTicker(bool value)
+        {
+            TickerVisibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         private int _deviceHeight;
         public int DeviceHeight
         {
@@ -609,6 +673,7 @@ namespace PixelBoardDevice.UI
                     AllowText(currentZoneType?.AllowText ?? false);
                     AllowTextEditing = currentZoneType?.AllowTextEditing ?? false;
                     AllowClock(currentZoneType?.AllowClock ?? false);
+                    AllowTicker(currentZoneType?.AllowTicker ?? false);
                     OnPropertyChanged(nameof(SelectedZoneType));
                 }
                 if (!_selectedZone.IsNull() && _selectedZone.IsFonted)
@@ -626,29 +691,34 @@ namespace PixelBoardDevice.UI
                         IsItalic = binaryFont.Italic;
                         IsBold = binaryFont.Bold;
                     }
-                    if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Text)
-                    {
-                        Text = _selectedZone.Text;
-                    }
-                    else
-                    {
-                        Text = String.Empty;
-                    }
-                    if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
-                    {
-                        SelectedClockType = _clockTypes.FirstOrDefault(ct => ct.Id == _selectedZone.ClockType);
-                        SelectedClockFormat = _clockFormats.FirstOrDefault(cf => cf.Id == _selectedZone.ClockFormat);
-                        AllowPeriodicSync = _selectedZone.AllowPeriodicTimeSync;
-                        AllowScheduledSync = _selectedZone.AllowScheduledSync;
-                        PeriodicSyncInterval = _selectedZone.PeriodicSyncInterval;
-                        ScheduledTimeSync = _selectedZone.ScheduledTimeSync.ToString(@"hh\:mm");
-                    }
-                    if (_selectedZone.ZoneType==(int)DomainObjects.ZoneTypes.MQTT)
-                    {
-                        ExternalSourceTag = _selectedZone.ExternalSourceTag;
-                    }
-
                 }
+                if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Text)
+                {
+                    Text = _selectedZone.Text;
+                }
+                else
+                {
+                    Text = String.Empty;
+                }
+                if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
+                {
+                    SelectedClockType = _clockTypes.FirstOrDefault(ct => ct.Id == _selectedZone.ClockType);
+                    SelectedClockFormat = _clockFormats.FirstOrDefault(cf => cf.Id == _selectedZone.ClockFormat);
+                    AllowPeriodicSync = _selectedZone.AllowPeriodicTimeSync;
+                    AllowScheduledSync = _selectedZone.AllowScheduledSync;
+                    PeriodicSyncInterval = _selectedZone.PeriodicSyncInterval;
+                    ScheduledTimeSync = _selectedZone.ScheduledTimeSync.ToString(@"hh\:mm");
+                }
+                if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.MQTT)
+                {
+                    ExternalSourceTag = _selectedZone.ExternalSourceTag;
+                }
+                if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Ticker)
+                {
+                    SelectedTickerType = _tickerTypes.FirstOrDefault(tt => tt.Id == _selectedZone.TickerType);
+                    TickerCountDownStartValue = _selectedZone.TickerCountDownStartValue.ToString(@"mm\:ss\.ffff");
+                }
+
             }
         }
 
@@ -718,6 +788,25 @@ namespace PixelBoardDevice.UI
                 OnPropertyChanged(nameof(SelectedClockFormat));
             }
         }
+
+        private TickerType _selectedTickerType;
+        public TickerType SelectedTickerType
+        {
+            get => _selectedTickerType;
+            set
+            {
+                _selectedTickerType = value;
+                var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Ticker)
+                {
+                    zone.TickerType = value?.Id ?? 0;
+                    AllowTickerCountDown = value.AllowStartValue;
+                }
+                OnPropertyChanged(nameof(SelectedTickerType));
+            }
+        }
+
+        public bool AllowTickerCountDown { get; set; }
 
         private string _externalSourceTag;
         public string ExternalSourceTag
@@ -1024,7 +1113,6 @@ namespace PixelBoardDevice.UI
                 }
             }
         }
-
 
         public readonly double PreviewScaleMinRate;
         public readonly double PreviewScaleMaxRate;

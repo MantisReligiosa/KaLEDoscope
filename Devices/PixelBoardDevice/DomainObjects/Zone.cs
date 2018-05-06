@@ -20,7 +20,7 @@ namespace PixelBoardDevice.DomainObjects
         {
             get
             {
-                return (new int[] { (int)ZoneTypes.Text, (int)ZoneTypes.Sensor, (int)ZoneTypes.MQTT, (int)ZoneTypes.Clock }).Contains(ZoneType);
+                return (new int[] { (int)ZoneTypes.Text, (int)ZoneTypes.Sensor, (int)ZoneTypes.MQTT, (int)ZoneTypes.Clock, (int)ZoneTypes.Ticker }).Contains(ZoneType);
             }
         }
 
@@ -33,6 +33,8 @@ namespace PixelBoardDevice.DomainObjects
         public bool AllowScheduledSync { get; set; }
         public int PeriodicSyncInterval { get; set; }
         public TimeSpan ScheduledTimeSync { get; set; }
+        public int TickerType { get; set; }
+        public TimeSpan TickerCountDownStartValue { get; set; }
 
         public bool IntersectWith(Zone z)
         {
@@ -54,6 +56,7 @@ namespace PixelBoardDevice.DomainObjects
         Sensor,
         Picture,
         MQTT,
-        Clock
+        Clock,
+        Ticker
     }
 }
