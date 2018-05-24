@@ -53,6 +53,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Setup", "Setup\Setup.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compression", "Infrastructure\Compression\Compression.csproj", "{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{0A07F064-E2DD-48A0-B3F3-B185D05DF4FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseCommandsTesting", "Tests\BaseCommandsTesting\BaseCommandsTesting.csproj", "{1D0E1143-504D-46F3-A7F6-A3457585B81D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +141,10 @@ Global
 		{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D0E1143-504D-46F3-A7F6-A3457585B81D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D0E1143-504D-46F3-A7F6-A3457585B81D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D0E1143-504D-46F3-A7F6-A3457585B81D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D0E1143-504D-46F3-A7F6-A3457585B81D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,6 +166,7 @@ Global
 		{802F2818-55B8-43E0-80E8-A72FB8E15054} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
 		{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44} = {CB066D1E-7C67-40AC-9F9F-19D75635B074}
 		{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
+		{1D0E1143-504D-46F3-A7F6-A3457585B81D} = {0A07F064-E2DD-48A0-B3F3-B185D05DF4FC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C0D49DF-1E93-42DA-A343-18EBC2062313}

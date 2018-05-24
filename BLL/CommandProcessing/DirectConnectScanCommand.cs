@@ -62,6 +62,7 @@ namespace CommandProcessing
             //            });
             //#endif
             _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
+#error передавать бинарный код
             var request = new Request
             {
                 Scan = new object()

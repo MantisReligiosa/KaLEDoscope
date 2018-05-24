@@ -1,16 +1,25 @@
-﻿using Newtonsoft.Json;
+﻿using Extensions;
 
 namespace CommandProcessing.DTO
 {
-    internal class Request
+    public abstract class Request
     {
-        [JsonProperty("scan", NullValueHandling = NullValueHandling.Ignore)]
-        public object Scan { get; set; }
-
-        [JsonProperty("configuration",NullValueHandling = NullValueHandling.Ignore)]
-        public object Device { get; set; }
-
-        [JsonProperty("getConfig", NullValueHandling = NullValueHandling.Ignore)]
-        public object GetConfig { get; set; }
+        public abstract byte ID { get; }
+        public ushort DeviceId { get; set; }
+        public abstract ushort DataArrayLength { get; }
+        public abstract byte[] GetData();
+        public byte[] GetBytes()
+        {
+            var length = DataArrayLength + 5;
+            var bytes = new byte[length];
+            DeviceId.ToBytes().CopyTo(bytes, 0);
+            bytes[2] = ID;
+            DataArrayLength.ToBytes().CopyTo(bytes, 3);
+            if (DataArrayLength > 0)
+            {
+                GetData().CopyTo(bytes, 5);
+            }
+            return bytes;
+        }
     }
 }
