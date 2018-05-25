@@ -471,7 +471,6 @@ namespace PixelBoardDevice.UI
                     Height = newFontSize,
                     Bold = bold,
                     Italic = italic,
-#error Хранить просто байты и Base64
                     Base64Bitmap = BitmapProcessor.GenerateBase64FontMono(Device.Alphabet, newFont, italic, bold, newFontSize)
                 };
                 Device.Fonts.Add(newBinaryFont);

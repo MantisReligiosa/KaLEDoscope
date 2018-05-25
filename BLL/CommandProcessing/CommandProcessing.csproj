@@ -49,7 +49,6 @@
     <Compile Include="DirectConnectUploadSettingsCommand.cs" />
     <Compile Include="DTO\Request.cs" />
     <Compile Include="DTO\ScanCommandResponce.cs" />
-    <Compile Include="DTO\ScanRequest.cs" />
     <Compile Include="Invoker.cs" />
     <Compile Include="DeviceScanner.cs" />
     <Compile Include="DirectConnectScanCommand.cs" />

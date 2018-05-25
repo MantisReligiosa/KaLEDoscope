@@ -240,7 +240,6 @@ namespace SevenSegmentBoardDevice.UI
             }
         }
 
-#warning не передаётся на устройстово расписание фреймов!!!!!!!
         private DisplayFormat _displayFormat;
         public DisplayFormat DisplayFormat
         {
