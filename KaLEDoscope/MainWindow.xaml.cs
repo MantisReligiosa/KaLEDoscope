@@ -1,4 +1,5 @@
 ﻿using Compression;
+using JsonExchange;
 using Logger;
 using System;
 using System.Windows;
@@ -20,7 +21,9 @@ namespace KaLEDoscope
             var compressor = new Compressor();
             var networkScanAgent = new UdpAgent();
             var networkExcangeAgent = new TcpAgent();
-            var viewModel = new MainViewModel(logger, compressor, networkScanAgent, networkExcangeAgent);
+            var requestBuilder = new JsonRequestBuilder();
+            var responceProcessor = new JsonResponceProcessor();
+            var viewModel = new MainViewModel(logger, compressor, networkScanAgent, networkExcangeAgent, requestBuilder, responceProcessor);
             viewModel.ShowOptions += new EventHandler(OnShowOptions);
             viewModel.QuitApplication += new EventHandler(OnQuitApplication);
             DataContext = trvMenu.DataContext = viewModel;

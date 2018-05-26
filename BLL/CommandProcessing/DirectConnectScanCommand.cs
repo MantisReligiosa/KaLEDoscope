@@ -17,8 +17,14 @@ namespace CommandProcessing
         public event Action<List<Device>> OnScanCompleted;
         public override string Name => "Распознавание устройств";
 
-        public DirectConnectScanCommand(INetworkAgent networkAgent, ILogger logger, int port = 30000, int timeout = 10000)
-            : base(null, networkAgent, logger)
+        public DirectConnectScanCommand(
+            INetworkAgent networkAgent,
+            IRequestBuilder requestBuilder,
+            IResponceProcessor responceProcessor,
+            ILogger logger,
+            int port = 30000,
+            int timeout = 10000)
+            : base(null, networkAgent, requestBuilder, responceProcessor, logger)
         {
             _devices = new List<Device>();
             _port = port;
@@ -27,14 +33,12 @@ namespace CommandProcessing
 
         public override void Execute()
         {
-            _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
-            var request = new Request
+            var request = new BaseRequest
             {
                 Scan = new object()
             };
-            var requestString = JsonConvert.SerializeObject(request);
-            _logger.Debug(this, $"Широковещательный запрос: {requestString}");
-            _networkAgent.SendBroadcast(_port, requestString);
+            _requestBuilder.SetRequest(request);
+            _networkAgent.SendBroadcast(_port, _requestBuilder);
             _logger.Debug(this, $"Жду ответы {_timeout} мс");
 
             _networkAgent.Listen(_port, (recieveString) =>

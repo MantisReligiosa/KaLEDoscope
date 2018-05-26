@@ -19,6 +19,8 @@ namespace KaLEDoscope.ViewModel
         private readonly Invoker _invoker;
         private readonly ICompressor _compressor;
         private readonly INetworkAgent _networkAgent;
+        private readonly IRequestBuilder _requestBuilder;
+        private readonly IResponceProcessor _responceProcessor;
         private const string _defaultStructureFileExtension = ".device";
         private const string _defaultStructureFilter = "Device file (.device)|*.device|All files (*.*)|*.*";
 
@@ -32,12 +34,16 @@ namespace KaLEDoscope.ViewModel
             Invoker invoker,
             ICompressor compressor,
             INetworkAgent networkAgent,
+            IRequestBuilder requestBuilder,
+            IResponceProcessor responceProcessor,
             ILogger logger)
         {
             DeviceNode = deviceNode;
             _logger = logger;
             _networkAgent = networkAgent;
             _deviceFactory = deviceFactory;
+            _requestBuilder = requestBuilder;
+            _responceProcessor = responceProcessor;
             _invoker = invoker;
             _compressor = compressor;
         }
@@ -77,7 +83,7 @@ namespace KaLEDoscope.ViewModel
                     {
                         d.AllowUpload = true;
                         BeforeGettingSettings?.Invoke(this, d);
-                        var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceFactory, _networkAgent, _logger);
+                        var command = new DirectConnectDownloadSettingsCommand(d.Device, _deviceFactory, _networkAgent, _requestBuilder, _responceProcessor, _logger);
                         command.OnConfigurationDownloaded += ((sender, device) => AfterGetingSettings?.Invoke(this, device));
                         _invoker.Invoke(command);
                     });
@@ -95,7 +101,7 @@ namespace KaLEDoscope.ViewModel
                 {
                     _uploadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
-                        var command = new DirectConnectUploadSettingsCommand(d.Device, _networkAgent, _logger);
+                        var command = new DirectConnectUploadSettingsCommand(d.Device, _networkAgent, _requestBuilder, _responceProcessor, _logger);
                         _invoker.Invoke(command);
                     });
                 }

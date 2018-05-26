@@ -30,7 +30,6 @@ namespace TcpExcange
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
             var s = new TcpState
             {
-                //Endpoint = ipEndpoint,
                 TcpListener = tcpListener
             };
             tcpListener.Start();
@@ -44,17 +43,6 @@ namespace TcpExcange
             {
                 if (_isClosed)
                     return;
-                //var ipEndPoint = ((TcpState)(ar.AsyncState)).Endpoint;
-                //if (!ipEndPoint.Address.ToString().Equals(_device.Network.IpAddress))
-                //{
-                //    var tcpState = new TcpState
-                //    {
-                //        Endpoint = ipEndPoint,
-                //        TcpListener = listener
-                //    };
-                //    listener.BeginAcceptSocket(new AsyncCallback(DoAcceptSocketCallback), tcpState);
-                //    return;
-                //}
                 var client = listener.EndAcceptTcpClient(ar);
                 var stream = client.GetStream();
                 var data = new byte[1024];
@@ -70,18 +58,24 @@ namespace TcpExcange
             }
         }
 
-        public void Send(string ipAddress, int port, string requestString)
+        public void Send(string ipAddress, int port, IRequestBuilder requestBuilder)
+        {
+            Logger.Debug(this, $"Запрос по TCP к {ipAddress}, порт {port}: {requestBuilder.GetString()}");
+            Send(ipAddress, port, requestBuilder.GetBytes());
+        }
+
+        private void Send(string ipAddress, int port, byte[] bytes)
         {
             var ipEndpoint = new IPEndPoint(IPAddress.Parse(ipAddress), port);
             _tcpClient = new TcpClient();
             _tcpClient.Connect(ipEndpoint);
-            var bytes = Encoding.UTF8.GetBytes(requestString);
             var stream = _tcpClient.GetStream();
             stream.Write(bytes, 0, bytes.Length);
             Close();
         }
 
-        public void SendBroadcast(int port, string requestString)
+
+        public void SendBroadcast(int port, IRequestBuilder requestBuilder)
         {
             throw new NotImplementedException();
         }

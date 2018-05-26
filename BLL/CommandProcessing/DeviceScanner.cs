@@ -13,19 +13,28 @@ namespace CommandProcessing
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
         private readonly INetworkAgent _networkAgent;
+        private readonly IRequestBuilder _requestBuilder;
+        private readonly IResponceProcessor _responceProcessor;
         public event Action<List<Device>> OnScanCompleted;
 
-        public DeviceScanner(ILogger logger, INetworkAgent networkAgent, DeviceFactory deviceFactory)
+        public DeviceScanner(
+            ILogger logger,
+            INetworkAgent networkAgent,
+            IRequestBuilder requestBuilder,
+            IResponceProcessor responceProcessor,
+            DeviceFactory deviceFactory)
         {
             _logger = logger;
             _deviceFactory = deviceFactory;
             _invoker = new Invoker(_logger);
             _networkAgent = networkAgent;
+            _requestBuilder = requestBuilder;
+            _responceProcessor = responceProcessor;
         }
 
         public void StartSearch()
         {
-            var directConnectScanCommand = new DirectConnectScanCommand(_networkAgent, _logger);
+            var directConnectScanCommand = new DirectConnectScanCommand(_networkAgent, _requestBuilder, _responceProcessor, _logger);
             directConnectScanCommand.OnScanCompleted += DirectConnectScanCommand_OnScanCompleted;
             _invoker.Invoke(directConnectScanCommand);
         }

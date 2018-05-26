@@ -7,13 +7,17 @@ namespace ServiceInterfaces
     {
         protected TDevice _device;
         protected INetworkAgent _networkAgent;
+        protected IRequestBuilder _requestBuilder;
+        protected IResponceProcessor _responceProcessor;
         protected ILogger _logger;
         protected string _commandName;
-        protected DeviceCommand(TDevice device, INetworkAgent networkAgent, ILogger logger)
+        protected DeviceCommand(TDevice device, INetworkAgent networkAgent, IRequestBuilder requestBuilder, IResponceProcessor responceProcessor, ILogger logger)
         {
             _device = device;
             _logger = logger;
             _networkAgent = networkAgent;
+            _requestBuilder = requestBuilder;
+            _responceProcessor = responceProcessor;
             _networkAgent.Logger = _logger;
         }
 

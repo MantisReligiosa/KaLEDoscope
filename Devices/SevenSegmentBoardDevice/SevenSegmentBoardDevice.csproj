@@ -71,11 +71,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\DirectConnectPauseTimer.cs" />
-    <Compile Include="Commands\DirectConnectResetTimer.cs" />
-    <Compile Include="Commands\DirectConnectStartTimer.cs" />
-    <Compile Include="Commands\DirectConnectStopResetTimer.cs" />
-    <Compile Include="Commands\DTO\SevenSegmentBoardDeviceRequest.cs" />
     <Compile Include="DomainObjects\Alarm.cs" />
     <Compile Include="Serialization\SerializableAlarm.cs" />
     <Compile Include="Serialization\SerializableBoardType.cs" />
@@ -135,10 +130,6 @@
     <ProjectReference Include="..\..\ServiceInterfaces\ServiceInterfaces.csproj">
       <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>
       <Name>ServiceInterfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Infrastructure\TcpExcange\TcpExcange.csproj">
-      <Project>{82374D01-1F4E-4792-A413-B02E462C96C2}</Project>
-      <Name>TcpExcange</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

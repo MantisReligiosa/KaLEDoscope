@@ -11,7 +11,6 @@ using System.Text.RegularExpressions;
 using BaseDevice;
 using CommandProcessing;
 using SevenSegmentBoardDevice.UI.POCO;
-using SevenSegmentBoardDevice.Commands;
 using UiCommands;
 using Extensions;
 
@@ -20,9 +19,6 @@ namespace SevenSegmentBoardDevice.UI
     public class TimerDeviceViewModel : Notified
     {
         private readonly SevenSegmentBoard _device;
-        private readonly ILogger _logger;
-        private readonly Invoker _invoker;
-        private readonly INetworkAgent _networkAgent;
 
         private readonly List<DisplayType> _displayTypes = new List<DisplayType>
         {
@@ -441,12 +437,9 @@ namespace SevenSegmentBoardDevice.UI
 
         public Alarm SelectedAlarm { get; set; }
 
-        public TimerDeviceViewModel(Device device, INetworkAgent networkAgent, ILogger logger)
+        public TimerDeviceViewModel(Device device, ILogger logger)
         {
             _device = (SevenSegmentBoard)device;
-            _networkAgent = networkAgent;
-            _logger = logger;
-            _invoker = new Invoker(_logger);
             DisplayTypes = new ObservableCollection<DisplayType>(_displayTypes);
             DisplayType = _displayTypes.FirstOrDefault(d => d.Id == _device.BoardType?.TypeId);
             FontTypes = new ObservableCollection<FontType>(_fontTypes);
@@ -504,74 +497,6 @@ namespace SevenSegmentBoardDevice.UI
                     });
                 }
                 return _removeAlarm;
-            }
-        }
-
-        private DelegateCommand _startTimer;
-        public Input.ICommand StartTimer
-        {
-            get
-            {
-                if (_startTimer == null)
-                {
-                    _startTimer = new DelegateCommand((o) =>
-                      {
-                          var command = new DirectConnectStartTimer(_device, _networkAgent, _logger);
-                          _invoker.Invoke(command);
-                      });
-                }
-                return _startTimer;
-            }
-        }
-
-        private DelegateCommand _pauseTimer;
-        public Input.ICommand PauseTimer
-        {
-            get
-            {
-                if (_pauseTimer == null)
-                {
-                    _pauseTimer = new DelegateCommand((o) =>
-                    {
-                        var command = new DirectConnectPauseTimer(_device, _networkAgent, _logger);
-                        _invoker.Invoke(command);
-                    });
-                }
-                return _pauseTimer;
-            }
-        }
-
-        private DelegateCommand _resetTimer;
-        public Input.ICommand ResetTimer
-        {
-            get
-            {
-                if (_resetTimer == null)
-                {
-                    _resetTimer = new DelegateCommand((o) =>
-                    {
-                        var command = new DirectConnectResetTimer(_device, _networkAgent, _logger);
-                        _invoker.Invoke(command);
-                    });
-                }
-                return _resetTimer;
-            }
-        }
-
-        private DelegateCommand _stopResetTimer;
-        public Input.ICommand StopResetTimer
-        {
-            get
-            {
-                if (_stopResetTimer == null)
-                {
-                    _stopResetTimer = new DelegateCommand((o) =>
-                    {
-                        var command = new DirectConnectStopResetTimer(_device, _networkAgent, _logger);
-                        _invoker.Invoke(command);
-                    });
-                }
-                return _stopResetTimer;
             }
         }
     }

@@ -1,7 +1,6 @@
 ﻿using DeviceBuilding;
 using BaseDevice;
 using CommandProcessing.DTO;
-using Newtonsoft.Json;
 using ServiceInterfaces;
 using System;
 using System.Timers;
@@ -18,9 +17,15 @@ namespace CommandProcessing
 
         public event EventHandler<Device> OnConfigurationDownloaded;
 
-        public DirectConnectDownloadSettingsCommand(Device device,
-            DeviceFactory deviceFactory, INetworkAgent networkAgent, ILogger logger, int timeout = 10000) 
-            : base(device, networkAgent, logger)
+        public DirectConnectDownloadSettingsCommand(
+            Device device,
+            DeviceFactory deviceFactory,
+            INetworkAgent networkAgent,
+            IRequestBuilder requestBuilder,
+            IResponceProcessor responceProcessor,
+            ILogger logger,
+            int timeout = 10000)
+            : base(device, networkAgent, requestBuilder, responceProcessor, logger)
         {
             _deviceFactory = deviceFactory;
             _timeout = timeout;
@@ -28,11 +33,13 @@ namespace CommandProcessing
 
         public override void Execute()
         {
-            var requestString = JsonConvert.SerializeObject(new Request
+#warning перейти к запросам блоками
+            var request = new BaseRequest
             {
                 GetConfig = new object()
-            });
-            _networkAgent.Send(_device.Network.IpAddress, _device.Network.Port, requestString);
+            };
+            _requestBuilder.SetRequest(request);
+            _networkAgent.Send(_device.Network.IpAddress, _device.Network.Port, _requestBuilder);
             _logger.Debug(this, $"Жду ответ {_timeout} мс");
             _networkAgent.Listen(_device.Network.Port, (recieveString) =>
             {

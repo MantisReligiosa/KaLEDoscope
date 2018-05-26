@@ -8,20 +8,25 @@ namespace UdpExcange
 {
     public class UdpAgent : INetworkAgent
     {
+#warning Почему public?
         public ILogger Logger { get; set; }
-
         private UdpClient _udpClient;
         private bool _isClosed = false;
 
-        public void SendBroadcast(int port, string requestString)
+        private void SendBroadcast(int port, byte[] bytes)
         {
             _isClosed = false;
             var endPoint = new IPEndPoint(IPAddress.Broadcast, port);
             _udpClient = new UdpClient();
             _udpClient.Connect(endPoint);
-            var bytes = Encoding.UTF8.GetBytes(requestString);
             _udpClient.Send(bytes, bytes.Length);
             Close();
+        }
+
+        public void SendBroadcast(int port, IRequestBuilder requestBuilder)
+        {
+            Logger.Debug(this, $"Широковещательный запрос по UDP, порт {port}: {requestBuilder.GetString()}");
+            SendBroadcast(port, requestBuilder.GetBytes());
         }
 
         public void Close()
@@ -72,7 +77,7 @@ namespace UdpExcange
             }
         }
 
-        public void Send(string ipAddress, int port, string requestString)
+        public void Send(string ipAddress, int port, IRequestBuilder requestBuilder)
         {
             throw new NotImplementedException();
         }

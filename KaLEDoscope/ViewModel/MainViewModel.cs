@@ -38,6 +38,8 @@ namespace KaLEDoscope
         private readonly ObservableCollection<LogItem> _logItems = new ObservableCollection<LogItem>();
         private readonly INetworkAgent _networkScanAgent;
         private readonly INetworkAgent _networkExchangeAgent;
+        private readonly IRequestBuilder _requestBuilder;
+        private readonly IResponceProcessor _responceProcessor;
 
         private const string _defaultStructureFileName = "Структура";
         private const string _defaultStructureFileExtension = ".struct";
@@ -66,12 +68,20 @@ namespace KaLEDoscope
         public int Errors { get; set; }
 
 
-        public MainViewModel(ILogger logger, ICompressor compressor, INetworkAgent networkScanAgent, INetworkAgent networkExchangeAgent)
+        public MainViewModel(
+            ILogger logger,
+            ICompressor compressor,
+            INetworkAgent networkScanAgent,
+            INetworkAgent networkExchangeAgent,
+            IRequestBuilder requestBuilder,
+            IResponceProcessor responceProcessor)
         {
             _logger = logger;
             _compressor = compressor;
             _networkScanAgent = networkScanAgent;
             _networkExchangeAgent = networkExchangeAgent;
+            _requestBuilder = requestBuilder;
+            _responceProcessor = responceProcessor;
             _logger.InfoRaised += (sender, message) => LogMessage(new LogItem
             {
                 LogLevel = LogLevel.Info,
@@ -114,7 +124,7 @@ namespace KaLEDoscope
 
         private void MakeNodes()
         {
-            var directConnectDeviceScanner = new DeviceScanner(_logger, _networkScanAgent, _deviceFactory);
+            var directConnectDeviceScanner = new DeviceScanner(_logger, _networkScanAgent, _requestBuilder, _responceProcessor, _deviceFactory);
             directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
             directConnectDeviceScanner.StartSearch();
             IsScanEnabled = false;
@@ -790,7 +800,7 @@ namespace KaLEDoscope
 
         private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems)
         {
-            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _logger);
+            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _requestBuilder, _responceProcessor, _logger);
             model.OnNodeRenamed += ((sender, node) =>
             {
                 var tab = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);

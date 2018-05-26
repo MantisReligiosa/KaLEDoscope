@@ -53,6 +53,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Setup", "Setup\Setup.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Compression", "Infrastructure\Compression\Compression.csproj", "{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonExchange", "Infrastructure\JsonExchange\JsonExchange.csproj", "{A57D4318-0F02-453F-8A05-3B4D56B65254}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,10 @@ Global
 		{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A57D4318-0F02-453F-8A05-3B4D56B65254}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A57D4318-0F02-453F-8A05-3B4D56B65254}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A57D4318-0F02-453F-8A05-3B4D56B65254}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A57D4318-0F02-453F-8A05-3B4D56B65254}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -158,6 +164,7 @@ Global
 		{802F2818-55B8-43E0-80E8-A72FB8E15054} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
 		{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44} = {CB066D1E-7C67-40AC-9F9F-19D75635B074}
 		{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
+		{A57D4318-0F02-453F-8A05-3B4D56B65254} = {AAAD01AE-698E-470D-B07A-BFE80E4046CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8C0D49DF-1E93-42DA-A343-18EBC2062313}

@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using TcpExcange;
 
 namespace SevenSegmentBoardDevice
 {
@@ -21,8 +20,7 @@ namespace SevenSegmentBoardDevice
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var pack = new ControlsPack();
-            var networkAgent = new TcpAgent();
-            var model = new TimerDeviceViewModel(device, networkAgent, logger);
+            var model = new TimerDeviceViewModel(device, logger);
             var timerControl = new TimerControl
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,

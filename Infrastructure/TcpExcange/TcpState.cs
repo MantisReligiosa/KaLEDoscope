@@ -5,7 +5,6 @@ namespace TcpExcange
 {
     internal class TcpState
     {
-        public IPEndPoint Endpoint;
         public TcpListener TcpListener;
     }
 }
