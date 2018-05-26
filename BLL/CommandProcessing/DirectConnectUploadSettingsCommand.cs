@@ -1,13 +1,13 @@
 ﻿using BaseDevice;
 using Newtonsoft.Json;
 using ServiceInterfaces;
-using TcpExcange;
 
 namespace CommandProcessing
 {
-    public class DirectConnectUploadSettingsCommand : Command<Device, TcpAgent>
+    public class DirectConnectUploadSettingsCommand : DeviceCommand<Device>
     {
-        public DirectConnectUploadSettingsCommand(Device device, ILogger logger) : base(device, logger)
+        public DirectConnectUploadSettingsCommand(Device device, INetworkAgent networkAgent, ILogger logger)
+            : base(device, networkAgent, logger)
         {
         }
 

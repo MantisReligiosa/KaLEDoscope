@@ -41,8 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Command.cs" />
-    <Compile Include="ICommand.cs" />
+    <Compile Include="DeviceCommand.cs" />
+    <Compile Include="IDeviceCommand.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="INetworkAgent.cs" />

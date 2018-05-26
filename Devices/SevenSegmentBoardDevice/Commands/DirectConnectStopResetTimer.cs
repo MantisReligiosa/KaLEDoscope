@@ -1,17 +1,13 @@
-﻿using TcpExcange;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using ServiceInterfaces;
-using SevenSegmentBoardDevice;
 using SevenSegmentBoardDevice.Commands.DTO;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 
 namespace SevenSegmentBoardDevice.Commands
 {
-    public class DirectConnectStopResetTimer : Command<SevenSegmentBoard, TcpAgent>
+    public class DirectConnectStopResetTimer : DeviceCommand<SevenSegmentBoard>
     {
-        public DirectConnectStopResetTimer(SevenSegmentBoard board, ILogger logger) : base(board, logger) { }
+        public DirectConnectStopResetTimer(SevenSegmentBoard board, INetworkAgent networkAgent, ILogger logger)
+            : base(board, networkAgent, logger) { }
 
         public override string Name => "Стоп";
 

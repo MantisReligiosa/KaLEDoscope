@@ -5,11 +5,10 @@ using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Timers;
-using UdpExcange;
 
 namespace CommandProcessing
 {
-    public class DirectConnectScanCommand : Command<Device, UdpAgent>
+    public class DirectConnectScanCommand : DeviceCommand<Device>
     {
         private readonly int _port;
         private readonly int _timeout;
@@ -18,7 +17,8 @@ namespace CommandProcessing
         public event Action<List<Device>> OnScanCompleted;
         public override string Name => "Распознавание устройств";
 
-        public DirectConnectScanCommand(ILogger logger, int port = 30000, int timeout = 10000) : base(null, logger)
+        public DirectConnectScanCommand(INetworkAgent networkAgent, ILogger logger, int port = 30000, int timeout = 10000)
+            : base(null, networkAgent, logger)
         {
             _devices = new List<Device>();
             _port = port;
@@ -27,40 +27,6 @@ namespace CommandProcessing
 
         public override void Execute()
         {
-            //#if DEBUG
-            //            _devices.Add(new Device
-            //            {
-            //                Model = "boardClock",
-            //                Network = new Network
-            //                {
-            //                    IpAddress = "192.168.0.88",
-            //                    Port = 500
-            //                },
-            //                Id = 1,
-            //                Name = "Часы 1"
-            //            });
-            //            _devices.Add(new Device
-            //            {
-            //                Model = "pixelBoard",
-            //                Id = 2,
-            //                Network = new Network
-            //                {
-            //                    IpAddress = "192.168.0.77",
-            //                    Port = 500
-            //                },
-            //                Name = "Бегущая строка"
-            //            });
-            //            _devices.Add(new Device
-            //            {
-            //                Model = "strange",
-            //                Id = 13,
-            //                Network = new Network
-            //                {
-            //                    IpAddress = "192.168.0.13",
-            //                    Port = 500
-            //                }
-            //            });
-            //#endif
             _logger.Info(this, $"Начало сканирования по UDP. Порт {_port}");
             var request = new Request
             {

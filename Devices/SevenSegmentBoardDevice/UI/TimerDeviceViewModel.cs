@@ -22,6 +22,7 @@ namespace SevenSegmentBoardDevice.UI
         private readonly SevenSegmentBoard _device;
         private readonly ILogger _logger;
         private readonly Invoker _invoker;
+        private readonly INetworkAgent _networkAgent;
 
         private readonly List<DisplayType> _displayTypes = new List<DisplayType>
         {
@@ -440,9 +441,10 @@ namespace SevenSegmentBoardDevice.UI
 
         public Alarm SelectedAlarm { get; set; }
 
-        public TimerDeviceViewModel(Device device, ILogger logger)
+        public TimerDeviceViewModel(Device device, INetworkAgent networkAgent, ILogger logger)
         {
             _device = (SevenSegmentBoard)device;
+            _networkAgent = networkAgent;
             _logger = logger;
             _invoker = new Invoker(_logger);
             DisplayTypes = new ObservableCollection<DisplayType>(_displayTypes);
@@ -514,7 +516,7 @@ namespace SevenSegmentBoardDevice.UI
                 {
                     _startTimer = new DelegateCommand((o) =>
                       {
-                          var command = new DirectConnectStartTimer(_device, _logger);
+                          var command = new DirectConnectStartTimer(_device, _networkAgent, _logger);
                           _invoker.Invoke(command);
                       });
                 }
@@ -531,7 +533,7 @@ namespace SevenSegmentBoardDevice.UI
                 {
                     _pauseTimer = new DelegateCommand((o) =>
                     {
-                        var command = new DirectConnectPauseTimer(_device, _logger);
+                        var command = new DirectConnectPauseTimer(_device, _networkAgent, _logger);
                         _invoker.Invoke(command);
                     });
                 }
@@ -548,7 +550,7 @@ namespace SevenSegmentBoardDevice.UI
                 {
                     _resetTimer = new DelegateCommand((o) =>
                     {
-                        var command = new DirectConnectResetTimer(_device, _logger);
+                        var command = new DirectConnectResetTimer(_device, _networkAgent, _logger);
                         _invoker.Invoke(command);
                     });
                 }
@@ -565,7 +567,7 @@ namespace SevenSegmentBoardDevice.UI
                 {
                     _stopResetTimer = new DelegateCommand((o) =>
                     {
-                        var command = new DirectConnectStopResetTimer(_device, _logger);
+                        var command = new DirectConnectStopResetTimer(_device, _networkAgent, _logger);
                         _invoker.Invoke(command);
                     });
                 }

@@ -1,5 +1,4 @@
-﻿using TcpExcange;
-using DeviceBuilding;
+﻿using DeviceBuilding;
 using BaseDevice;
 using CommandProcessing.DTO;
 using Newtonsoft.Json;
@@ -9,7 +8,7 @@ using System.Timers;
 
 namespace CommandProcessing
 {
-    public class DirectConnectDownloadSettingsCommand : Command<Device, TcpAgent>
+    public class DirectConnectDownloadSettingsCommand : DeviceCommand<Device>
     {
         private readonly DeviceFactory _deviceFactory;
         private readonly int _timeout;
@@ -20,7 +19,8 @@ namespace CommandProcessing
         public event EventHandler<Device> OnConfigurationDownloaded;
 
         public DirectConnectDownloadSettingsCommand(Device device,
-            DeviceFactory deviceFactory, ILogger logger, int timeout = 10000) : base(device, logger)
+            DeviceFactory deviceFactory, INetworkAgent networkAgent, ILogger logger, int timeout = 10000) 
+            : base(device, networkAgent, logger)
         {
             _deviceFactory = deviceFactory;
             _timeout = timeout;
@@ -58,7 +58,7 @@ namespace CommandProcessing
         {
             _networkAgent.Close();
             _logger.Debug(this, $"Завершение запроса конфигурации");
-            OnConfigurationDownloaded?.Invoke(this,_device);
+            OnConfigurationDownloaded?.Invoke(this, _device);
         }
 
         public override void Finally()

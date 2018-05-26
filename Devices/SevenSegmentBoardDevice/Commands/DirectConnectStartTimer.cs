@@ -1,13 +1,13 @@
-﻿using TcpExcange;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using ServiceInterfaces;
 using SevenSegmentBoardDevice.Commands.DTO;
 
 namespace SevenSegmentBoardDevice.Commands
 {
-    public class DirectConnectStartTimer : Command<SevenSegmentBoard, TcpAgent>
+    public class DirectConnectStartTimer : DeviceCommand<SevenSegmentBoard>
     {
-        public DirectConnectStartTimer(SevenSegmentBoard board, ILogger logger) : base(board, logger) { }
+        public DirectConnectStartTimer(SevenSegmentBoard board, INetworkAgent networkAgent, ILogger logger) 
+            : base(board, networkAgent, logger) { }
 
         public override string Name => "Пуск секундомера";
 

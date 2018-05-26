@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using TcpExcange;
 
 namespace SevenSegmentBoardDevice
 {
@@ -20,7 +21,8 @@ namespace SevenSegmentBoardDevice
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var pack = new ControlsPack();
-            var model = new TimerDeviceViewModel(device, logger);
+            var networkAgent = new TcpAgent();
+            var model = new TimerDeviceViewModel(device, networkAgent, logger);
             var timerControl = new TimerControl
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -30,9 +32,9 @@ namespace SevenSegmentBoardDevice
             pack.CustomizationControl = timerControl;
             pack.PreviewControl = new UserControl
             {
-                Content=new Label
+                Content = new Label
                 {
-                    Content="Тут будет предпросмотр для часов"
+                    Content = "Тут будет предпросмотр для часов"
                 }
             };
             return pack;

@@ -1,11 +1,12 @@
 ﻿using BaseDevice;
 namespace ServiceInterfaces
 {
-    public interface ICommand
+    public interface IDeviceCommand<out TDevice>
+        where TDevice : Device
     {
         void Execute();
         void Finally();
         string Name { get; }
-        Device Device { get; }
+        TDevice Device { get; }
     }
 }

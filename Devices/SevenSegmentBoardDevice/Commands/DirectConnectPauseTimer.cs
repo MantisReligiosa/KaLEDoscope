@@ -1,12 +1,12 @@
 ﻿using Newtonsoft.Json;
 using ServiceInterfaces;
-using TcpExcange;
 
 namespace SevenSegmentBoardDevice.Commands
 {
-    public class DirectConnectPauseTimer : Command<SevenSegmentBoard, TcpAgent>
+    public class DirectConnectPauseTimer : DeviceCommand<SevenSegmentBoard>
     {
-        public DirectConnectPauseTimer(SevenSegmentBoard board, ILogger logger) : base(board, logger) { }
+        public DirectConnectPauseTimer(SevenSegmentBoard board, INetworkAgent networkAgent, ILogger logger)
+            : base(board, networkAgent, logger) { }
 
         public override string Name => "Пауза секундомера";
 
