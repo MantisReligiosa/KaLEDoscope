@@ -38,8 +38,6 @@ namespace KaLEDoscope
         private readonly ObservableCollection<LogItem> _logItems = new ObservableCollection<LogItem>();
         private readonly INetworkAgent _networkScanAgent;
         private readonly INetworkAgent _networkExchangeAgent;
-        private readonly IRequestBuilder _requestBuilder;
-        private readonly IResponceProcessor _responceProcessor;
 
         private const string _defaultStructureFileName = "Структура";
         private const string _defaultStructureFileExtension = ".struct";
@@ -72,16 +70,12 @@ namespace KaLEDoscope
             ILogger logger,
             ICompressor compressor,
             INetworkAgent networkScanAgent,
-            INetworkAgent networkExchangeAgent,
-            IRequestBuilder requestBuilder,
-            IResponceProcessor responceProcessor)
+            INetworkAgent networkExchangeAgent)
         {
             _logger = logger;
             _compressor = compressor;
             _networkScanAgent = networkScanAgent;
             _networkExchangeAgent = networkExchangeAgent;
-            _requestBuilder = requestBuilder;
-            _responceProcessor = responceProcessor;
             _logger.InfoRaised += (sender, message) => LogMessage(new LogItem
             {
                 LogLevel = LogLevel.Info,
@@ -106,25 +100,25 @@ namespace KaLEDoscope
             _invoker = new Invoker(_logger);
             IsScanEnabled = true;
             _deviceFactory = new DeviceFactory(_logger);
-            _deviceFactory.Builders.Add(new SevenSegmentDeviceBuilder());
-            _deviceFactory.Builders.Add(new PixelDeviceBuilder());
+            _deviceFactory.AddBuilder(new SevenSegmentDeviceBuilder());
+            _deviceFactory.AddBuilder(new PixelDeviceBuilder());
 
             _logger.Info(this, "Started");
 
-            foreach (var deviceBuilder in _deviceFactory.Builders)
+            foreach (var deviceItem in _deviceFactory.GetBuilderList())
             {
                 DeviceItems.Add(new MenuItem
                 {
-                    Header = deviceBuilder.DisplayName,
+                    Header = deviceItem.DisplayName,
                     Command = AddNewDevice,
-                    CommandParameter = deviceBuilder.Model
+                    CommandParameter = deviceItem.Model
                 });
             }
         }
 
         private void MakeNodes()
         {
-            var directConnectDeviceScanner = new DeviceScanner(_logger, _networkScanAgent, _requestBuilder, _responceProcessor, _deviceFactory);
+            var directConnectDeviceScanner = new DeviceScanner(_logger, _networkScanAgent, _deviceFactory);
             directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
             directConnectDeviceScanner.StartSearch();
             IsScanEnabled = false;
@@ -235,7 +229,6 @@ namespace KaLEDoscope
                     _addNewDevice = new DelegateCommand((o) =>
                     {
                         var model = o.ToString();
-                        var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(model));
                         var rootDevices = StructureNodes.OfType<DeviceNode>();
                         var aggregations = StructureNodes.OfType<AggregationNode>();
                         var folders = StructureNodes.OfType<FolderNode>();
@@ -281,13 +274,7 @@ namespace KaLEDoscope
                                 maxId = maxDeviceId;
                         }
                         var id = maxId + 1;
-                        var device = deviceBuilder.UpdateCustomSettings(new Device
-                        {
-                            Id = id,
-                            Name = $"{deviceBuilder.DisplayName}",
-                            Model = deviceBuilder.Model,
-                            IsStandaloneConfiguration = true
-                        });
+                        var device = _deviceFactory.GetNewDevice(model, id);
                         StructureNodes.Add(new DeviceNode
                         {
                             Device = device,
@@ -491,8 +478,9 @@ namespace KaLEDoscope
                             {
                                 var baseDevice = (serializableContainer.Content as JObject)
                                     .ToObject<SerializableBaseDevice>();
-                                var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(baseDevice.Model));
-                                var device = deviceBuilder.FromSerializable(serializableContainer.Content);
+                                //var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(baseDevice.Model));
+                                //var device = deviceBuilder.FromSerializable(serializableContainer.Content);
+                                var device = _deviceFactory.FromSerializable(baseDevice.Model, serializableContainer.Content);
                                 var deviceNode = new DeviceNode
                                 {
                                     Device = device,
@@ -576,11 +564,10 @@ namespace KaLEDoscope
 
         private SerializableContainer GetDeviceSerializableContainer(DeviceNode node)
         {
-            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(node.Device.Model));
             var deviceSerializableContainer = new SerializableContainer
             {
                 ContentType = ContentType.Device,
-                Content = deviceBuilder.GetSerializable(node.Device)
+                Content = _deviceFactory.GetSerializable(node.Device)
             };
             return deviceSerializableContainer;
         }
@@ -639,18 +626,10 @@ namespace KaLEDoscope
                 SelectedTabItem = existTab;
                 return;
             }
-            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(deviceNode.Device.Model));
-            var previewControl = new UserControl();
-            var customizationControl = new UserControl();
             IEnumerable<object> menuItems = null;
-            if (!deviceBuilder.IsNull())
-            {
-                var pack = deviceBuilder.GetControlsPack(deviceNode.Device, _logger);
-                previewControl = pack.PreviewControl;
-                customizationControl = pack.CustomizationControl;
-                menuItems = pack.MenuItems;
-            }
-            var grid = GetDeviceItemGrid(deviceNode, previewControl, customizationControl, menuItems);
+            var pack = _deviceFactory.GetControlsPack(deviceNode.Device, _logger);
+            menuItems = pack.MenuItems;
+            var grid = GetDeviceItemGrid(deviceNode, pack.PreviewControl, pack.CustomizationControl, menuItems);
             var newTabItem = new ClosableTab
             {
                 Title = GetDeviceTabItemTitle(deviceNode),
@@ -693,17 +672,9 @@ namespace KaLEDoscope
 
         private UserControl GetAggregationGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
         {
-            var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(selectedDeviceNode.Device.Model));
             var previewControl = GetAggregationPreviewGrid(aggregationNode, selectedDeviceNode);
-            var customizationComtrol = new UserControl();
-            IEnumerable<object> menuItems = null;
-            if (!deviceBuilder.IsNull())
-            {
-                var pack = deviceBuilder.GetControlsPack(selectedDeviceNode.Device, _logger);
-                customizationComtrol = pack.CustomizationControl;
-                menuItems = pack.MenuItems;
-            }
-            return GetDeviceItemGrid(selectedDeviceNode, previewControl, customizationComtrol, menuItems);
+            var pack = _deviceFactory.GetControlsPack(selectedDeviceNode.Device, _logger);
+            return GetDeviceItemGrid(selectedDeviceNode, previewControl, pack.CustomizationControl, pack.MenuItems);
         }
 
         private UserControl GetAggregationPreviewGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
@@ -714,8 +685,7 @@ namespace KaLEDoscope
             }
             if (aggregationNode.Nodes.Count == 1)
             {
-                var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(selectedDeviceNode.Device.Model));
-                var pack = deviceBuilder.GetControlsPack(selectedDeviceNode.Device, _logger);
+                var pack = _deviceFactory.GetControlsPack(selectedDeviceNode.Device, _logger);
                 return pack.PreviewControl;
             }
             var control = new UserControl();
@@ -746,8 +716,7 @@ namespace KaLEDoscope
                 {
                     Width = new GridLength(1, GridUnitType.Star)
                 });
-                var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(((DeviceNode)node).Device.Model));
-                var pack = deviceBuilder.GetControlsPack(((DeviceNode)node).Device, _logger);
+                var pack = _deviceFactory.GetControlsPack(((DeviceNode)node).Device, _logger);
                 var devicePreview = pack.PreviewControl;
                 devicePreview.HorizontalAlignment = HorizontalAlignment.Stretch;
                 devicePreview.VerticalAlignment = VerticalAlignment.Stretch;
@@ -800,7 +769,7 @@ namespace KaLEDoscope
 
         private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems)
         {
-            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _requestBuilder, _responceProcessor, _logger);
+            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _logger);
             model.OnNodeRenamed += ((sender, node) =>
             {
                 var tab = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);
@@ -817,18 +786,8 @@ namespace KaLEDoscope
             model.AfterGetingSettings += ((sender, device) =>
               {
                   _updatedNode.Device = device;
-                  var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(device.Model));
-                  previewControl = new UserControl();
-                  var customizationComtrol = new UserControl();
-                  IEnumerable<object> menuItems = null;
-                  if (!deviceBuilder.IsNull())
-                  {
-                      var pack = deviceBuilder.GetControlsPack(_updatedNode.Device, _logger);
-                      previewControl = pack.PreviewControl;
-                      customizationComtrol = pack.CustomizationControl;
-                      menuItems = pack.MenuItems;
-                  }
-                  _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, previewControl, customizationComtrol, menuItems));
+                  var pack = _deviceFactory.GetControlsPack(_updatedNode.Device, _logger);
+                  _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, pack.PreviewControl, pack.CustomizationControl, pack.MenuItems));
                   _tabItem.DataContext = device;
               });
             var control = new CustomizationControl

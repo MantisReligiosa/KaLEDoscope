@@ -42,19 +42,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DeviceCommand.cs" />
+    <Compile Include="ExceptionEventArgs.cs" />
     <Compile Include="IDeviceCommand.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="INetworkAgent.cs" />
-    <Compile Include="IRequestBuilder.cs" />
-    <Compile Include="IResponceProcessor.cs" />
+    <Compile Include="IResponceReciever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request.cs" />
+    <Compile Include="Responce.cs" />
+    <Compile Include="SuccessCommendEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BLL\BaseDevice\BaseDevice.csproj">
+    <ProjectReference Include="..\Domain\BaseDevice\BaseDevice.csproj">
       <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
       <Name>BaseDevice</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Domain\Extensions\Extensions.csproj">
+      <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
+      <Name>Extensions</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

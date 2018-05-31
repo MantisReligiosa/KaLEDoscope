@@ -4,6 +4,7 @@ using ServiceInterfaces;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Extensions;
+using System;
 
 namespace DeviceBuilding
 {
@@ -16,13 +17,18 @@ namespace DeviceBuilding
             _logger = logger;
         }
 
-        public List<IDeviceBuilder> Builders { get; set; } = new List<IDeviceBuilder>();
+        private readonly List<IDeviceBuilder> _builders = new List<IDeviceBuilder>();
+
+        public void AddBuilder(IDeviceBuilder deviceBuilder)
+        {
+            _builders.Add(deviceBuilder);
+        }
 
         public Device Customize(object device) => Customize(device as Device);
 
         public Device Customize(Device device)
         {
-            var builder = Builders.FirstOrDefault(b => b.Model.Equals(device.Model));
+            var builder = _builders.FirstOrDefault(b => b.Model.Equals(device.Model));
             if (!builder.IsNull())
             {
                 device = builder.UpdateCustomSettings(device);
@@ -42,11 +48,21 @@ namespace DeviceBuilding
             return device;
         }
 
+        public Func<Device, INetworkAgent, ILogger, DeviceCommand<Device>> GetDownloadCommands(string model)
+        {
+            return _builders.FirstOrDefault(b => b.Model.Equals(model)).GetDownloadCommands();
+        }
+
+        public IDeviceBuilder GetDeviceBuilder(string model)
+        {
+            return _builders.FirstOrDefault(b => b.Model.Equals(model));
+        }
+
         public Device DeserializeDevice(string text)
         {
             var device = JsonConvert.DeserializeObject<Device>(text);
             _logger.Debug(this, "Извлечение базовой информации");
-            var builder = Builders.FirstOrDefault(b => b.Model.Equals(device.Model));
+            var builder = _builders.FirstOrDefault(b => b.Model.Equals(device.Model));
             if (!builder.IsNull())
             {
                 device = builder.DeserializeDevice(text);
@@ -68,8 +84,43 @@ namespace DeviceBuilding
 
         public string SerializeDevice(Device device)
         {
-            var builder = Builders.FirstOrDefault(b => b.Model.Equals(device.Model));
+            var builder = _builders.FirstOrDefault(b => b.Model.Equals(device.Model));
             return builder.SerializeDevice(device);
+        }
+
+        public IEnumerable<IDeviceBuilder> GetBuilderList()
+        {
+            return _builders;
+        }
+
+        public Device GetNewDevice(string model, int id)
+        {
+            var deviceBuilder = _builders.FirstOrDefault(b => b.Model.Equals(model));
+            return deviceBuilder.UpdateCustomSettings(new Device
+            {
+                Id = id,
+                Name = $"{deviceBuilder.DisplayName}",
+                Model = deviceBuilder.Model,
+                IsStandaloneConfiguration = true
+            });
+        }
+
+        public Device FromSerializable(string model, object content)
+        {
+            var deviceBuilder = _builders.FirstOrDefault(b => b.Model.Equals(model));
+            return deviceBuilder.FromSerializable(content);
+        }
+
+        public object GetSerializable(Device device)
+        {
+            var deviceBuilder = _builders.FirstOrDefault(b => b.Model.Equals(device.Model));
+            return deviceBuilder.GetSerializable(device);
+        }
+
+        public ControlsPack GetControlsPack(Device device, ILogger logger)
+        {
+            var deviceBuilder = _builders.FirstOrDefault(b => b.Model.Equals(device.Model));
+            return deviceBuilder.GetControlsPack(device, logger);
         }
     }
 }

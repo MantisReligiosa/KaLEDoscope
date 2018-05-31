@@ -800,7 +800,7 @@ namespace PixelBoardDevice.UI
                 if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Ticker)
                 {
                     zone.TickerType = value?.Id ?? 0;
-                    AllowTickerCountDown = value.AllowStartValue;
+                    AllowTickerCountDown = value?.AllowStartValue ?? false;
                 }
                 OnPropertyChanged(nameof(SelectedTickerType));
             }

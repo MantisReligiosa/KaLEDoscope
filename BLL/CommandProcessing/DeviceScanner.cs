@@ -13,37 +13,40 @@ namespace CommandProcessing
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
         private readonly INetworkAgent _networkAgent;
-        private readonly IRequestBuilder _requestBuilder;
-        private readonly IResponceProcessor _responceProcessor;
         public event Action<List<Device>> OnScanCompleted;
 
         public DeviceScanner(
             ILogger logger,
             INetworkAgent networkAgent,
-            IRequestBuilder requestBuilder,
-            IResponceProcessor responceProcessor,
             DeviceFactory deviceFactory)
         {
             _logger = logger;
             _deviceFactory = deviceFactory;
             _invoker = new Invoker(_logger);
             _networkAgent = networkAgent;
-            _requestBuilder = requestBuilder;
-            _responceProcessor = responceProcessor;
         }
 
         public void StartSearch()
         {
-            var directConnectScanCommand = new DirectConnectScanCommand(_networkAgent, _requestBuilder, _responceProcessor, _logger);
+            var directConnectScanCommand = new ScanCommand(_networkAgent, _logger);
             directConnectScanCommand.OnScanCompleted += DirectConnectScanCommand_OnScanCompleted;
+            directConnectScanCommand.Error += DirectConnectScanCommand_Error;
             _invoker.Invoke(directConnectScanCommand);
+        }
+
+        private void DirectConnectScanCommand_Error(object sender, ExceptionEventArgs e)
+        {
+            _logger.Error(this, "Ошибка при сканировании", e.Exception);
         }
 
         private void DirectConnectScanCommand_OnScanCompleted(List<Device> devices)
         {
-            var findedDevices = devices ?? new List<Device>();
+            if (!devices.Any())
+            {
+                return;
+            }
             _logger.Info(this, "Начинаю распознавание");
-            OnScanCompleted?.Invoke(findedDevices.Select(d =>
+            OnScanCompleted?.Invoke(devices.Select(d =>
             {
                 return _deviceFactory.Customize(d);
             }

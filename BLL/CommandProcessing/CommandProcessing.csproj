@@ -45,23 +45,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DirectConnectDownloadSettingsCommand.cs" />
+    <Compile Include="Commands\IdentityCommand.cs" />
+    <Compile Include="ConfigurationService.cs" />
     <Compile Include="DirectConnectUploadSettingsCommand.cs" />
-    <Compile Include="DTO\Request.cs" />
-    <Compile Include="DTO\ScanCommandResponce.cs" />
+    <Compile Include="DTO\Identity.cs" />
+    <Compile Include="Exceptions\ExchangeException.cs" />
+    <Compile Include="Exceptions\InvalidByteSequence.cs" />
     <Compile Include="Invoker.cs" />
     <Compile Include="DeviceScanner.cs" />
-    <Compile Include="DirectConnectScanCommand.cs" />
+    <Compile Include="Commands\ScanCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Requests\ConfigurationRequest.cs" />
+    <Compile Include="Requests\ScanRequest.cs" />
+    <Compile Include="Responces\IdentityResponce.cs" />
+    <Compile Include="Responces\ScanResponce.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Domain\BaseDevice\BaseDevice.csproj">
+      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
+      <Name>BaseDevice</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Domain\Extensions\Extensions.csproj">
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
       <Name>Extensions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\BaseDevice\BaseDevice.csproj">
-      <Project>{677B5FDE-5DA7-4065-B446-014822533CBC}</Project>
-      <Name>BaseDevice</Name>
     </ProjectReference>
     <ProjectReference Include="..\DeviceBuilding\DeviceBuilding.csproj">
       <Project>{2D60FBB1-2869-4354-939B-7F72D9B314B3}</Project>

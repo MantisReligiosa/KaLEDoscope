@@ -95,10 +95,6 @@
     <Compile Include="DomainObjects\TimeSyncParameters.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BLL\BaseDevice\BaseDevice.csproj">
-      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
-      <Name>BaseDevice</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\BLL\CommandProcessing\CommandProcessing.csproj">
       <Project>{a9c0a719-e20b-4c57-a443-8c994c70fda9}</Project>
       <Name>CommandProcessing</Name>
@@ -110,6 +106,10 @@
     <ProjectReference Include="..\..\Domain\Abstractions\Abstractions.csproj">
       <Project>{11fba52a-1c5b-4248-a35c-3b7c95d9480c}</Project>
       <Name>Abstractions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Domain\BaseDevice\BaseDevice.csproj">
+      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
+      <Name>BaseDevice</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Domain\Extensions\Extensions.csproj">
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>

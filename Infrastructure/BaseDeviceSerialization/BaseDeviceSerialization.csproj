@@ -47,13 +47,13 @@
     <Compile Include="SerializableWorkSchedule.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\BLL\BaseDevice\BaseDevice.csproj">
-      <Project>{677B5FDE-5DA7-4065-B446-014822533CBC}</Project>
-      <Name>BaseDevice</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Domain\Abstractions\Abstractions.csproj">
       <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
       <Name>Abstractions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Domain\BaseDevice\BaseDevice.csproj">
+      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
+      <Name>BaseDevice</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Domain\Extensions\Extensions.csproj">
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>

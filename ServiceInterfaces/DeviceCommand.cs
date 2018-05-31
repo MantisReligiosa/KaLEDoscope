@@ -1,4 +1,5 @@
-﻿using BaseDevice;
+﻿using System;
+using BaseDevice;
 
 namespace ServiceInterfaces
 {
@@ -7,17 +8,14 @@ namespace ServiceInterfaces
     {
         protected TDevice _device;
         protected INetworkAgent _networkAgent;
-        protected IRequestBuilder _requestBuilder;
-        protected IResponceProcessor _responceProcessor;
+        protected IResponceReciever responceBuilder;
         protected ILogger _logger;
         protected string _commandName;
-        protected DeviceCommand(TDevice device, INetworkAgent networkAgent, IRequestBuilder requestBuilder, IResponceProcessor responceProcessor, ILogger logger)
+        protected DeviceCommand(TDevice device, INetworkAgent networkAgent, ILogger logger)
         {
             _device = device;
             _logger = logger;
             _networkAgent = networkAgent;
-            _requestBuilder = requestBuilder;
-            _responceProcessor = responceProcessor;
             _networkAgent.Logger = _logger;
         }
 
@@ -25,7 +23,25 @@ namespace ServiceInterfaces
 
         public TDevice Device => _device;
 
+        public event EventHandler<SuccessCommendEventArgs> Success;
+        public event EventHandler<ExceptionEventArgs> Error;
+        public event EventHandler Repeat;
+
         public abstract void Execute();
-        public abstract void Finally();
+
+        internal protected void RaiseError(Exception exception)
+        {
+            Error?.Invoke(this, new ExceptionEventArgs { Exception = exception });
+        }
+
+        internal protected void RaiseSuccess()
+        {
+            Success?.Invoke(this, new SuccessCommendEventArgs { Device = _device });
+        }
+
+        internal protected void RaiseRepeat()
+        {
+            Repeat?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

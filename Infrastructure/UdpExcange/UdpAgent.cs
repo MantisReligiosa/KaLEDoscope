@@ -23,24 +23,23 @@ namespace UdpExcange
             Close();
         }
 
-        public void SendBroadcast(int port, IRequestBuilder requestBuilder)
+        public void SendBroadcast(int port, Request request)
         {
-            Logger.Debug(this, $"Широковещательный запрос по UDP, порт {port}: {requestBuilder.GetString()}");
-            SendBroadcast(port, requestBuilder.GetBytes());
+            Logger.Debug(this, $"Широковещательный запрос по UDP, порт {port}: {request.ToString()}");
+            SendBroadcast(port, request.GetBytes());
         }
 
         public void Close()
         {
             _udpClient?.Close();
             _isClosed = true;
-            _messageHandler = null;
         }
 
-        private Action<string> _messageHandler;
-        public void Listen(int port, Action<string> messageHandler)
+        public void Listen<TResponce, T>(int port, Action<TResponce> responceHandler)
+            where TResponce : Responce<T>, new()
+            where T : class, new()
         {
             _isClosed = false;
-            _messageHandler = messageHandler;
             var endPoint = new IPEndPoint(IPAddress.Any, port);
             _udpClient = new UdpClient(endPoint);
             var udpState = new UdpState
@@ -48,36 +47,31 @@ namespace UdpExcange
                 IpEndPoint = endPoint,
                 UdpClient = _udpClient
             };
-            _udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpState);
-        }
-
-        private void ReceiveCallback(IAsyncResult ar)
-        {
-            try
+            var asyncCallback = new AsyncCallback(ar =>
             {
-                if (_isClosed)
+                try
                 {
-                    return;
+                    if (_isClosed)
+                    {
+                        return;
+                    }
+                    var udpClient = ((UdpState)(ar.AsyncState)).UdpClient;
+                    var ipEndPoint = ((UdpState)(ar.AsyncState)).IpEndPoint;
+                    var recievedBytes = udpClient.EndReceive(ar, ref ipEndPoint);
+                    var responce = new TResponce();
+                    responce.SetByteSequence(recievedBytes);
+                    Logger.Debug(this, $"Ответ по UDP, порт {port}: {responce.ToString()}");
                 }
-                var udpClient = ((UdpState)(ar.AsyncState)).UdpClient;
-                var ipEndPoint = ((UdpState)(ar.AsyncState)).IpEndPoint;
-                var recieveBytes = udpClient.EndReceive(ar, ref ipEndPoint);
-                var recieveString = Encoding.UTF8.GetString(recieveBytes);
-                _messageHandler?.Invoke(recieveString);
-                var udpState = new UdpState
+                catch (Exception ex)
                 {
-                    IpEndPoint = ipEndPoint,
-                    UdpClient = udpClient
-                };
-                udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), udpState);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(this, "UDP error", ex);
-            }
+                    Logger.Error(this, "UDP error", ex);
+                }
+            });
+            _udpClient.BeginReceive(asyncCallback, udpState);
         }
 
-        public void Send(string ipAddress, int port, IRequestBuilder requestBuilder)
+
+        public void Send(string ipAddress, int port, Request request)
         {
             throw new NotImplementedException();
         }

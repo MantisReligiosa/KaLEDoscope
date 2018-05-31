@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BaseDevice
+﻿namespace BaseDevice
 {
     public class Device
     {
@@ -10,6 +8,7 @@ namespace BaseDevice
         public Brightness Brightness { get; set; } = new Brightness();
         public Network Network { get; set; } = new Network();
         public string Model { get; set; }
+        public string Firmware { get; set; }
         public bool IsStandaloneConfiguration { get; set; }
         public int? FolderId { get; set; }
         public int? AggregationId { get; set; }

@@ -1,4 +1,5 @@
-﻿using BaseDevice;
+﻿using System;
+using BaseDevice;
 using ServiceInterfaces;
 
 namespace DeviceBuilding
@@ -13,5 +14,6 @@ namespace DeviceBuilding
         Device DeserializeDevice(string text);
         object GetSerializable(Device device);
         Device FromSerializable(object serializableDevice);
+        Func<Device, INetworkAgent, ILogger, DeviceCommand<Device>> GetDownloadCommands();
     }
 }

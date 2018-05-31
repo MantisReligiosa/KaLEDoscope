@@ -216,10 +216,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BLL\BaseDevice\BaseDevice.csproj">
-      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
-      <Name>BaseDevice</Name>
-    </ProjectReference>
     <ProjectReference Include="..\BLL\CommandProcessing\CommandProcessing.csproj">
       <Project>{A9C0A719-E20B-4C57-A443-8C994C70FDA9}</Project>
       <Name>CommandProcessing</Name>
@@ -240,6 +236,10 @@
       <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
       <Name>Abstractions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Domain\BaseDevice\BaseDevice.csproj">
+      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
+      <Name>BaseDevice</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Domain\Extensions\Extensions.csproj">
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
       <Name>Extensions</Name>
@@ -251,10 +251,6 @@
     <ProjectReference Include="..\Infrastructure\Compression\Compression.csproj">
       <Project>{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}</Project>
       <Name>Compression</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure\JsonExchange\JsonExchange.csproj">
-      <Project>{A57D4318-0F02-453F-8A05-3B4D56B65254}</Project>
-      <Name>JsonExchange</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Logger\Logger.csproj">
       <Project>{F5C748BA-65E1-430D-8385-CFD198FE850E}</Project>

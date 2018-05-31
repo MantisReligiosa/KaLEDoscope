@@ -12,7 +12,6 @@ namespace TcpExcange
 
         private TcpClient _tcpClient;
         private TcpListener tcpListener;
-        private Action<string> _messageHandler;
         private bool _isClosed = false;
 
         public void Close()
@@ -20,48 +19,47 @@ namespace TcpExcange
             _isClosed = true;
             _tcpClient?.Close();
             tcpListener?.Stop();
-            _messageHandler = null;
         }
 
-        public void Listen(int port, Action<string> messageHandler)
+        public void Listen<TResponce, T>(int port, Action<TResponce> responceHandler)
+            where TResponce : Responce<T>, new()
+            where T : class, new()
         {
             _isClosed = false;
-            _messageHandler = messageHandler;
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
             var s = new TcpState
             {
                 TcpListener = tcpListener
             };
             tcpListener.Start();
-            tcpListener.BeginAcceptSocket(new AsyncCallback(DoAcceptSocketCallback), s);
+            tcpListener.BeginAcceptSocket(new AsyncCallback(ar =>
+            {
+                var listener = ((TcpState)(ar.AsyncState)).TcpListener;
+                try
+                {
+                    if (_isClosed)
+                        return;
+                    var client = listener.EndAcceptTcpClient(ar);
+                    var stream = client.GetStream();
+                    var data = new byte[1024];
+                    var recievedBytesAmount = stream.Read(data, 0, data.Length);
+                    var recievedBytes = new byte[recievedBytesAmount];
+                    Array.Copy(data, recievedBytes, recievedBytesAmount);
+                    var responce = new TResponce();
+                    responce.SetByteSequence(recievedBytes);
+                    responceHandler?.Invoke(responce);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(this, "Ошибка при получении ответа", ex);
+                }
+            }), s);
         }
 
-        private void DoAcceptSocketCallback(IAsyncResult ar)
+        public void Send(string ipAddress, int port, Request request)
         {
-            var listener = ((TcpState)(ar.AsyncState)).TcpListener;
-            try
-            {
-                if (_isClosed)
-                    return;
-                var client = listener.EndAcceptTcpClient(ar);
-                var stream = client.GetStream();
-                var data = new byte[1024];
-                var recievedBytesAmount = stream.Read(data, 0, data.Length);
-                var recievedBytes = new byte[recievedBytesAmount];
-                Array.Copy(data, recievedBytes, recievedBytesAmount);
-                var recieveString = Encoding.UTF8.GetString(recievedBytes);
-                _messageHandler?.Invoke(recieveString);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(this, "Ошибка при получении ответа", ex);
-            }
-        }
-
-        public void Send(string ipAddress, int port, IRequestBuilder requestBuilder)
-        {
-            Logger.Debug(this, $"Запрос по TCP к {ipAddress}, порт {port}: {requestBuilder.GetString()}");
-            Send(ipAddress, port, requestBuilder.GetBytes());
+            Logger.Debug(this, $"Запрос по TCP к {ipAddress}, порт {port}: {request.ToString()}");
+            Send(ipAddress, port, request.GetBytes());
         }
 
         private void Send(string ipAddress, int port, byte[] bytes)
@@ -75,7 +73,7 @@ namespace TcpExcange
         }
 
 
-        public void SendBroadcast(int port, IRequestBuilder requestBuilder)
+        public void SendBroadcast(int port, Request request)
         {
             throw new NotImplementedException();
         }

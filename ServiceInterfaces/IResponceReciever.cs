@@ -1,6 +1,6 @@
 ﻿namespace ServiceInterfaces
 {
-    public interface IResponceProcessor
+    public interface IResponceReciever
     {
     }
 }

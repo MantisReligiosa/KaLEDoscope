@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Aggregations
+namespace CommandTests
 {
-    public class Aggregation
+    public class ScanCommandTesting
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public void ScanTesting()
+        {
+
+        }
     }
 }

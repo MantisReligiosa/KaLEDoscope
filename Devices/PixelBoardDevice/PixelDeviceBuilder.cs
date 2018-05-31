@@ -143,5 +143,10 @@ namespace PixelBoardDevice
             }
             return null;
         }
+
+        public Func<Device, INetworkAgent, ILogger, DeviceCommand<Device>> GetDownloadCommands()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
