@@ -2,7 +2,7 @@
 
 namespace ResponceTesting
 {
-    public class BasicTests
+    public class BasicResponceTests
     {
         [Fact]
         public void TestToString()

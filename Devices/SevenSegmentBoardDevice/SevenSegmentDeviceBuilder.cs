@@ -51,7 +51,7 @@ namespace SevenSegmentBoardDevice
                 Brightness = castedDevice?.Brightness ?? new Brightness
                 {
                     BrightnessPeriods = new List<BrightnessPeriod>(),
-                    Mode = Mode.Auto
+                    Mode = BrightnessMode.Auto
                 },
                 WorkSchedule = castedDevice?.WorkSchedule ?? new WorkSchedule(),
                 BoardType = castedDevice?.BoardType ?? new BoardType(),
@@ -92,7 +92,7 @@ namespace SevenSegmentBoardDevice
             return null;
         }
 
-        public Func<Device, INetworkAgent, ILogger, DeviceCommand<Device>> GetDownloadCommands()
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands()
         {
             throw new NotImplementedException();
         }

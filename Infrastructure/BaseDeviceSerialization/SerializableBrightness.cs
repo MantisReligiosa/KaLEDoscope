@@ -27,7 +27,7 @@ namespace BaseDeviceSerialization
             {
                 BrightnessPeriods = serializableBrightness.BrightnessPeriods.Select(p => (BrightnessPeriod)p).ToList(),
                 ManualValue = serializableBrightness.ManualValue,
-                Mode = (Mode)serializableBrightness.Mode
+                Mode = (BrightnessMode)serializableBrightness.Mode
             };
         }
     }

@@ -1,16 +1,29 @@
-﻿using System.Text;
+﻿using CommandProcessing.Exceptions;
+using Extensions;
+using ServiceInterfaces;
+using System.Text;
 
-namespace ServiceInterfaces
+namespace CommandProcessing
 {
-    public abstract class Responce<T>
+    public abstract class Responce<T> : IResponce<T>
         where T : class, new()
     {
         protected byte[] _bytes;
         public Resultativity Resultativity { get; private set; }
 
+        public abstract byte ResponceID { get; }
+
         public void SetByteSequence(byte[] recievedBytes)
         {
             _bytes = recievedBytes;
+            var responceId = _bytes[2];
+            if (responceId != ResponceID)
+                throw new InvalidByteSequenceException("Неверный ID ответа");
+            if (recievedBytes.Length < 5)
+                throw new InvalidByteSequenceException("Неверная длина ответа");
+            var dataLength = _bytes.ExtractUshort(3);
+            if (dataLength != _bytes.Length - 5)
+                throw new InvalidByteSequenceException("Неверная длина данных");
             Resultativity = GetResultativity();
         }
 
@@ -33,22 +46,7 @@ namespace ServiceInterfaces
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
-            foreach (var b in _bytes)
-            {
-                sb.Append($"[{b:X2}]");
-            }
-            return sb.ToString();
+            return _bytes.ToStringExtend();
         }
-    }
-
-    public enum Resultativity
-    {
-        IncorrectRequestLength = -3,
-        IncorrectRequestData = -2,
-        IncorrectRequestObject = -1,
-        Busy = 0,
-        DataRequest = 1,
-        Accepted = 2
     }
 }

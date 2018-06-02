@@ -1,0 +1,21 @@
+﻿namespace ServiceInterfaces
+{
+    public interface IResponce<out T> where T : class, new()
+    {
+        byte ResponceID { get; }
+        Resultativity Resultativity { get; }
+        T Cast();
+        void SetByteSequence(byte[] recievedBytes);
+        string ToString();
+    }
+
+    public enum Resultativity
+    {
+        IncorrectRequestLength = -3,
+        IncorrectRequestData = -2,
+        IncorrectRequestObject = -1,
+        Busy = 0,
+        DataRequest = 1,
+        Accepted = 2
+    }
+}

@@ -1,20 +1,14 @@
 ﻿using BaseDevice;
-using CommandProcessing.Exceptions;
 using Extensions;
-using ServiceInterfaces;
 
 namespace CommandProcessing.Responces
 {
     public class ScanResponce : Responce<Device>
     {
+        public override byte ResponceID => 1;
+
         public override Device Cast()
         {
-            var responceId = _bytes[2];
-            if (responceId != 1)
-                throw new InvalidByteSequenceException("Неверный ID ответа");
-            var dataLength = _bytes.ExtractUshort(3);
-            if (dataLength != _bytes.Length - 5)
-                throw new InvalidByteSequenceException("Неверная длина данных");
             var modelNameLenght = _bytes[11];
             var deviceLenght = _bytes[modelNameLenght + 15];
             return new Device

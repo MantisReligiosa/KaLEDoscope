@@ -45,8 +45,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\BrightnessCommand.cs" />
     <Compile Include="Commands\IdentityCommand.cs" />
+    <Compile Include="Commands\WorkScheduleCommand.cs" />
     <Compile Include="ConfigurationService.cs" />
+    <Compile Include="Abstractions\DeviceCommand.cs" />
     <Compile Include="DirectConnectUploadSettingsCommand.cs" />
     <Compile Include="DTO\Identity.cs" />
     <Compile Include="Exceptions\ExchangeException.cs" />
@@ -55,10 +58,15 @@
     <Compile Include="DeviceScanner.cs" />
     <Compile Include="Commands\ScanCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Abstractions\Request.cs" />
     <Compile Include="Requests\ConfigurationRequest.cs" />
     <Compile Include="Requests\ScanRequest.cs" />
+    <Compile Include="Abstractions\Responce.cs" />
+    <Compile Include="Responces\BrightnessResponce.cs" />
     <Compile Include="Responces\IdentityResponce.cs" />
     <Compile Include="Responces\ScanResponce.cs" />
+    <Compile Include="Responces\WorkScheduleResponce.cs" />
+    <Compile Include="Abstractions\RequestingCommand.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Domain\BaseDevice\BaseDevice.csproj">

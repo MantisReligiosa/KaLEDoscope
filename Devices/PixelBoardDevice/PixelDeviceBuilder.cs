@@ -93,7 +93,7 @@ namespace PixelBoardDevice
                 Brightness = castedDevice?.Brightness ?? new Brightness
                 {
                     BrightnessPeriods = new List<BrightnessPeriod>(),
-                    Mode = Mode.Auto
+                    Mode = BrightnessMode.Auto
                 },
                 WorkSchedule = castedDevice?.WorkSchedule ?? new WorkSchedule(),
                 BoardSize = castedDevice?.BoardSize ?? new BoardSize
@@ -144,7 +144,7 @@ namespace PixelBoardDevice
             return null;
         }
 
-        public Func<Device, INetworkAgent, ILogger, DeviceCommand<Device>> GetDownloadCommands()
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands()
         {
             throw new NotImplementedException();
         }

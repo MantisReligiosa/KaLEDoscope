@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Timers;
 
-namespace CommandProcessing
+namespace CommandProcessing.Commands
 {
     public class ScanCommand : DeviceCommand<Device>
     {

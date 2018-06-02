@@ -6,7 +6,7 @@ namespace BaseDevice
 {
     public class Brightness
     {
-        public Mode Mode { get; set; }
+        public BrightnessMode Mode { get; set; }
         public int ManualValue { get; set; }
         public List<BrightnessPeriod> BrightnessPeriods { get; set; }
     }
@@ -55,7 +55,7 @@ namespace BaseDevice
             set; }
     }
 
-    public enum Mode
+    public enum BrightnessMode
     {
         Auto,
         Manual,

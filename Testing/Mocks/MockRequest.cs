@@ -1,6 +1,6 @@
-﻿using ServiceInterfaces;
+﻿using CommandProcessing;
 
-namespace RequestTesting
+namespace Testing
 {
     public class MockRequest : Request
     {

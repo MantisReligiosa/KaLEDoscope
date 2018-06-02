@@ -48,7 +48,7 @@ namespace DeviceBuilding
             return device;
         }
 
-        public Func<Device, INetworkAgent, ILogger, DeviceCommand<Device>> GetDownloadCommands(string model)
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands(string model)
         {
             return _builders.FirstOrDefault(b => b.Model.Equals(model)).GetDownloadCommands();
         }

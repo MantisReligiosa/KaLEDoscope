@@ -223,13 +223,13 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Brightness.Mode == Mode.Auto;
+                return _device.Brightness.Mode == BrightnessMode.Auto;
             }
             set
             {
                 if (value)
                 {
-                    _device.Brightness.Mode = Mode.Auto;
+                    _device.Brightness.Mode = BrightnessMode.Auto;
                 }
                 OnPropertyChanged(nameof(AutomaticBrightness));
             }
@@ -239,13 +239,13 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Brightness.Mode == Mode.Manual;
+                return _device.Brightness.Mode == BrightnessMode.Manual;
             }
             set
             {
                 if (value)
                 {
-                    _device.Brightness.Mode = Mode.Manual;
+                    _device.Brightness.Mode = BrightnessMode.Manual;
                 }
                 OnPropertyChanged(nameof(ManualBrightness));
             }
@@ -268,13 +268,13 @@ namespace KaLEDoscope.ViewModel
         {
             get
             {
-                return _device.Brightness.Mode == Mode.Scheduled;
+                return _device.Brightness.Mode == BrightnessMode.Scheduled;
             }
             set
             {
                 if (value)
                 {
-                    _device.Brightness.Mode = Mode.Scheduled;
+                    _device.Brightness.Mode = BrightnessMode.Scheduled;
                 }
                 OnPropertyChanged(nameof(ScheduledBrightness));
             }

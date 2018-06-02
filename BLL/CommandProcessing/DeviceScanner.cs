@@ -1,4 +1,5 @@
 ﻿using BaseDevice;
+using CommandProcessing.Commands;
 using DeviceBuilding;
 using ServiceInterfaces;
 using System;

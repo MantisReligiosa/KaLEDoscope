@@ -1,6 +1,7 @@
 ﻿using ServiceInterfaces;
+using System;
 
-namespace CommandProcessing
+namespace CommandProcessing.Requests
 {
     public class ConfigurationRequest : Request
     {
@@ -8,7 +9,7 @@ namespace CommandProcessing
 
         public override byte[] MakeData(object o)
         {
-            return new byte[] { (byte)o };
+            return new byte[] { Convert.ToByte(o) };
         }
     }
 }

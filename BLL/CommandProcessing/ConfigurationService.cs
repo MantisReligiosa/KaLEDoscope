@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BaseDevice;
+using CommandProcessing.Commands;
 using DeviceBuilding;
 using ServiceInterfaces;
 
@@ -14,10 +15,12 @@ namespace CommandProcessing
         private readonly Invoker _invoker;
         private readonly ILogger _logger;
 
-        private readonly List<Func<Device, INetworkAgent, ILogger, DeviceCommand<Device>>> _commandProvider
-            = new List<Func<Device, INetworkAgent, ILogger, DeviceCommand<Device>>>
+        private readonly List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> _downloadingCommandProvider
+            = new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
             {
-                (d, n, l) => new IdentityCommand(d, n, l)
+                (d, n, l) => new IdentityCommand(d, n, l),
+                (d, n, l) => new WorkScheduleCommand(d, n, l),
+                (d, n, l) => new BrightnessCommand(d, n, l)
             };
 
         public ConfigurationService(INetworkAgent networkAgent, DeviceFactory deviceFactory, ILogger logger)
@@ -30,14 +33,14 @@ namespace CommandProcessing
 
         public void DownloadSettings(Device device)
         {
-            _commandProvider.Add(_deviceFactory.GetDownloadCommands(device.Model));
+            _downloadingCommandProvider.AddRange(_deviceFactory.GetDownloadCommands(device.Model));
             _logger.Info(this, "Начало загрузки конфигурации");
-            var command = _commandProvider.First().Invoke(device, _networkAgent, _logger);
+            var command = _downloadingCommandProvider.First().Invoke(device, _networkAgent, _logger);
             ProcessCommand(command);
         }
 
         private int _counter = 0;
-        private void ProcessCommand(DeviceCommand<Device> command)
+        private void ProcessCommand(IDeviceCommand<Device> command)
         {
             command.Error += Command_Error;
             command.Success += Command_Success;
@@ -47,9 +50,9 @@ namespace CommandProcessing
         private void Command_Success(object sender, SuccessCommendEventArgs e)
         {
             _counter++;
-            if (_commandProvider.Count > _counter)
+            if (_downloadingCommandProvider.Count > _counter)
             {
-                var command = _commandProvider.ElementAt(_counter).Invoke(e.Device, _networkAgent, _logger);
+                var command = _downloadingCommandProvider.ElementAt(_counter).Invoke(e.Device, _networkAgent, _logger);
                 ProcessCommand(command);
             }
             else

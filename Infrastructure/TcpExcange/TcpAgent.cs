@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 using ServiceInterfaces;
 
 namespace TcpExcange
@@ -22,7 +21,7 @@ namespace TcpExcange
         }
 
         public void Listen<TResponce, T>(int port, Action<TResponce> responceHandler)
-            where TResponce : Responce<T>, new()
+            where TResponce : IResponce<T>, new()
             where T : class, new()
         {
             _isClosed = false;
@@ -56,7 +55,7 @@ namespace TcpExcange
             }), s);
         }
 
-        public void Send(string ipAddress, int port, Request request)
+        public void Send(string ipAddress, int port, IRequest request)
         {
             Logger.Debug(this, $"Запрос по TCP к {ipAddress}, порт {port}: {request.ToString()}");
             Send(ipAddress, port, request.GetBytes());
@@ -73,7 +72,7 @@ namespace TcpExcange
         }
 
 
-        public void SendBroadcast(int port, Request request)
+        public void SendBroadcast(int port, IRequest request)
         {
             throw new NotImplementedException();
         }

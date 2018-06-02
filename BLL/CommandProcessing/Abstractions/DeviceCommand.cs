@@ -1,7 +1,8 @@
 ﻿using System;
 using BaseDevice;
+using ServiceInterfaces;
 
-namespace ServiceInterfaces
+namespace CommandProcessing
 {
     public abstract class DeviceCommand<TDevice> : IDeviceCommand<TDevice>
         where TDevice : Device

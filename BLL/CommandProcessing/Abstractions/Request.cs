@@ -1,9 +1,10 @@
 ﻿using Extensions;
+using ServiceInterfaces;
 using System.Text;
 
-namespace ServiceInterfaces
+namespace CommandProcessing
 {
-    public abstract class Request
+    public abstract class Request : IRequest
     {
         private object _t;
         public abstract byte RequestID { get; }
@@ -31,12 +32,7 @@ namespace ServiceInterfaces
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
-            foreach (var b in GetBytes())
-            {
-                sb.Append($"[{b:X2}]");
-            }
-            return sb.ToString();
+            return GetBytes().ToStringExtend();
         }
     }
 }

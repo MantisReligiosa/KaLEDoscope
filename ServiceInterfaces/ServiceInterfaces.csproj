@@ -41,16 +41,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DeviceCommand.cs" />
     <Compile Include="ExceptionEventArgs.cs" />
     <Compile Include="IDeviceCommand.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="INetworkAgent.cs" />
+    <Compile Include="IRequest.cs" />
+    <Compile Include="IResponce.cs" />
     <Compile Include="IResponceReciever.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Request.cs" />
-    <Compile Include="Responce.cs" />
     <Compile Include="SuccessCommendEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>

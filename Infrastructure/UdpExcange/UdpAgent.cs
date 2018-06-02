@@ -2,7 +2,6 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace UdpExcange
 {
@@ -23,7 +22,7 @@ namespace UdpExcange
             Close();
         }
 
-        public void SendBroadcast(int port, Request request)
+        public void SendBroadcast(int port, IRequest request)
         {
             Logger.Debug(this, $"Широковещательный запрос по UDP, порт {port}: {request.ToString()}");
             SendBroadcast(port, request.GetBytes());
@@ -36,7 +35,7 @@ namespace UdpExcange
         }
 
         public void Listen<TResponce, T>(int port, Action<TResponce> responceHandler)
-            where TResponce : Responce<T>, new()
+            where TResponce : IResponce<T>, new()
             where T : class, new()
         {
             _isClosed = false;
@@ -71,7 +70,7 @@ namespace UdpExcange
         }
 
 
-        public void Send(string ipAddress, int port, Request request)
+        public void Send(string ipAddress, int port, IRequest request)
         {
             throw new NotImplementedException();
         }
