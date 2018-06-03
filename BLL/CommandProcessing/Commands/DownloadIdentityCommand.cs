@@ -1,13 +1,14 @@
 ﻿using BaseDevice;
 using CommandProcessing.DTO;
+using CommandProcessing.Requests;
 using CommandProcessing.Responces;
 using ServiceInterfaces;
 
 namespace CommandProcessing.Commands
 {
-    public class IdentityCommand : RequestingCommand<IdentityResponce, Identity>
+    public class DownloadIdentityCommand : RequestingCommand<ConfigurationRequest, IdentityResponce, Identity>
     {
-        public IdentityCommand(Device device, INetworkAgent networkAgent, ILogger logger)
+        public DownloadIdentityCommand(Device device, INetworkAgent networkAgent, ILogger logger)
             : base(device, networkAgent, logger) { }
 
         public override string Name => "Запрос идентификатора";

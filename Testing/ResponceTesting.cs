@@ -10,9 +10,9 @@ namespace Testing
         [Fact]
         public void Responce_ToString()
         {
-            var responce = new SomeResponce();
-            responce.SetByteSequence(new byte[] { 0xab, 0xcd, 0xef, 0x00, 0x00 });
-            Assert.Equal("[AB][CD][EF][00][00]", responce.ToString());
+            var responce = new AcceptanceResponce();
+            responce.SetByteSequence(new byte[] { 0xab, 0xcd, 0xff, 0x00, 0x00 });
+            Assert.Equal("[AB][CD][FF][00][00]", responce.ToString());
         }
 
         [Fact]

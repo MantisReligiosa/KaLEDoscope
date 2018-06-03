@@ -1,13 +1,13 @@
 ﻿using BaseDevice;
 using CommandProcessing.Exceptions;
-using CommandProcessing.Requests;
 using ServiceInterfaces;
 using System;
 using System.Timers;
 
 namespace CommandProcessing
 {
-    public abstract class RequestingCommand<TResponce, TResponceDTO> : DeviceCommand<Device>
+    public abstract class RequestingCommand<TRequest, TResponce, TResponceDTO> : DeviceCommand<Device>
+        where TRequest : Request, new()
         where TResponce : Responce<TResponceDTO>, new()
         where TResponceDTO : class, new()
     {
@@ -28,7 +28,7 @@ namespace CommandProcessing
 
         public override void Execute()
         {
-            var request = new ConfigurationRequest
+            var request = new TRequest
             {
                 DeviceID = (ushort)_device.Id
             };
@@ -70,7 +70,7 @@ namespace CommandProcessing
                 RaiseRepeat();
                 return;
             }
-            if (responce.Resultativity != Resultativity.DataRequest 
+            if (responce.Resultativity != Resultativity.DataRequest
                 || responce.Resultativity != Resultativity.Accepted)
             {
                 _logger.Debug(this, $"Устройство вернуло код {responce.Resultativity}");

@@ -79,9 +79,7 @@ namespace KaLEDoscope.ViewModel
                         BeforeGettingSettings?.Invoke(this, d);
                         var configurationService = new ConfigurationService(_networkAgent, _deviceFactory, _logger);
                         configurationService.DownloadSettings(d.Device);
-                        //var command = new DirectConnectDownloadSettingsCommand(d.Device,  _networkAgent, _logger);
-                        //command.OnConfigurationDownloaded += ((sender, device) => AfterGetingSettings?.Invoke(this, device));
-                        //_invoker.Invoke(command);
+                        AfterGetingSettings?.Invoke(this, d.Device);
                     });
                 }
                 return _downloadSettings;
@@ -97,8 +95,8 @@ namespace KaLEDoscope.ViewModel
                 {
                     _uploadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
-                        var command = new DirectConnectUploadSettingsCommand(d.Device, _networkAgent, _logger);
-                        _invoker.Invoke(command);
+                        var configurationService = new ConfigurationService(_networkAgent, _deviceFactory, _logger);
+                        configurationService.UploadSettings(d.Device);
                     });
                 }
                 return _uploadSettings;

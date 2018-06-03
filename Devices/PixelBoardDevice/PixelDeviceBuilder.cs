@@ -145,8 +145,11 @@ namespace PixelBoardDevice
         }
 
         public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands()
-        {
-            throw new NotImplementedException();
-        }
+            => new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
+            { };
+
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands()
+            => new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
+            { };
     }
 }

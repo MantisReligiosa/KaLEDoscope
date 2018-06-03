@@ -1,4 +1,5 @@
-﻿using CommandProcessing.Requests;
+﻿using CommandProcessing.DTO;
+using CommandProcessing.Requests;
 using Xunit;
 
 namespace Testing
@@ -43,6 +44,24 @@ namespace Testing
             };
             request.SetRequestData(5);
             Assert.Equal(new byte[] { 0x0F, 0x00, 0x0A, 0x00, 0x01, 0x05 }, request.GetBytes());
+        }
+
+        [Fact]
+        public void UploadIdentityRequest_ByteSequence()
+        {
+            var request = new UploadIdentityRequest
+            {
+                DeviceID = 0xabcd
+            };
+            request.SetRequestData(new Identity
+            {
+                Id = 43982,
+                Name = "deviceName"
+            });
+            Assert.Equal(new byte[]
+            {
+                0xAB,0xCD,0x03,0x00,0x0D,0xAB,0xCE,0x0A,0x64,0x65,0x76,0x69,0x63,0x65,0x4E,0x61,0x6D,0x65
+            }, request.GetBytes());
         }
     }
 }

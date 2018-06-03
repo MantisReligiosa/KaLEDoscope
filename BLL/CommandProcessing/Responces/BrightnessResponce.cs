@@ -13,7 +13,7 @@ namespace CommandProcessing.Responces
             {
                 Mode = (BrightnessMode)_bytes[5],
                 ManualValue = _bytes[6],
-                BrightnessPeriods=new System.Collections.Generic.List<BrightnessPeriod>()
+                BrightnessPeriods = new System.Collections.Generic.List<BrightnessPeriod>()
             };
             var periods = _bytes[7];
             if (periods > 0)

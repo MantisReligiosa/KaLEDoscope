@@ -1,13 +1,14 @@
 ﻿using BaseDevice;
+using CommandProcessing.Requests;
 using CommandProcessing.Responces;
 using ServiceInterfaces;
 
 
 namespace CommandProcessing.Commands
 {
-    public class WorkScheduleCommand : RequestingCommand<WorkScheduleResponce, WorkSchedule>
+    public class DownloadWorkScheduleCommand : RequestingCommand<ConfigurationRequest, WorkScheduleResponce, WorkSchedule>
     {
-        public WorkScheduleCommand(Device device, INetworkAgent networkAgent, ILogger logger)
+        public DownloadWorkScheduleCommand(Device device, INetworkAgent networkAgent, ILogger logger)
             : base(device, networkAgent, logger) { }
 
         public override string Name => "Запрос расписания работы";

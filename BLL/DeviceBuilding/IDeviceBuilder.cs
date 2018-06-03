@@ -16,5 +16,6 @@ namespace DeviceBuilding
         object GetSerializable(Device device);
         Device FromSerializable(object serializableDevice);
         IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands();
+        IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands();
     }
 }

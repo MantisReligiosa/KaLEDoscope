@@ -53,6 +53,11 @@ namespace DeviceBuilding
             return _builders.FirstOrDefault(b => b.Model.Equals(model)).GetDownloadCommands();
         }
 
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands(string model)
+        {
+            return _builders.FirstOrDefault(b => b.Model.Equals(model)).GetUploadCommands();
+        }
+
         public IDeviceBuilder GetDeviceBuilder(string model)
         {
             return _builders.FirstOrDefault(b => b.Model.Equals(model));
