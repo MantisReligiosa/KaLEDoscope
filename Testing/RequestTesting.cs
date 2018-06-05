@@ -1,4 +1,5 @@
-﻿using CommandProcessing.DTO;
+﻿using BaseDevice;
+using CommandProcessing.DTO;
 using CommandProcessing.Requests;
 using Xunit;
 
@@ -60,7 +61,31 @@ namespace Testing
             });
             Assert.Equal(new byte[]
             {
-                0xAB,0xCD,0x03,0x00,0x0D,0xAB,0xCE,0x0A,0x64,0x65,0x76,0x69,0x63,0x65,0x4E,0x61,0x6D,0x65
+                0xAB, 0xCD, 0x03, 0x00, 0x0D, 0xAB, 0xCE, 0x0A, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65,
+                0x4E, 0x61, 0x6D, 0x65
+            }, request.GetBytes());
+        }
+
+        [Fact]
+        public void UploadNetworkRequest_ToByteSequence()
+        {
+            var request = new UploadNetworkRequest
+            {
+                DeviceID = 255
+            };
+            request.SetRequestData(new Network
+            {
+                IpAddress = "192.168.0.9",
+                Port = 500,
+                SubnetMask = 24,
+                Gateway = "192.168.0.100",
+                DnsServer = "192.168.0.101",
+                AlternativeDnsServer = "192.168.0.102"
+            });
+            Assert.Equal(new byte[]
+            {
+               0x00, 0xFF, 0x02, 0x00, 0x16, 0xC0, 0xA8, 0x00, 0x09, 0x01, 0xF4, 0xFF, 0xFF, 0xFF, 0x00, 0xC0, 0xA8,
+               0x00, 0x64, 0xC0, 0xA8, 0x00, 0x65, 0xC0, 0xA8, 0x00, 0x66
             }, request.GetBytes());
         }
     }

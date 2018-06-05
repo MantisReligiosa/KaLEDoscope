@@ -114,7 +114,24 @@ namespace Testing
                 p.To.Equals(new TimeSpan(8, 30, 0)) &&
                 p.Value == 4
             );
+        }
 
+        [Fact]
+        public void NetworkResponce_FromByteSequence()
+        {
+            var networkResponce = new NetworkResponce();
+            networkResponce.SetByteSequence(new byte[]
+            {
+               0x00, 0xFF, 0x02, 0x00, 0x16, 0xC0, 0xA8, 0x00, 0x09, 0x01, 0xF4, 0xFF, 0xFF, 0xFF, 0x00, 0xC0, 0xA8,
+               0x00, 0x64, 0xC0, 0xA8, 0x00, 0x65, 0xC0, 0xA8, 0x00, 0x66
+            });
+            var network = networkResponce.Cast();
+            Assert.Equal("192.168.0.9", network.IpAddress);
+            Assert.Equal(500, network.Port);
+            Assert.Equal(24, network.SubnetMask);
+            Assert.Equal("192.168.0.100", network.Gateway);
+            Assert.Equal("192.168.0.101", network.DnsServer);
+            Assert.Equal("192.168.0.102", network.AlternativeDnsServer);
         }
     }
 }

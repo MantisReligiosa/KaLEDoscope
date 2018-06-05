@@ -62,6 +62,7 @@
     <Compile Include="RequestTesting.cs" />
     <Compile Include="ResponceTesting.cs" />
     <Compile Include="ExtenstionTesting.cs" />
+    <Compile Include="SubnetMaskTesting.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

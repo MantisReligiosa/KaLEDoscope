@@ -19,6 +19,7 @@ namespace CommandProcessing
             = new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
             {
                 (d, n, l) => new DownloadIdentityCommand(d, n, l),
+                (d, n, l) => new DownloadNetworkCommand(d, n, l),
                 (d, n, l) => new DownloadWorkScheduleCommand(d, n, l),
                 (d, n, l) => new DownloadBrightnessCommand(d, n, l)
             };
@@ -26,7 +27,8 @@ namespace CommandProcessing
         private readonly List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> _uploadingCommandContainer
             = new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
             {
-                (d, n, l) => new UploadIdentityCommand(d, n, l)
+                (d, n, l) => new UploadIdentityCommand(d, n, l),
+                (d, n, l) => new UploadNetworkCommand(d, n, l),
             };
 
         public ConfigurationService(INetworkAgent networkAgent, DeviceFactory deviceFactory, ILogger logger)
