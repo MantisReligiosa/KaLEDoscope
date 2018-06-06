@@ -51,6 +51,8 @@
     <Compile Include="Commands\DownloadWorkScheduleCommand.cs" />
     <Compile Include="Commands\UploadIdentityCommand.cs" />
     <Compile Include="Commands\UploadNetworkCommand.cs" />
+    <Compile Include="Commands\UploadBrightnessCommand.cs" />
+    <Compile Include="Commands\UploadWorkScheduleCommand.cs" />
     <Compile Include="ConfigurationService.cs" />
     <Compile Include="Abstractions\DeviceCommand.cs" />
     <Compile Include="DirectConnectUploadSettingsCommand.cs" />
@@ -65,8 +67,10 @@
     <Compile Include="Requests\ConfigurationRequest.cs" />
     <Compile Include="Requests\ScanRequest.cs" />
     <Compile Include="Abstractions\Responce.cs" />
+    <Compile Include="Requests\UploadBrightnessRequest.cs" />
     <Compile Include="Requests\UploadIdentityRequest.cs" />
     <Compile Include="Requests\UploadNetworkRequest.cs" />
+    <Compile Include="Requests\UploadWorkScheduleRequest.cs" />
     <Compile Include="Responces\AcceptanceResponce.cs" />
     <Compile Include="Responces\BrightnessResponce.cs" />
     <Compile Include="Responces\IdentityResponce.cs" />

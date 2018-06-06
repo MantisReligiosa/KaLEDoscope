@@ -29,6 +29,8 @@ namespace CommandProcessing
             {
                 (d, n, l) => new UploadIdentityCommand(d, n, l),
                 (d, n, l) => new UploadNetworkCommand(d, n, l),
+                (d, n, l) => new UploadWorkScheduleCommand(d, n, l),
+                (d, n, l) => new UploadBrightnessCommand(d, n, l)
             };
 
         public ConfigurationService(INetworkAgent networkAgent, DeviceFactory deviceFactory, ILogger logger)

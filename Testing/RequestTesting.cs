@@ -1,6 +1,8 @@
 ﻿using BaseDevice;
 using CommandProcessing.DTO;
 using CommandProcessing.Requests;
+using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Testing
@@ -86,6 +88,130 @@ namespace Testing
             {
                0x00, 0xFF, 0x02, 0x00, 0x16, 0xC0, 0xA8, 0x00, 0x09, 0x01, 0xF4, 0xFF, 0xFF, 0xFF, 0x00, 0xC0, 0xA8,
                0x00, 0x64, 0xC0, 0xA8, 0x00, 0x65, 0xC0, 0xA8, 0x00, 0x66
+            }, request.GetBytes());
+        }
+
+        [Fact]
+        public void UploadWorkScheduleRequest_Schedule_ToByteSequence()
+        {
+            var request = new UploadWorkScheduleRequest
+            {
+                DeviceID = 1
+            };
+            request.SetRequestData(new WorkSchedule
+            {
+                StartFrom = new System.TimeSpan(8, 0, 0),
+                FinishTo = new System.TimeSpan(19, 30, 0),
+                RunInSun = false,
+                RunInMon = true,
+                RunInTue = false,
+                RunInWed = true,
+                RunInThu = false,
+                RunInFri = true,
+                RunInSat = false,
+                AllWeek = false,
+                AroundTheClock = false
+            });
+            Assert.Equal(new byte[]
+            {
+               0x00, 0x01, 0x04, 0x00, 0x05, 0x08, 0x00, 0x13, 0x1E, 0x54
+            }, request.GetBytes());
+        }
+
+        [Fact]
+        public void UploadWorkScheduleRequest_NonStopSchedule_ToByteSequence()
+        {
+            var request = new UploadWorkScheduleRequest
+            {
+                DeviceID = 0x100
+            };
+            request.SetRequestData(new WorkSchedule
+            {
+                StartFrom = new System.TimeSpan(8, 0, 0),
+                FinishTo = new System.TimeSpan(19, 30, 0),
+                RunInSun = false,
+                RunInMon = true,
+                RunInTue = false,
+                RunInWed = true,
+                RunInThu = false,
+                RunInFri = true,
+                RunInSat = false,
+                AllWeek = true,
+                AroundTheClock = true
+            });
+            Assert.Equal(new byte[]
+            {
+               0x01, 0x00, 0x04, 0x00, 0x05, 0xff, 0xff, 0xff, 0xff, 0x80
+            }, request.GetBytes());
+        }
+
+        [Fact]
+        public void UploadBrightnessRequest_Auto_ToByteSequence()
+        {
+            var request = new UploadBrightnessRequest
+            {
+                DeviceID = 0x1111
+            };
+            request.SetRequestData(new Brightness
+            {
+                Mode = BrightnessMode.Auto,
+                ManualValue = 14
+            });
+            Assert.Equal(new byte[]
+            {
+               0x11, 0x11, 0x05, 0x00, 0x03, 0x00, 0x00, 0x00
+            }, request.GetBytes());
+        }
+
+        [Fact]
+        public void UploadBrightnessRequest_Manual_ToByteSequence()
+        {
+            var request = new UploadBrightnessRequest
+            {
+                DeviceID = 0x1111
+            };
+            request.SetRequestData(new Brightness
+            {
+                Mode = BrightnessMode.Manual,
+                ManualValue = 5
+            });
+            Assert.Equal(new byte[]
+            {
+               0x11, 0x11, 0x05, 0x00, 0x03, 0x01, 0x05, 0x00
+            }, request.GetBytes());
+        }
+
+        [Fact]
+        public void UploadBrightnessRequest_Scheduled_ToByteSequence()
+        {
+            var request = new UploadBrightnessRequest
+            {
+                DeviceID = 0x1111
+            };
+            request.SetRequestData(new Brightness
+            {
+                Mode = BrightnessMode.Scheduled,
+                ManualValue = 5,
+                BrightnessPeriods = new List<BrightnessPeriod>
+                {
+                    new BrightnessPeriod
+                    {
+                        From = new TimeSpan(8, 30, 0),
+                        To = new TimeSpan(21, 0, 0),
+                        Value = 7
+                    },
+                    new BrightnessPeriod
+                    {
+                        From = new TimeSpan(21, 0, 0),
+                        To = new TimeSpan(8, 30, 0),
+                        Value = 4
+                    }
+                }
+            });
+            Assert.Equal(new byte[]
+            {
+               0x11, 0x11, 0x05, 0x00, 0x0D, 0x02, 0x00, 0x02, 0x08, 0x1E, 0x15, 0x00, 0x07, 0x15, 0x00, 0x08,
+               0x1E, 0x04
             }, request.GetBytes());
         }
     }

@@ -57,8 +57,8 @@ namespace BaseDevice
 
     public enum BrightnessMode
     {
-        Auto,
-        Manual,
-        Scheduled
+        Auto = 0,
+        Manual = 1,
+        Scheduled = 2
     }
 }
