@@ -1,8 +1,6 @@
-﻿using Abstractions;
-
-namespace KaLEDoscope.POCO.Timer
+﻿namespace KaLEDoscope.POCO.Timer
 {
-    public class FontType : IIdentified, INamed
+    public class FontType
     {
         public int Id { get; set; }
         public string Name { get; set; }

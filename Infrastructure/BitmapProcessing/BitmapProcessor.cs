@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using Font = System.Windows.Media;
@@ -10,28 +9,29 @@ namespace BitmapProcessing
 {
     public static class BitmapProcessor
     {
-        public static string GenerateBase64FontMono(string text, Font.FontFamily newFont, bool itallic, bool bold, int newFontSize)
+        public static string GenerateBase64FontMono(string text, Font.FontFamily newFont, bool itallic, 
+            bool bold, int newFontSize)
         {
             var bitmapChars = new List<bool[,]>();
             foreach (var c in text)
             {
-                var style = System.Drawing.FontStyle.Regular;
+                var style = FontStyle.Regular;
                 if (itallic && bold)
                 {
-                    style = System.Drawing.FontStyle.Italic | System.Drawing.FontStyle.Bold;
+                    style = FontStyle.Italic | FontStyle.Bold;
                 }
                 else if (itallic)
                 {
-                    style = System.Drawing.FontStyle.Italic;
+                    style = FontStyle.Italic;
                 }
                 else if (bold)
                 {
-                    style = System.Drawing.FontStyle.Bold;
+                    style = FontStyle.Bold;
                 }
                 var font = new System.Drawing.Font(newFont.Source, (float)newFontSize, style, GraphicsUnit.Pixel);
                 var image = DrawTextImage(c.ToString(), font, Color.White, Color.Black, Size.Empty) as Bitmap;
-                var trimmedToHeightImage = image.Clone(new Rectangle(0, image.Height - newFontSize, image.Width, newFontSize),
-                    image.PixelFormat);
+                var trimmedToHeightImage = image.Clone(new Rectangle(0, image.Height - newFontSize, image.Width,
+                    newFontSize), image.PixelFormat);
                 var bitmap = BitmapToMonochrome(trimmedToHeightImage);
                 var trimmedbitmap = TrimSpaces(bitmap);
                 bitmapChars.Add(trimmedbitmap);

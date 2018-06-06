@@ -1,28 +1,28 @@
-﻿using BaseDevice;
+﻿using Abstractions;
+using BaseDevice;
+using BaseDeviceSerialization;
 using CommandProcessing;
+using DeviceBuilding;
+using Extensions;
+using GongSolutions.Wpf.DragDrop;
+using KaLEDoscope.Serialization;
 using KaLEDoscope.ViewModel;
 using KaLEDoscope.Views;
+using Microsoft.Win32;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using PixelBoardDevice;
 using ServiceInterfaces;
+using SevenSegmentBoardDevice;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using UiCommands;
 using Input = System.Windows.Input;
-using SevenSegmentBoardDevice;
-using DeviceBuilding;
-using Abstractions;
-using PixelBoardDevice;
-using GongSolutions.Wpf.DragDrop;
-using Extensions;
-using System;
-using Microsoft.Win32;
-using KaLEDoscope.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using BaseDeviceSerialization;
 
 namespace KaLEDoscope
 {

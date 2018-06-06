@@ -1,8 +1,6 @@
-﻿using Abstractions;
-
-namespace SevenSegmentBoardDevice.UI.POCO
+﻿namespace SevenSegmentBoardDevice.UI.POCO
 {
-    public class DisplayType : IIdentified, INamed
+    public class DisplayType
     {
         public int Id { get; set; }
         public string Name { get; set; }

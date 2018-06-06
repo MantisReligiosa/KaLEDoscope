@@ -1,6 +1,6 @@
-﻿using System;
-using BaseDevice;
+﻿using BaseDevice;
 using ServiceInterfaces;
+using System;
 
 namespace CommandProcessing
 {
@@ -9,7 +9,6 @@ namespace CommandProcessing
     {
         protected TDevice _device;
         protected INetworkAgent _networkAgent;
-        protected IResponceReciever responceBuilder;
         protected ILogger _logger;
         protected string _commandName;
         protected DeviceCommand(TDevice device, INetworkAgent networkAgent, ILogger logger)
@@ -24,7 +23,7 @@ namespace CommandProcessing
 
         public TDevice Device => _device;
 
-        public event EventHandler<SuccessCommendEventArgs> Success;
+        public event EventHandler<SuccessCommandEventArgs> Success;
         public event EventHandler<ExceptionEventArgs> Error;
         public event EventHandler Repeat;
 
@@ -37,7 +36,7 @@ namespace CommandProcessing
 
         internal protected void RaiseSuccess()
         {
-            Success?.Invoke(this, new SuccessCommendEventArgs { Device = _device });
+            Success?.Invoke(this, new SuccessCommandEventArgs { Device = _device });
         }
 
         internal protected void RaiseRepeat()

@@ -1,6 +1,4 @@
-﻿using ServiceInterfaces;
-
-namespace CommandProcessing.Requests
+﻿namespace CommandProcessing.Requests
 {
     public class ScanRequest : Request
     {

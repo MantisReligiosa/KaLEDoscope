@@ -3,7 +3,6 @@ using CommandProcessing.Requests;
 using CommandProcessing.Responces;
 using ServiceInterfaces;
 
-
 namespace CommandProcessing.Commands
 {
     public class DownloadWorkScheduleCommand : RequestingCommand<ConfigurationRequest, WorkScheduleResponce, WorkSchedule>

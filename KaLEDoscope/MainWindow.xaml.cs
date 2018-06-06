@@ -12,7 +12,6 @@ namespace KaLEDoscope
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ApplicationInfrastructure _infrastructure = new ApplicationInfrastructure();
         public MainWindow()
         {
             InitializeComponent();
@@ -24,7 +23,6 @@ namespace KaLEDoscope
             viewModel.ShowOptions += new EventHandler(OnShowOptions);
             viewModel.QuitApplication += new EventHandler(OnQuitApplication);
             DataContext = trvMenu.DataContext = viewModel;
-            _infrastructure.Tabs = tabControl.Items;
         }
 
         private void OnQuitApplication(object sender, EventArgs e)

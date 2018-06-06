@@ -1,7 +1,6 @@
 ﻿using CommandProcessing.Exceptions;
 using Extensions;
 using ServiceInterfaces;
-using System.Text;
 
 namespace CommandProcessing
 {

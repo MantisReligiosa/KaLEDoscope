@@ -51,8 +51,11 @@ namespace BaseDevice
         }
 
 
-        public int Value { get;
-            set; }
+        public int Value
+        {
+            get;
+            set;
+        }
     }
 
     public enum BrightnessMode

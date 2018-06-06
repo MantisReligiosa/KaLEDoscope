@@ -29,7 +29,7 @@ namespace CommandProcessing.Requests
             bytes[15] = Convert.ToByte(dns[1]);
             bytes[16] = Convert.ToByte(dns[2]);
             bytes[17] = Convert.ToByte(dns[3]);
-            var alternateDns= network.AlternativeDnsServer.Split('.');
+            var alternateDns = network.AlternativeDnsServer.Split('.');
             bytes[18] = Convert.ToByte(alternateDns[0]);
             bytes[19] = Convert.ToByte(alternateDns[1]);
             bytes[20] = Convert.ToByte(alternateDns[2]);

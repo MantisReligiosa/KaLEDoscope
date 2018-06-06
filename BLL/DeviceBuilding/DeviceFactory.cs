@@ -1,10 +1,10 @@
-﻿using System.Linq;
-using BaseDevice;
-using ServiceInterfaces;
-using System.Collections.Generic;
-using Newtonsoft.Json;
+﻿using BaseDevice;
 using Extensions;
+using Newtonsoft.Json;
+using ServiceInterfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DeviceBuilding
 {

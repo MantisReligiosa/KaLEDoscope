@@ -1,7 +1,7 @@
-﻿using System;
+﻿using ServiceInterfaces;
+using System;
 using System.Net;
 using System.Net.Sockets;
-using ServiceInterfaces;
 
 namespace TcpExcange
 {

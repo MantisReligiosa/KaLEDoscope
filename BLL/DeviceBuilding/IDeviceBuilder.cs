@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using BaseDevice;
+﻿using BaseDevice;
 using ServiceInterfaces;
+using System;
+using System.Collections.Generic;
 
 namespace DeviceBuilding
 {

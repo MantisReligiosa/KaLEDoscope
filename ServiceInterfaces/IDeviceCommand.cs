@@ -10,7 +10,7 @@ namespace ServiceInterfaces
         string Name { get; }
         TDevice Device { get; }
 
-        event EventHandler<SuccessCommendEventArgs> Success;
+        event EventHandler<SuccessCommandEventArgs> Success;
         event EventHandler<ExceptionEventArgs> Error;
         event EventHandler Repeat;
     }

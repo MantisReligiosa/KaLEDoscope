@@ -1,8 +1,6 @@
-﻿using Abstractions;
-
-namespace SevenSegmentBoardDevice.UI.POCO
+﻿namespace SevenSegmentBoardDevice.UI.POCO
 {
-    public class CountdownType : IIdentified, INamed
+    public class CountdownType
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -3,7 +3,7 @@ using System;
 
 namespace ServiceInterfaces
 {
-    public class SuccessCommendEventArgs : EventArgs
+    public class SuccessCommandEventArgs : EventArgs
     {
         public Device Device{get;set;}
     }

@@ -2,7 +2,7 @@
 
 namespace SevenSegmentBoardDevice.UI.POCO
 {
-    public class DisplayFrame : Notified, IIdentified, INamed
+    public class DisplayFrame : Notified
     {
         public int Id { get; set; }
         public string Name { get; set; }

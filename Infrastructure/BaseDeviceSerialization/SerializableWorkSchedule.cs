@@ -1,5 +1,5 @@
-﻿using System;
-using BaseDevice;
+﻿using BaseDevice;
+using System;
 
 namespace BaseDeviceSerialization
 {

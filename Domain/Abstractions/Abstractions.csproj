@@ -40,8 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IIdentified.cs" />
-    <Compile Include="INamed.cs" />
     <Compile Include="Notified.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using BaseDevice;
+﻿using BaseDevice;
 using CommandProcessing.Commands;
 using DeviceBuilding;
 using ServiceInterfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CommandProcessing
 {
@@ -72,7 +72,7 @@ namespace CommandProcessing
             _invoker.Invoke(command);
         }
 
-        private void DownloadCommand_Success(object sender, SuccessCommendEventArgs e)
+        private void DownloadCommand_Success(object sender, SuccessCommandEventArgs e)
         {
             _counter++;
             if (_downloadingCommandContainer.Count > _counter)
@@ -86,7 +86,7 @@ namespace CommandProcessing
             }
         }
 
-        private void UploadCommand_Success(object sender, SuccessCommendEventArgs e)
+        private void UploadCommand_Success(object sender, SuccessCommandEventArgs e)
         {
             _counter++;
             if (_uploadingCommandContainer.Count > _counter)

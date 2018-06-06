@@ -43,5 +43,4 @@ namespace BaseDeviceSerialization
             device.IsStandaloneConfiguration = IsStandaloneConfiguration;
         }
     }
-    
 }

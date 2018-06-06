@@ -7,6 +7,7 @@ using KaLEDoscope.Views;
 using Microsoft.Win32;
 using ServiceInterfaces;
 using System;
+using UiCommands;
 using Input = System.Windows.Input;
 
 namespace KaLEDoscope.ViewModel
