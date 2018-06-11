@@ -478,8 +478,6 @@ namespace KaLEDoscope
                             {
                                 var baseDevice = (serializableContainer.Content as JObject)
                                     .ToObject<SerializableBaseDevice>();
-                                //var deviceBuilder = _deviceFactory.Builders.FirstOrDefault(b => b.Model.Equals(baseDevice.Model));
-                                //var device = deviceBuilder.FromSerializable(serializableContainer.Content);
                                 var device = _deviceFactory.FromSerializable(baseDevice.Model, serializableContainer.Content);
                                 var deviceNode = new DeviceNode
                                 {
@@ -825,7 +823,6 @@ namespace KaLEDoscope
                 {
                     _scanDevices = new DelegateCommand((o) =>
                       {
-                          //_rootNode.Devices.Clear();
                           MakeNodes();
                       });
                 }

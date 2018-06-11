@@ -1,18 +1,14 @@
 ﻿using Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using ServiceInterfaces;
-using System.Collections.ObjectModel;
-using KaLEDoscope.POCO.Timer;
-using System.Globalization;
-using Input = System.Windows.Input;
-using System.Text.RegularExpressions;
 using BaseDevice;
-using CommandProcessing;
-using SevenSegmentBoardDevice.UI.POCO;
-using UiCommands;
 using Extensions;
+using ServiceInterfaces;
+using System;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Linq;
+using System.Text.RegularExpressions;
+using UiCommands;
+using Input = System.Windows.Input;
 
 namespace SevenSegmentBoardDevice.UI
 {
@@ -20,182 +16,6 @@ namespace SevenSegmentBoardDevice.UI
     {
         private readonly SevenSegmentBoard _device;
 
-        private readonly List<DisplayType> _displayTypes = new List<DisplayType>
-        {
-            new DisplayType
-            {
-                Id = 1,
-                Name = "Цифровая",
-                IsFontEnabled = false
-            },
-            new DisplayType
-            {
-                Id = 2,
-                Name = "Пиксельная",
-                IsFontEnabled = true
-            }
-        };
-        private readonly List<FontType> _fontTypes = new List<FontType>
-        {
-            new FontType
-            {
-                Id = 1,
-                Name = "0-Arial8Narrow"
-            },
-            new FontType
-            {
-                Id = 2,
-                Name = "1-Другой"
-            }
-        };
-        private readonly List<DisplayFormat> _displayFormats = new List<DisplayFormat>
-        {
-            new DisplayFormat
-            {
-                Id = 1,
-                Name = "000 (3 сегмента)",
-                Capacity = 3
-            },
-            new DisplayFormat
-            {
-                Id = 2,
-                Name = "00:00 (4 сегмента)",
-                Capacity = 4
-            },
-            new DisplayFormat
-            {
-                Id=3,
-                Name="00:00:00 (6 сегментов)",
-                Capacity = 6
-            },
-            new DisplayFormat
-            {
-                Id = 4,
-                Name = "00:00:00.000 (9 сегментов)",
-                Capacity = 9
-            },
-        };
-        private readonly List<CountdownType> _countdownTypes = new List<CountdownType>
-        {
-            new CountdownType
-            {
-                Id = 1,
-                Name = "Секундомер"
-            },
-            new CountdownType
-            {
-                Id = 2,
-                Name = "Обратный отсчет"
-            }
-        };
-        private readonly List<DisplayFrame> _displayFrames = new List<DisplayFrame>
-        {
-            new DisplayFrame
-            {
-                Id = 1,
-                Name = "Текущее время",
-                DisplayPeriod = 45,
-                IsEnabled = true,
-                IsChecked = true,
-                CharLenght = 4
-            },
-            new DisplayFrame
-            {
-                Id = 2,
-                Name = "Дата дд/мм/гг",
-                DisplayPeriod = 35,
-                IsEnabled = false,
-                IsChecked = false,
-                CharLenght = 6
-            },
-            new DisplayFrame
-            {
-                Id = 3,
-                Name = "Дата дд/мм",
-                DisplayPeriod = 35,
-                IsEnabled = true,
-                IsChecked = false,
-                CharLenght = 4
-            },
-            new DisplayFrame
-            {
-                Id = 4,
-                Name = "гггг",
-                DisplayPeriod = 20,
-                IsEnabled = true,
-                IsChecked = false,
-                CharLenght = 4
-            },
-            new DisplayFrame
-            {
-                Id = 5,
-                Name = "Температура",
-                DisplayPeriod = 25,
-                IsEnabled = true,
-                IsChecked = false,
-                CharLenght = 2
-            },
-            new DisplayFrame
-            {
-                Id = 6,
-                Name = "Влажность",
-                DisplayPeriod = 25,
-                IsEnabled = true,
-                IsChecked = false,
-                CharLenght = 3
-            },
-            new DisplayFrame
-            {
-                Id = 7,
-                Name = "Давление",
-                DisplayPeriod = 5,
-                IsEnabled = true,
-                IsChecked = false,
-                CharLenght = 3
-            },
-            new DisplayFrame
-            {
-                Id = 8,
-                Name = "Уровень радиации",
-                DisplayPeriod = 5,
-                IsEnabled = true,
-                IsChecked = false,
-                CharLenght = 4
-            },
-            new DisplayFrame
-            {
-                Id = 9,
-                Name = "Датчик XXXXX",
-                DisplayPeriod = 5,
-                IsEnabled = false,
-                IsChecked = false,
-                CharLenght = 5
-            }
-        };
-        private readonly List<SyncSource> _syncSources = new List<SyncSource>
-        {
-            new SyncSource
-            {
-                Id = 1,
-                IsCutomized = false,
-                Name = "Встроенный источник точного времени",
-                AllowTimezones = false,
-            },
-            new SyncSource
-            {
-                Id = 2,
-                IsCutomized = true,
-                AllowTimezones = true,
-                Name = "NTP сервер"
-            },
-            new SyncSource
-            {
-                Id = 3,
-                IsCutomized = true,
-                AllowTimezones = false,
-                Name = "Альтернативный источник"
-            }
-        };
         private readonly ReadOnlyCollection<TimeZoneInfo> _timeZones = TimeZoneInfo.GetSystemTimeZones();
 
         public ObservableCollection<DisplayType> DisplayTypes { get; set; }
@@ -217,7 +37,7 @@ namespace SevenSegmentBoardDevice.UI
             set
             {
                 _displayType = value;
-                _device.BoardType.TypeId = value?.Id ?? default(int);
+                _device.BoardType.DisplayType = value;
                 OnPropertyChanged(nameof(DisplayType));
             }
         }
@@ -232,7 +52,7 @@ namespace SevenSegmentBoardDevice.UI
             set
             {
                 _fontType = value;
-                _device.BoardType.FontTypeId = value?.Id ?? default(int);
+                _device.BoardType.FontType = value;
                 OnPropertyChanged(nameof(FontType));
             }
         }
@@ -247,7 +67,7 @@ namespace SevenSegmentBoardDevice.UI
             set
             {
                 _displayFormat = value;
-                _device.BoardType.DisplayFormatId = value?.Id ?? default(int);
+                _device.BoardType.DisplayFormat = value;
                 if (value.IsNull())
                 {
                     return;
@@ -440,18 +260,18 @@ namespace SevenSegmentBoardDevice.UI
         public TimerDeviceViewModel(Device device, ILogger logger)
         {
             _device = (SevenSegmentBoard)device;
-            DisplayTypes = new ObservableCollection<DisplayType>(_displayTypes);
-            DisplayType = _displayTypes.FirstOrDefault(d => d.Id == _device.BoardType?.TypeId);
-            FontTypes = new ObservableCollection<FontType>(_fontTypes);
-            FontType = _fontTypes.FirstOrDefault(f => f.Id == _device.BoardType.FontTypeId);
-            DisplayFrames = new ObservableCollection<DisplayFrame>(_displayFrames);
-            DisplayFormats = new ObservableCollection<DisplayFormat>(_displayFormats);
-            DisplayFormat = _displayFormats.FirstOrDefault(d => d.Id == _device.BoardType.DisplayFormatId);
-            CountdownTypes = new ObservableCollection<CountdownType>(_countdownTypes);
-            CountdownType = _countdownTypes.FirstOrDefault(c => c.Id == _device.StopWatchParameters.CountdownTypeId);
+            DisplayTypes = new ObservableCollection<DisplayType>(Refs.DisplayTypes);
+            DisplayType = Refs.DisplayTypes.FirstOrDefault(d => d == _device.BoardType.DisplayType);
+            FontTypes = new ObservableCollection<FontType>(Refs.FontTypes);
+            FontType = Refs.FontTypes.FirstOrDefault(f => f == _device.BoardType?.FontType);
+            DisplayFrames = new ObservableCollection<DisplayFrame>(Refs.DisplayFrames);
+            DisplayFormats = new ObservableCollection<DisplayFormat>(Refs.DisplayFormats);
+            DisplayFormat = Refs.DisplayFormats.FirstOrDefault(d => d == _device.BoardType.DisplayFormat);
+            CountdownTypes = new ObservableCollection<CountdownType>(Refs.CountdownTypes);
+            CountdownType = Refs.CountdownTypes.FirstOrDefault(c => c.Id == _device.StopWatchParameters.CountdownTypeId);
             CountdownStartValue = _device.StopWatchParameters.CountdownStartValue;
-            SyncSources = new ObservableCollection<SyncSource>(_syncSources);
-            SyncSource = _syncSources.FirstOrDefault(s => s.Id == _device.TimeSyncParameters.SourceId);
+            SyncSources = new ObservableCollection<SyncSource>(Refs.SyncSources);
+            SyncSource = Refs.SyncSources.FirstOrDefault(s => s.Id == _device.TimeSyncParameters.SourceId);
             TimeZones = new ObservableCollection<TimeZoneInfo>(_timeZones);
             TimeZone = _timeZones.FirstOrDefault(t => t.Id.Equals(_device.TimeSyncParameters.ZoneId));
             TimeSyncPeriodValue = _device.TimeSyncParameters.SyncPeriod;

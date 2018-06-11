@@ -2,8 +2,8 @@
 {
     public class BoardType
     {
-        public int TypeId { get; set; }
-        public int FontTypeId { get; set; }
-        public int DisplayFormatId { get; set; }
+        public DisplayType DisplayType { get; set; }
+        public FontType FontType { get; set; }
+        public DisplayFormat DisplayFormat { get; set; }
     }
 }

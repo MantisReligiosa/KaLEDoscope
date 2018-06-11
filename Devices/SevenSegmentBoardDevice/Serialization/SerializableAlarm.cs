@@ -4,9 +4,9 @@ namespace SevenSegmentBoardDevice.Serialization
 {
     public class SerializableAlarm
     {
-        public bool IsActive { get; private set; }
-        public TimeSpan Period { get; private set; }
-        public TimeSpan StartTimeSpan { get; private set; }
+        public bool IsActive { get; set; }
+        public TimeSpan Period { get; set; }
+        public TimeSpan StartTimeSpan { get; set; }
 
         public static explicit operator SerializableAlarm(Alarm alarm)
         {

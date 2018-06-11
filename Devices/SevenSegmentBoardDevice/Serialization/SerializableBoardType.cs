@@ -1,4 +1,6 @@
-﻿namespace SevenSegmentBoardDevice.Serialization
+﻿using System.Linq;
+
+namespace SevenSegmentBoardDevice.Serialization
 {
     public class SerializableBoardType
     {
@@ -10,9 +12,9 @@
         {
             return new BoardType
             {
-                DisplayFormatId = boardType.DisplayFormatId,
-                FontTypeId = boardType.FontTypeId,
-                TypeId = boardType.TypeId
+                DisplayFormat = Refs.DisplayFormats.FirstOrDefault(d => d.Id == boardType.DisplayFormatId),
+                FontType = Refs.FontTypes.FirstOrDefault(f => f.Id == boardType.FontTypeId),
+                DisplayType = Refs.DisplayTypes.FirstOrDefault(d => d.Id == boardType.TypeId)
             };
         }
 
@@ -20,9 +22,9 @@
         {
             return new SerializableBoardType
             {
-                DisplayFormatId = boardType.DisplayFormatId,
-                FontTypeId = boardType.FontTypeId,
-                TypeId = boardType.TypeId
+                DisplayFormatId = boardType.DisplayFormat.Id,
+                FontTypeId = boardType.FontType.Id,
+                TypeId = boardType.DisplayType.Id
             };
         }
     }
