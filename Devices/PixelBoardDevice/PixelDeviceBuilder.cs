@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Newtonsoft.Json.Linq;
+using PixelBoardDevice.Commands;
 
 namespace PixelBoardDevice
 {
@@ -133,20 +134,24 @@ namespace PixelBoardDevice
 
         public Device FromSerializable(object serializableDevice)
         {
-            if (serializableDevice is SerializablePixelDevice)
+            if (serializableDevice is SerializablePixelDevice serializablePixelDevice)
             {
-                return (PixelBoard)(SerializablePixelDevice)serializableDevice;
+                return (PixelBoard)serializablePixelDevice;
             }
-            if (serializableDevice is JObject)
+            if (serializableDevice is JObject jObject)
             {
-                return (PixelBoard)(((JObject)serializableDevice).ToObject<SerializablePixelDevice>());
+                return (PixelBoard)((jObject).ToObject<SerializablePixelDevice>());
             }
             return null;
         }
 
         public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands()
             => new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
-            { };
+            {
+                (d, n, l) => new DownloadBoardConfigCommand(d, n, l),
+                (d, n, l) => new DownloadFontsCommand(d, n, l),
+                (d, n, l) => new DownloadProgrammsCommands(d, n, l)
+            };
 
         public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands()
             => new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>

@@ -10,6 +10,7 @@ namespace PixelBoardDevice.Serialization
         public int Id { get; set; }
         public bool Italic { get; set; }
         public string Source { get; set; }
+        public string Alphabet { get; set; }
 
         public static explicit operator SerializableFont(BinaryFont font)
         {
@@ -20,7 +21,8 @@ namespace PixelBoardDevice.Serialization
                 Height = font.Height,
                 Id = font.Id,
                 Italic = font.Italic,
-                Source = font.Source
+                Source = font.Source,
+                Alphabet = font.Alphabet
             };
         }
 
@@ -33,7 +35,8 @@ namespace PixelBoardDevice.Serialization
                 Height = font.Height,
                 Id = font.Id,
                 Italic = font.Italic,
-                Source = font.Source
+                Source = font.Source,
+                Alphabet = font.Alphabet
             };
         }
     }

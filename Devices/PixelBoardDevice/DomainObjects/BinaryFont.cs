@@ -8,5 +8,6 @@
         public bool Bold { get; set; }
         public string Base64Bitmap { get; set; }
         public string Source { get; set; }
+        public string Alphabet { get; internal set; }
     }
 }

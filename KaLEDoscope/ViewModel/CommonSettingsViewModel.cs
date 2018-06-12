@@ -107,6 +107,7 @@ namespace KaLEDoscope.ViewModel
 
         private bool ParceSubnet(string mask, out byte subnetMaskByte)
         {
+#warning Есть в Extensions
             subnetMaskByte = default(byte);
             var bytesStr = mask.Split('.');
             if (bytesStr.Length != 4)
