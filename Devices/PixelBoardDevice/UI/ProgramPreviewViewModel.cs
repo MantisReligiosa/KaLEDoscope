@@ -78,6 +78,7 @@ namespace PixelBoardDevice.UI
                         renderer.Value(zone,
                                        PreviewContent,
                                        _model.Device.Fonts.FirstOrDefault(f => f.Id == zone.FontId),
+                                       _model.Device.BinaryImages.FirstOrDefault(i => i.Id == zone.BinaryImageId),
                                        _model.PreviewScale);
                     }
                 }
@@ -306,54 +307,54 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        private readonly Dictionary<Func<Zone, bool>, Action<Zone, Canvas, BinaryFont, double>> zoneRenders
-            = new Dictionary<Func<Zone, bool>, Action<Zone, Canvas, BinaryFont, double>>
+        private readonly Dictionary<Func<Zone, bool>, Action<Zone, Canvas, BinaryFont, BinaryImage, double>> zoneRenders
+            = new Dictionary<Func<Zone, bool>, Action<Zone, Canvas, BinaryFont, BinaryImage, double>>
             {
                 {
                     (z) => z.ZoneType==(int)ZoneTypes.Text,
-                    (zone, canvas, font, scale) =>
+                    (zone, canvas, font, image, scale) =>
                     {
                         RenderText(canvas, font, zone.Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
                     (z) => z.ZoneType==(int)ZoneTypes.Sensor,
-                    (zone, canvas, font, scale) =>
+                    (zone, canvas, font, image, scale) =>
                     {
                         RenderText(canvas, font, "[Sensor]", zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
                     (z) => z.ZoneType==(int)ZoneTypes.MQTT,
-                    (zone, canvas, font, scale) =>
+                    (zone, canvas, font, image, scale) =>
                     {
                         RenderText(canvas, font, "[MQTT]", zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
                     (z) => z.ZoneType==(int)ZoneTypes.Picture,
-                    (zone, canvas, font, scale) =>
+                    (zone, canvas, font, image, scale) =>
                     {
-                        RenderBitmap(canvas, zone.BitmapBase64,zone.BitmapHeight,  zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderBitmap(canvas, image.Base64String,image.Height, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
                     (z) => (z.ZoneType==(int)ZoneTypes.Clock && z.ClockType == 1), //Текстовые часы
-                    (zone, canvas, font, scale) =>
+                    (zone, canvas, font, image, scale) =>
                     {
                         RenderText(canvas, font, zone.Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
                     (z) => (z.ZoneType==(int)ZoneTypes.Clock && z.ClockType == 2), //Графические часы
-                    (zone, canvas, font, scale) =>
+                    (zone, canvas, font, image, scale) =>
                     {
                         DrawClockPicture(canvas, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
                     (z) => z.ZoneType==(int)ZoneTypes.Ticker,
-                    (zone, canvas, font, scale) =>
+                    (zone, canvas, font, image, scale) =>
                     {
                         RenderText(canvas, font, "00:00.0000", zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }

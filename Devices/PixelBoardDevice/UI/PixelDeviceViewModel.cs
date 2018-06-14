@@ -893,9 +893,11 @@ namespace PixelBoardDevice.UI
                     _invertBitmap = new DelegateCommand((o) =>
                     {
                         var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                        var base64String = deviceZone.BitmapBase64;
+                        var bitmapId = deviceZone.BinaryImageId;
+                        var binaryImage = Device.BinaryImages.FirstOrDefault(b => b.Id == bitmapId);
+                        var base64String = binaryImage.Base64String;
                         var invertedbase64 = BitmapProcessor.InvertBase64String(base64String);
-                        deviceZone.BitmapBase64 = invertedbase64;
+                        binaryImage.Base64String = invertedbase64;
                         OnPropertyChanged("");
                     });
                 }
@@ -951,21 +953,26 @@ namespace PixelBoardDevice.UI
             var deviceZone = GetDeviceZone(program.Id, zone.Id);
             if (image.IsNull())
             {
-                deviceZone.BitmapHeight = 0;
-                deviceZone.BitmapBase64 = String.Empty;
+                var deletedBitmapImage = Device.BinaryImages.FirstOrDefault(i => i.Id == zone.BinaryImageId);
+                Device.BinaryImages.Remove(deletedBitmapImage);
+                deviceZone.BinaryImageId = 0;
             }
             else
             {
                 var bitmap = new Bitmap(image);
                 var height = bitmap.Height;
                 var base64String = BitmapProcessor.GenerateBase64ImageMono(bitmap);
-                deviceZone.BitmapHeight = height;
-                deviceZone.BitmapBase64 = base64String;
+                var nextId = (Device.BinaryImages.Any()) ? Device.BinaryImages.Max(x => x.Id) + 1 : 0;
+                Device.BinaryImages.Add(new BinaryImage
+                {
+                    Id = nextId,
+                    Base64String = base64String,
+                    Height = height
+                });
+                deviceZone.BinaryImageId = nextId;
             }
             OnPropertyChanged("");
         }
-
-
 
         private DelegateCommand _addProgram;
         public Input.ICommand AddProgram
@@ -1026,6 +1033,7 @@ namespace PixelBoardDevice.UI
                         {
                             ZoneType = (int)DomainObjects.ZoneTypes.Text,
                             Id = nextId,
+                            ProgramId = SelectedProgram.Id,
                             Name = "Текст",
                             X = 0,
                             Y = 0,

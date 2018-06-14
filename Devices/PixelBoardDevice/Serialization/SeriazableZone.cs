@@ -25,13 +25,14 @@ namespace PixelBoardDevice.Serialization
         public TimeSpan ScheduledTimeSync { get; set; }
         public int TickerType { get; set; }
         public TimeSpan TickerCountDownStartValue { get; set; }
+        public int ProgramId { get; set; }
+        public int BinaryImageId { get; set; }
 
         public static explicit operator SeriazableZone(Zone zone)
         {
             return new SeriazableZone
             {
-                BitmapBase64 = zone.BitmapBase64,
-                BitmapHeight = zone.BitmapHeight,
+                BinaryImageId = zone.BinaryImageId,
                 ClockFormat = zone.ClockFormat,
                 ClockType = zone.ClockType,
                 ExternalSourceTag = zone.ExternalSourceTag,
@@ -49,7 +50,8 @@ namespace PixelBoardDevice.Serialization
                 PeriodicSyncInterval = zone.PeriodicSyncInterval,
                 ScheduledTimeSync = zone.ScheduledTimeSync,
                 TickerType = zone.TickerType,
-                TickerCountDownStartValue=zone.TickerCountDownStartValue
+                TickerCountDownStartValue = zone.TickerCountDownStartValue,
+                ProgramId = zone.ProgramId
             };
         }
 
@@ -57,8 +59,7 @@ namespace PixelBoardDevice.Serialization
         {
             return new Zone
             {
-                BitmapBase64 = zone.BitmapBase64,
-                BitmapHeight = zone.BitmapHeight,
+                BinaryImageId = zone.BinaryImageId,
                 ClockFormat = zone.ClockFormat,
                 ClockType = zone.ClockType,
                 ExternalSourceTag = zone.ExternalSourceTag,
@@ -76,7 +77,8 @@ namespace PixelBoardDevice.Serialization
                 PeriodicSyncInterval = zone.PeriodicSyncInterval,
                 ScheduledTimeSync = zone.ScheduledTimeSync,
                 TickerType = zone.TickerType,
-                TickerCountDownStartValue = zone.TickerCountDownStartValue
+                TickerCountDownStartValue = zone.TickerCountDownStartValue,
+                ProgramId = zone.ProgramId
             };
         }
     }

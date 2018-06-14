@@ -23,10 +23,9 @@ namespace PixelBoardDevice.DomainObjects
                 return (new int[] { (int)ZoneTypes.Text, (int)ZoneTypes.Sensor, (int)ZoneTypes.MQTT, (int)ZoneTypes.Clock, (int)ZoneTypes.Ticker }).Contains(ZoneType);
             }
         }
-
+        public int ProgramId { get; set; }
         public string ExternalSourceTag { get; set; }
-        public int BitmapHeight { get; internal set; }
-        public string BitmapBase64 { get; internal set; }
+        public int BinaryImageId { get; set; }
         public int ClockType { get; set; }
         public int ClockFormat { get; internal set; }
         public bool AllowPeriodicTimeSync { get; set; }

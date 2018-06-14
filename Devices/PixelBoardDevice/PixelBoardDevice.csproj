@@ -81,9 +81,11 @@
   <ItemGroup>
     <Compile Include="Commands\DownloadBoardConfigCommand.cs" />
     <Compile Include="Commands\DownloadFontsCommand.cs" />
-    <Compile Include="Commands\DownloadProgrammsCommands.cs" />
+    <Compile Include="Commands\DownloadProgramsCommands.cs" />
     <Compile Include="Commands\DownloadStorageItemsCommand.cs" />
+    <Compile Include="Commands\DownloadZonesCommand.cs" />
     <Compile Include="DomainObjects\BinaryFont.cs" />
+    <Compile Include="DomainObjects\BinaryImage.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
     <Compile Include="DomainObjects\Program.cs" />
     <Compile Include="DomainObjects\Zone.cs" />
@@ -98,6 +100,8 @@
     <Compile Include="Responces\FontResponce.cs" />
     <Compile Include="Responces\IdListResponce.cs" />
     <Compile Include="Responces\ProgramResponce.cs" />
+    <Compile Include="Responces\ZoneResponce.cs" />
+    <Compile Include="Serialization\SerializableBinaryImage.cs" />
     <Compile Include="UI\POCO\TickerType.cs" />
     <Compile Include="UI\ProgramPreviewViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -5,9 +5,9 @@ using ServiceInterfaces;
 
 namespace PixelBoardDevice.Commands
 {
-    public class DownloadProgrammsCommands : DownloadStorageItemsCommand<ProgramResponce, Program>
+    public class DownloadProgramsCommands : DownloadStorageItemsCommand<ProgramResponce, Program>
     {
-        public DownloadProgrammsCommands(Device device, INetworkAgent networkAgent, ILogger logger,
+        public DownloadProgramsCommands(Device device, INetworkAgent networkAgent, ILogger logger,
             int port = 500, int timeout = 100) : base(device, networkAgent, logger, port, timeout)
         {
         }

@@ -19,12 +19,14 @@ namespace PixelBoardDevice.Serialization
             BoardSize = (SerializableBoardSize)device.BoardSize;
             Fonts = device.Fonts.Select(f => (SerializableFont)f).ToList();
             Programs = device.Programs.Select(p => (SerializableProgram)p).ToList();
+            BinaryImages = device.BinaryImages.Select(i => (SerializableBinaryImage)i).ToList();
         }
 
         public string Alphabet { get; set; }
         public SerializableBoardSize BoardSize { get; set; }
         public List<SerializableFont> Fonts { get; set; }
         public List<SerializableProgram> Programs { get; set; }
+        public List<SerializableBinaryImage> BinaryImages { get; private set; }
 
         public static explicit operator SerializablePixelDevice(PixelBoard device)
         {
@@ -39,6 +41,7 @@ namespace PixelBoardDevice.Serialization
             pixelBoard.BoardSize = (BoardSize)serializableDevice.BoardSize;
             pixelBoard.Fonts = serializableDevice.Fonts.Select(f => (BinaryFont)f).ToList();
             pixelBoard.Programs = serializableDevice.Programs.Select(p => (Program)p).ToList();
+            pixelBoard.BinaryImages = serializableDevice.BinaryImages.Select(i => (BinaryImage)i).ToList();
             return pixelBoard;
         }
     }

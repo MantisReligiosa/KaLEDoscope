@@ -150,7 +150,8 @@ namespace PixelBoardDevice
             {
                 (d, n, l) => new DownloadBoardConfigCommand(d, n, l),
                 (d, n, l) => new DownloadFontsCommand(d, n, l),
-                (d, n, l) => new DownloadProgrammsCommands(d, n, l)
+                (d, n, l) => new DownloadProgramsCommands(d, n, l),
+                (d, n, l) => new DownloadZonesCommand(d, n, l)
             };
 
         public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands()
