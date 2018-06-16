@@ -232,5 +232,24 @@ namespace PixelBoardDeviceTesting
             Assert.Equal(20, zone.TickerCountDownStartValue.Seconds);
             Assert.Equal(555, zone.TickerCountDownStartValue.Milliseconds);
         }
+
+        [Fact]
+        public void BinaryImageResponce_FromByteSequence()
+        {
+            var responce = new BinaryImageResponce();
+            responce.SetByteSequence(new byte[]
+            {
+                0x00, 0xaa, 0x25, 0x00, 0x14, 0x02, 0x00, 0x10, 0x00, 0x0f, 0x01, 0x02, 0x03,
+                0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+            });
+            var image = responce.Cast();
+            Assert.Equal(2, image.Id);
+            Assert.Equal(16, image.Height);
+            Assert.Equal(Convert.ToBase64String(new byte[]
+            {
+                0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c,
+                0x0d, 0x0e, 0x0f
+            }), image.Base64String);
+        }
     }
 }

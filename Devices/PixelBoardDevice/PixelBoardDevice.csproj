@@ -79,11 +79,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\DownloadBinaryImageCommand.cs" />
     <Compile Include="Commands\DownloadBoardConfigCommand.cs" />
     <Compile Include="Commands\DownloadFontsCommand.cs" />
     <Compile Include="Commands\DownloadProgramsCommands.cs" />
+    <Compile Include="Commands\UploadFontsCommand.cs" />
+    <Compile Include="Commands\UploadBinaryImageCommand.cs" />
+    <Compile Include="Commands\UploadStorageItemsCommand.cs" />
     <Compile Include="Commands\DownloadStorageItemsCommand.cs" />
     <Compile Include="Commands\DownloadZonesCommand.cs" />
+    <Compile Include="Commands\UploadZonesCommand.cs" />
     <Compile Include="DomainObjects\BinaryFont.cs" />
     <Compile Include="DomainObjects\BinaryImage.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
@@ -93,9 +98,15 @@
     <Compile Include="DTO\StorageItemIndex.cs" />
     <Compile Include="MouseBehaviour.cs" />
     <Compile Include="PixelDeviceBuilder.cs" />
-    <Compile Include="Requests\GetFontsRequest.cs" />
+    <Compile Include="Requests\CleanupStorageRequest.cs" />
     <Compile Include="Requests\GetIdListRequest.cs" />
     <Compile Include="Requests\GetStorageItemRequest.cs" />
+    <Compile Include="Requests\UploadBinaryImageRequest.cs" />
+    <Compile Include="Requests\UploadFontRequest.cs" />
+    <Compile Include="Commands\UploadProgramsCommand.cs" />
+    <Compile Include="Requests\UploadProgramRequest.cs" />
+    <Compile Include="Requests\UploadZoneRequest.cs" />
+    <Compile Include="Responces\BinaryImageResponce.cs" />
     <Compile Include="Responces\BoardConfigResponce.cs" />
     <Compile Include="Responces\FontResponce.cs" />
     <Compile Include="Responces\IdListResponce.cs" />

@@ -151,11 +151,17 @@ namespace PixelBoardDevice
                 (d, n, l) => new DownloadBoardConfigCommand(d, n, l),
                 (d, n, l) => new DownloadFontsCommand(d, n, l),
                 (d, n, l) => new DownloadProgramsCommands(d, n, l),
-                (d, n, l) => new DownloadZonesCommand(d, n, l)
+                (d, n, l) => new DownloadZonesCommand(d, n, l),
+                (d, n, l) => new DownloadBinaryImageCommand(d, n, l)
             };
 
         public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands()
             => new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
-            { };
+            {
+                (d, n, l) => new UploadFontsCommand(d, n, l),
+                (d, n, l) => new UploadProgramsCommand(d, n, l),
+                (d, n, l) => new UploadZonesCommand(d, n, l),
+                (d, n, l) => new UploadBinaryImageCommand(d, n, l)
+            };
     }
 }

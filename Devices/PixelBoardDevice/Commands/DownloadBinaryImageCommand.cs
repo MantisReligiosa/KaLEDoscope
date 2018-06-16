@@ -5,29 +5,29 @@ using ServiceInterfaces;
 
 namespace PixelBoardDevice.Commands
 {
-    public class DownloadFontsCommand : DownloadStorageItemsCommand<FontResponce, BinaryFont>
+    public class DownloadBinaryImageCommand : DownloadStorageItemsCommand<BinaryImageResponce, BinaryImage>
     {
-        public DownloadFontsCommand(Device device, INetworkAgent networkAgent, ILogger logger,
+        public DownloadBinaryImageCommand(Device device, INetworkAgent networkAgent, ILogger logger,
             int port = 500, int timeout = 100)
             : base(device, networkAgent, logger, port, timeout)
         {
         }
 
-        public override byte StorageId => 1;
+        public override byte StorageId => 4;
 
-        public override string Name => "Получение шрифтов";
+        public override string Name => "Получение изображений";
 
         public override void CleanupItemListBeforeRecievingItems()
         {
             var pixelBoard = _device as PixelBoard;
-            pixelBoard.Fonts.Clear();
+            pixelBoard.BinaryImages.Clear();
             _device = pixelBoard;
         }
 
-        public override void ProcessRecievedItem(BinaryFont item)
+        public override void ProcessRecievedItem(BinaryImage item)
         {
             var pixelBoard = _device as PixelBoard;
-            pixelBoard.Fonts.Add(item);
+            pixelBoard.BinaryImages.Add(item);
             _device = pixelBoard;
         }
     }

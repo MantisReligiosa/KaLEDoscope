@@ -1,25 +1,25 @@
 ﻿using BaseDevice;
 using CommandProcessing;
 using CommandProcessing.Exceptions;
-using PixelBoardDevice.DTO;
+using CommandProcessing.Responces;
 using PixelBoardDevice.Requests;
-using PixelBoardDevice.Responces;
 using ServiceInterfaces;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Timers;
 
 namespace PixelBoardDevice.Commands
 {
-    public abstract class DownloadStorageItemsCommand<TStorageItemResponce, TStorageItem> : DeviceCommand<Device>
-        where TStorageItemResponce : Responce<TStorageItem>, new()
-        where TStorageItem : class, new()
+    public abstract class UploadStorageItemsCommand<TUploadStorageItemRequest, TItem> : DeviceCommand<Device>
+        where TUploadStorageItemRequest : Request, new()
+        where TItem : class
     {
         private readonly int _port;
         private readonly int _timeout;
         private Timer _timer;
 
-        protected DownloadStorageItemsCommand(Device device, INetworkAgent networkAgent, ILogger logger,
+        protected UploadStorageItemsCommand(Device device, INetworkAgent networkAgent, ILogger logger,
             int port = 500,
             int timeout = 100)
             : base(device, networkAgent, logger)
@@ -30,9 +30,12 @@ namespace PixelBoardDevice.Commands
 
         public abstract byte StorageId { get; }
 
+        public abstract List<TItem> Items { get; }
+
+        private int itemIndex = 0;
         public override void Execute()
         {
-            var request = new GetIdListRequest()
+            var request = new CleanupStorageRequest()
             {
                 DeviceID = (ushort)_device.Id
             };
@@ -58,7 +61,7 @@ namespace PixelBoardDevice.Commands
             _timer.Start();
             try
             {
-                _networkAgent.Listen<IdListResponce, IdList>(_port, OnIdentityRecieved);
+                _networkAgent.Listen<AcceptanceResponce, object>(_port, OnStorageCleanedUp);
             }
             catch (Exception ex)
             {
@@ -66,15 +69,12 @@ namespace PixelBoardDevice.Commands
             }
         }
 
-        private IdList _idList;
-        private int _currentItemIndex = 0;
-
-        private void OnIdentityRecieved(IdListResponce responce)
+        private void OnStorageCleanedUp(AcceptanceResponce responce)
         {
             if (responce.Resultativity == Resultativity.Busy)
             {
                 _logger.Debug(this, "Устройстов занято");
-                ProcessStoreItemIndex();
+                RaiseRepeat();
                 return;
             }
             if (responce.Resultativity != Resultativity.DataRequest
@@ -84,37 +84,25 @@ namespace PixelBoardDevice.Commands
                 RaiseError(new ExchangeException("Ошибка запроса данных"));
                 return;
             }
-            _idList = responce.Cast();
-            if (StorageId != _idList.StorageId)
-            {
-                _logger.Debug(this, $"Устройство вернуло StorageId {_idList.StorageId}" +
-                    $" вместо ожидаемого {StorageId}");
-                RaiseError(new ExchangeException("Ошибка получения списка идентификаторов"));
-                return;
-            }
             _timer.Stop();
             _networkAgent.Close();
-            CleanupItemListBeforeRecievingItems();
-            if (!_idList.Items.Any())
+            if (Items.Any())
+            {
+                SendItem();
+            }
+            else
             {
                 RaiseSuccess();
-                return;
             }
-            ProcessStoreItemIndex();
         }
 
-        private void ProcessStoreItemIndex()
+        private void SendItem()
         {
-            var currentId = _idList.Items[_currentItemIndex];
-            var request = new GetStorageItemRequest()
+            var request = new TUploadStorageItemRequest()
             {
                 DeviceID = (ushort)_device.Id
             };
-            request.SetRequestData(new StorageItemIndex
-            {
-                StorageId = _idList.StorageId,
-                ItemId = currentId
-            });
+            request.SetRequestData(Items[itemIndex]);
             try
             {
                 _networkAgent.Send(_device.Network.IpAddress, _device.Network.Port, request);
@@ -136,7 +124,7 @@ namespace PixelBoardDevice.Commands
             _timer.Start();
             try
             {
-                _networkAgent.Listen<TStorageItemResponce, TStorageItem>(_port, OnItemRecieved);
+                _networkAgent.Listen<AcceptanceResponce, object>(_port, OnItemSended);
             }
             catch (Exception ex)
             {
@@ -144,12 +132,12 @@ namespace PixelBoardDevice.Commands
             }
         }
 
-        private void OnItemRecieved(TStorageItemResponce responce)
+        private void OnItemSended(AcceptanceResponce responce)
         {
             if (responce.Resultativity == Resultativity.Busy)
             {
                 _logger.Debug(this, "Устройстов занято");
-                RaiseRepeat();
+                SendItem();
                 return;
             }
             if (responce.Resultativity != Resultativity.DataRequest
@@ -159,22 +147,17 @@ namespace PixelBoardDevice.Commands
                 RaiseError(new ExchangeException("Ошибка запроса данных"));
                 return;
             }
-            var item = responce.Cast();
-            ProcessRecievedItem(item);
             _timer.Stop();
             _networkAgent.Close();
-            _currentItemIndex++;
-            if (_currentItemIndex == _idList.Items.Count)
+            itemIndex++;
+            if (Items.Count == itemIndex)
             {
                 RaiseSuccess();
             }
             else
             {
-                ProcessStoreItemIndex();
+                SendItem();
             }
         }
-
-        public abstract void ProcessRecievedItem(TStorageItem item);
-        public abstract void CleanupItemListBeforeRecievingItems();
     }
 }

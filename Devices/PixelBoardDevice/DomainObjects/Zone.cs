@@ -27,7 +27,7 @@ namespace PixelBoardDevice.DomainObjects
         public string ExternalSourceTag { get; set; }
         public int BinaryImageId { get; set; }
         public int ClockType { get; set; }
-        public int ClockFormat { get; internal set; }
+        public int ClockFormat { get; set; }
         public bool AllowPeriodicTimeSync { get; set; }
         public bool AllowScheduledSync { get; set; }
         public int PeriodicSyncInterval { get; set; }
@@ -58,4 +58,5 @@ namespace PixelBoardDevice.DomainObjects
         Clock,
         Ticker
     }
+
 }
