@@ -103,6 +103,7 @@ namespace PixelBoardDevice
                     Width = 160
                 },
                 Fonts = castedDevice?.Fonts ?? new List<BinaryFont>(),
+                BinaryImages = castedDevice?.BinaryImages ?? new List<BinaryImage>(),
                 Programs = castedDevice?.Programs ?? new List<Program>
                 {
                     new Program

@@ -41,7 +41,7 @@ namespace PixelBoardDevice.Serialization
             pixelBoard.BoardSize = (BoardSize)serializableDevice.BoardSize;
             pixelBoard.Fonts = serializableDevice.Fonts.Select(f => (BinaryFont)f).ToList();
             pixelBoard.Programs = serializableDevice.Programs.Select(p => (Program)p).ToList();
-            pixelBoard.BinaryImages = serializableDevice.BinaryImages.Select(i => (BinaryImage)i).ToList();
+            pixelBoard.BinaryImages = serializableDevice.BinaryImages?.Select(i => (BinaryImage)i).ToList() ?? new List<BinaryImage>();
             return pixelBoard;
         }
     }

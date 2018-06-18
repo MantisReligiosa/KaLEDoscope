@@ -311,9 +311,37 @@ namespace KaLEDoscope
                         {
                             node.Parent.Nodes.Remove(node);
                         }
+                        CloseTabs(node);
                     });
                 }
                 return _removeNode;
+            }
+        }
+
+        private void CloseTabs(NodeItem node)
+        {
+            if (node is FolderNode folderNode)
+            {
+                foreach (var childNode in folderNode.Nodes)
+                {
+                    CloseTabs(childNode);
+                }
+            }
+            if (node is AggregationNode aggregationNode)
+            {
+                var tab = DeviceTabs.FirstOrDefault(t => t.DataContext == aggregationNode.Aggregation);
+                if (!tab.IsNull())
+                {
+                    DeviceTabs.Remove(tab);
+                }
+            }
+            if (node is DeviceNode deviceNode)
+            {
+                var tab = DeviceTabs.FirstOrDefault(t => t.DataContext == deviceNode.Device);
+                if (!tab.IsNull())
+                {
+                    DeviceTabs.Remove(tab);
+                }
             }
         }
 
@@ -808,6 +836,7 @@ namespace KaLEDoscope
                     _clearStructure = new DelegateCommand((o) =>
                       {
                           StructureNodes.Clear();
+
                       });
                 }
                 return _clearStructure;

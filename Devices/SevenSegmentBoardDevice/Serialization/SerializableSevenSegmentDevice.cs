@@ -36,7 +36,7 @@ namespace SevenSegmentBoardDevice.Serialization
             var sevenSegmentBoard = new SevenSegmentBoard();
             serializableDevice.FillBasicParameters(sevenSegmentBoard);
             sevenSegmentBoard.AlarmSchedule = serializableDevice.AlarmSchedule.Select(a => (Alarm)a).ToList();
-            sevenSegmentBoard.DisplayFrames = serializableDevice.DisplayFrames.Select(f => (DisplayFrame)f).ToList();
+            sevenSegmentBoard.DisplayFrames = serializableDevice.DisplayFrames?.Select(f => (DisplayFrame)f).ToList() ?? new List<DisplayFrame>();
             sevenSegmentBoard.BoardType = (BoardType)serializableDevice.BoardType;
             sevenSegmentBoard.StopWatchParameters = (StopWatchParameters)serializableDevice.StopWatchParameters;
             sevenSegmentBoard.TimeSyncParameters = (TimeSyncParameters)serializableDevice.TimeSyncParameters;

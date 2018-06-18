@@ -7,7 +7,7 @@
         xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         mc:Ignorable="d"
         xmlns:dd="urn:gong-wpf-dragdrop"
-        Title="MainWindow" d:DesignWidth="900" d:DesignHeight="540" WindowState="Maximized" Icon="Resources/Logo.ico">
+        Title="KaLEDoscope" d:DesignWidth="900" d:DesignHeight="540" WindowState="Maximized" Icon="Resources/Logo.ico">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Closing">
             <i:InvokeCommandAction Command="{Binding Quit}" />
