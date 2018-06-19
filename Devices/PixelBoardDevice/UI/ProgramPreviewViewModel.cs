@@ -296,15 +296,20 @@ namespace PixelBoardDevice.UI
                 {
                     _mouseUp = new DelegateCommand((o) =>
                     {
-                        if (_suggestedMouseState == MouseState.Movement)
-                        {
-                            return;
-                        }
-                        _currentMouseState = MouseState.Movement;
+                        OnMouseUp();
                     });
                 }
                 return _mouseUp;
             }
+        }
+
+        public void OnMouseUp()
+        {
+            if (_suggestedMouseState == MouseState.Movement)
+            {
+                return;
+            }
+            _currentMouseState = MouseState.Movement;
         }
 
         private readonly Dictionary<Func<Zone, bool>, Action<Zone, Canvas, BinaryFont, BinaryImage, double>> zoneRenders

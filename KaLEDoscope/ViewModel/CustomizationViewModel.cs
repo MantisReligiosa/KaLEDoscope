@@ -26,6 +26,7 @@ namespace KaLEDoscope.ViewModel
         public event EventHandler<DeviceNode> OnNodeRenamed;
         public event EventHandler<DeviceNode> BeforeGettingSettings;
         public event EventHandler<Device> AfterGetingSettings;
+        public event EventHandler MouseUpEvent;
 
         public CustomizationViewModel(
             DeviceNode deviceNode,
@@ -159,6 +160,22 @@ namespace KaLEDoscope.ViewModel
                     });
                 }
                 return _loadSettings;
+            }
+        }
+
+        private DelegateCommand _mouseUp;
+        public Input.ICommand MouseUp
+        {
+            get
+            {
+                if (_mouseUp.IsNull())
+                {
+                    _mouseUp = new DelegateCommand((d) => 
+                    {
+                        MouseUpEvent?.Invoke(this, EventArgs.Empty);
+                    });
+                }
+                return _mouseUp;
             }
         }
     }

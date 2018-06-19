@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Controls;
 
 namespace DeviceBuilding
@@ -8,5 +9,6 @@ namespace DeviceBuilding
         public UserControl PreviewControl { get; set; }
         public UserControl CustomizationControl { get; set; }
         public IEnumerable<object> MenuItems { get; set; }
+        public Action OnPreviewAreaMouseDown { get; set; }
     }
 }

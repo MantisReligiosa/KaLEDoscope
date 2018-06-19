@@ -655,7 +655,8 @@ namespace KaLEDoscope
             IEnumerable<object> menuItems = null;
             var pack = _deviceFactory.GetControlsPack(deviceNode.Device, _logger);
             menuItems = pack.MenuItems;
-            var grid = GetDeviceItemGrid(deviceNode, pack.PreviewControl, pack.CustomizationControl, menuItems);
+
+            var grid = GetDeviceItemGrid(deviceNode, pack.PreviewControl, pack.CustomizationControl, menuItems, pack.OnPreviewAreaMouseDown);
             var newTabItem = new ClosableTab
             {
                 Title = GetDeviceTabItemTitle(deviceNode),
@@ -700,7 +701,7 @@ namespace KaLEDoscope
         {
             var previewControl = GetAggregationPreviewGrid(aggregationNode, selectedDeviceNode);
             var pack = _deviceFactory.GetControlsPack(selectedDeviceNode.Device, _logger);
-            return GetDeviceItemGrid(selectedDeviceNode, previewControl, pack.CustomizationControl, pack.MenuItems);
+            return GetDeviceItemGrid(selectedDeviceNode, previewControl, pack.CustomizationControl, pack.MenuItems, pack.OnPreviewAreaMouseDown);
         }
 
         private UserControl GetAggregationPreviewGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
@@ -793,7 +794,7 @@ namespace KaLEDoscope
             return $"{aggregationNode.Name}";
         }
 
-        private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems)
+        private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems, Action OnMouseUp)
         {
             var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _logger);
             model.OnNodeRenamed += ((sender, node) =>
@@ -813,7 +814,7 @@ namespace KaLEDoscope
               {
                   _updatedNode.Device = device;
                   var pack = _deviceFactory.GetControlsPack(_updatedNode.Device, _logger);
-                  _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, pack.PreviewControl, pack.CustomizationControl, pack.MenuItems));
+                  _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, pack.PreviewControl, pack.CustomizationControl, pack.MenuItems, pack.OnPreviewAreaMouseDown));
                   _tabItem.DataContext = device;
               });
             var control = new CustomizationControl
@@ -821,6 +822,7 @@ namespace KaLEDoscope
                 DataContext = model
             };
             control.SetPreviewControl(previewControl);
+            control.MouseUp += (s, e) => { OnMouseUp?.Invoke(); };
             control.SetCustomizationControl(customizationControl);
             control.AddToolbarItems(toolbarItems);
             return control;

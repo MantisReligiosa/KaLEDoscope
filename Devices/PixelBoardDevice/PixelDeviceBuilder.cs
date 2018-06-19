@@ -30,11 +30,16 @@ namespace PixelBoardDevice
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     VerticalAlignment = VerticalAlignment.Stretch,
                     DataContext = _model
-                }
+                },
+            };
+            var previewModel = new ProgramPreviewViewModel(_model);
+            pack.OnPreviewAreaMouseDown = () => 
+            {
+                previewModel.OnMouseUp();
             };
             var _previewControl = new ProgramPreviewControl
             {
-                DataContext = new ProgramPreviewViewModel(_model)
+                DataContext = previewModel
             };
             pack.PreviewControl = _previewControl;
             var slider = new Slider
