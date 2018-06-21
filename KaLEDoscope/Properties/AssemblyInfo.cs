@@ -12,7 +12,6 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("KaLEDoscope")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -40,7 +39,7 @@ using System.Windows;
                                               // app, or any theme specific resource dictionaries)
 )]
 
-
+/*
 // Version information for an assembly consists of the following four values:
 //
 //      Major Version
@@ -53,3 +52,4 @@ using System.Windows;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+*/
