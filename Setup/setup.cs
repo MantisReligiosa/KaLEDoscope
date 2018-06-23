@@ -1,41 +1,77 @@
-using System;
 using Microsoft.Deployment.WindowsInstaller;
+using Setups.Common.Managers;
+using System;
+using System.Diagnostics;
+using System.IO;
 using WixSharp;
-using WixSharp.CommonTasks;
 using WixSharp.Forms;
 
-public class Script
+namespace Setup
 {
-    static public void Main(string[] args)
+    public static class Script
     {
-        var project =
-            new ManagedProject("KaLEDoscope",
-                new Dir(@"%ProgramFiles%\SmartTechnologiesM\KaLEDoscope",
-                    new DirFiles(@".\..\_publish\KaLEDoscope\*.*")),
-                new Dir(@"%ProgramMenu%\Smart Technologies-M",
-                        new ExeFileShortcut("Uninstall KaLEDoscope", "[System64Folder]msiexec.exe", "/x [ProductCode]"),
-                        new ExeFileShortcut("KaLEDoscope", "[INSTALLDIR]KaLEDoscope.exe", arguments: "")),
-                new Dir(@"%Desktop%",
-                        new ExeFileShortcut("KaLEDoscope", "[INSTALLDIR]KaLEDoscope.exe", arguments: "")))
+        private static string[] _dependentLibraries => new[]
+        {
+            "Setups.Common.dll",
+            "BCrypt.Net-Next.dll"
+        };
+
+        [STAThread]
+        static public void Main(string[] args)
+        {
+            AssemblyManager.GetAssemblyInfo(@".\..\_publish\KaLEDoscope\KaLEDoscope.exe",
+                out Guid guid, out Version version);
+
+            var project =
+                new ManagedProject("KaLEDoscope",
+                    new Dir(@"%ProgramFiles%\SmartTechnologiesM\KaLEDoscope",
+                        new DirFiles(@".\..\_publish\KaLEDoscope\*.*")),
+                    new Dir(@"%ProgramMenu%\Smart Technologies-M",
+                            new ExeFileShortcut("Uninstall KaLEDoscope", "[System64Folder]msiexec.exe", "/x [ProductCode]"),
+                            new ExeFileShortcut("KaLEDoscope", "[INSTALLDIR]KaLEDoscope.exe", arguments: "")),
+                    new Dir(@"%Desktop%",
+                            new ExeFileShortcut("KaLEDoscope", "[INSTALLDIR]KaLEDoscope.exe", arguments: "")))
+                {
+                    GUID = guid,
+                    Version = version
+                };
+            project.ControlPanelInfo.Manufacturer = "SmartTechnologies-M";
+
+            var codeBase = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var directoryName = Path.GetDirectoryName(codeBase);
+            foreach (var dependentLibrary in _dependentLibraries)
             {
-                UI = WUI.WixUI_InstallDir
-            };
+                var pathToLibrary = Path.Combine(directoryName, dependentLibrary);
+                project.DefaultRefAssemblies.Add(pathToLibrary);
+            }
 
-        project.GUID = new Guid("6f330b47-2577-43ad-9095-1861ba25889b");
+            project.UIInitialized += UIInitialized;
 
-        project.ManagedUI = new ManagedUI();
-        project.ManagedUI.InstallDialogs.Add(Dialogs.Welcome)
-                                    .Add(Dialogs.InstallDir)
-                                    .Add(Dialogs.Progress)
-                                    .Add(Dialogs.Exit);
+            project.ManagedUI = new ManagedUI();
+            project.ManagedUI.InstallDialogs.Add(Dialogs.Welcome)
+                                        .Add<ActivationDialog>()
+                                        .Add(Dialogs.InstallDir)
+                                        .Add(Dialogs.Progress)
+                                        .Add(Dialogs.Exit);
 
-        project.ManagedUI.ModifyDialogs.Add(Dialogs.MaintenanceType)
-                                   .Add(Dialogs.Progress)
-                                   .Add(Dialogs.Exit);
+            project.ManagedUI.ModifyDialogs.Add(Dialogs.MaintenanceType)
+                                       .Add(Dialogs.Progress)
+                                       .Add(Dialogs.Exit);
 
-        Compiler.BuildMsi(project);
+            Compiler.BuildMsi(project);
+        }
+
+        private static void UIInitialized(SetupEventArgs e)
+        {
+            try
+            {
+                e.Session["RequestId"] = new LicenseManager().GetRequestCode();
+            }
+            catch (Exception ex)
+            {
+                NotificationManager.ShowExclamationMessage(ex.Message);
+                e.Result = ActionResult.Failure;
+            }
+        }
     }
 }
-
-
-

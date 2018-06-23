@@ -38,6 +38,7 @@ using System.Windows;
                                               //(used if a resource is not found in the page, 
                                               // app, or any theme specific resource dictionaries)
 )]
+[assembly: Guid("8e64d843-a92b-40c5-a0bf-88640ad33672")]
 
 /*
 // Version information for an assembly consists of the following four values:

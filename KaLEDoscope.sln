@@ -59,6 +59,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SevenSegmentTesting", "Devi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PixelBoardDeviceTesting", "Devices\PixelBoardDeviceTesting\PixelBoardDeviceTesting.csproj", "{3D65827C-89CD-47DD-8674-03ABD9D79CB7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Keygen", "Keygen\Keygen.csproj", "{3BAD87F0-9196-4477-8BAC-DAF69351F791}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Setups.Common", "Setups.Common\Setups.Common.csproj", "{37D5DBED-774F-4C3A-B1D5-6828D837FA5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -155,6 +159,13 @@ Global
 		{3D65827C-89CD-47DD-8674-03ABD9D79CB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D65827C-89CD-47DD-8674-03ABD9D79CB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D65827C-89CD-47DD-8674-03ABD9D79CB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BAD87F0-9196-4477-8BAC-DAF69351F791}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BAD87F0-9196-4477-8BAC-DAF69351F791}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BAD87F0-9196-4477-8BAC-DAF69351F791}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37D5DBED-774F-4C3A-B1D5-6828D837FA5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37D5DBED-774F-4C3A-B1D5-6828D837FA5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37D5DBED-774F-4C3A-B1D5-6828D837FA5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37D5DBED-774F-4C3A-B1D5-6828D837FA5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
