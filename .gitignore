@@ -323,3 +323,5 @@ ASALocalRun/
 *.binlog
 _publish/
 tools/
+*.wxs
+*.msi

@@ -16,13 +16,6 @@ namespace PixelBoardDevice.DomainObjects
         public int ZoneType { get; set; }
         public int? FontId { get; set; }
         public string Text { get; set; }
-        public bool IsFonted
-        {
-            get
-            {
-                return (new int[] { (int)ZoneTypes.Text, (int)ZoneTypes.Sensor, (int)ZoneTypes.MQTT, (int)ZoneTypes.Clock, (int)ZoneTypes.Ticker }).Contains(ZoneType);
-            }
-        }
         public int ProgramId { get; set; }
         public string ExternalSourceTag { get; set; }
         public int BinaryImageId { get; set; }

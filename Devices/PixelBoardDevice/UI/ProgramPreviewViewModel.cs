@@ -3,8 +3,6 @@ using Extensions;
 using PixelBoardDevice.DomainObjects;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Drawing2D;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -340,7 +338,7 @@ namespace PixelBoardDevice.UI
                     (z) => z.ZoneType==(int)ZoneTypes.Picture,
                     (zone, canvas, font, image, scale) =>
                     {
-                        RenderBitmap(canvas, image.Base64String,image.Height, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderBitmap(canvas, image?.Base64String ?? String.Empty, image?.Height ?? 0, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {

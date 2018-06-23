@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Abstractions;
+﻿using Abstractions;
 using BaseDevice;
+using BitmapProcessing;
+using Extensions;
+using Microsoft.Win32;
+using PixelBoardDevice.DomainObjects;
 using PixelBoardDevice.UI.POCO;
 using ServiceInterfaces;
-using Input = System.Windows.Input;
-using UiCommands;
-using System.Linq;
-using Font = System.Windows.Media;
-using System.Drawing.Text;
-using BitmapProcessing;
-using System.Windows;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
-using PixelBoardDevice.DomainObjects;
-using Microsoft.Win32;
-using Extensions;
+using System.Drawing.Text;
+using System.Linq;
+using System.Windows;
+using UiCommands;
+using Font = System.Windows.Media;
+using Input = System.Windows.Input;
 
 namespace PixelBoardDevice.UI
 {
@@ -32,7 +32,6 @@ namespace PixelBoardDevice.UI
                 Name = "Текст",
                 AllowAnimation = true,
                 AllowBitmap = false,
-                AllowFont = true,
                 AllowText = true,
                 AllowTextEditing=true,
                 AllowClock = false,
@@ -50,7 +49,6 @@ namespace PixelBoardDevice.UI
                 Name = "Датчик",
                 AllowAnimation=false,
                 AllowBitmap=false,
-                AllowFont=true,
                 AllowText=true,
                 AllowMQTT=false,
                 AllowTextEditing=false,
@@ -68,7 +66,6 @@ namespace PixelBoardDevice.UI
                 Name = "Тэг внешнего сервера",
                 AllowAnimation = false,
                 AllowBitmap = false,
-                AllowFont = true,
                 AllowText = true,
                 AllowMQTT = true,
                 AllowTextEditing=false,
@@ -86,7 +83,6 @@ namespace PixelBoardDevice.UI
                 Name = "Изображение",
                 AllowAnimation=false,
                 AllowBitmap=true,
-                AllowFont=false,
                 AllowText=false,
                 AllowClock = false,
                 ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.Picture,
@@ -102,8 +98,8 @@ namespace PixelBoardDevice.UI
                 Name = "Часы",
                 AllowAnimation = false,
                 AllowBitmap = false,
-                AllowFont = true,
-                AllowText = false,
+                AllowText = true,
+                AllowTextEditing = false,
                 AllowClock = true,
                 ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.Clock,
                 Customize = () => new Zone{
@@ -118,8 +114,8 @@ namespace PixelBoardDevice.UI
                 Name = "Таймер",
                 AllowAnimation = false,
                 AllowBitmap = false,
-                AllowFont = true,
-                AllowText = false,
+                AllowText = true,
+                AllowTextEditing = false,
                 AllowClock = false,
                 AllowTicker=true,
                 ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType==(int)DomainObjects.ZoneTypes.Ticker,
@@ -226,7 +222,6 @@ namespace PixelBoardDevice.UI
             AllowChangeBoardSize = Device.IsStandaloneConfiguration;
             AllowAnimation(false);
             AllowBitmap(false);
-            AllowFont = false;
             AllowExternalTag(false);
             AllowText(false);
             AllowClock(false);
@@ -443,17 +438,22 @@ namespace PixelBoardDevice.UI
             }
         }
 
+        private bool IsZoneFonted(Zone zone)
+        {
+            return _zoneTypes.Any(t => t.Id == zone.ZoneType && t.AllowText);
+        }
+
         private void UpdateZoneFont(Program program, Zone zone, Font.FontFamily newFont, int newFontSize, bool italic, bool bold)
         {
             var deviceZone = GetDeviceZone(program.Id, zone.Id);
-            if (!deviceZone.IsFonted)
+            if (!IsZoneFonted(deviceZone))
             {
                 return;
             }
             var existBinaryFont = Device.Fonts.FirstOrDefault(bf => bf.Id == deviceZone.FontId);
             if (!existBinaryFont.IsNull())
             {
-                var numberOfFontEntry = Device.Programs.Sum(s => s.Zones.Count(f => f.IsFonted && f.FontId == existBinaryFont.Id));
+                var numberOfFontEntry = Device.Programs.Sum(s => s.Zones.Count(f => IsZoneFonted(f) && f.FontId == existBinaryFont.Id));
                 if (numberOfFontEntry <= 1)
                 {
                     Device.Fonts.Remove(existBinaryFont);
@@ -562,9 +562,6 @@ namespace PixelBoardDevice.UI
 
         public bool AllowZoneCoordinates => !SelectedZone.IsNull();
 
-        public bool AllowFont { get; set; }
-        public bool AllowTextEditing { get; set; }
-
         private void AllowAnimation(bool value)
         {
             AnimationVisibility = value ? Visibility.Visible : Visibility.Collapsed;
@@ -587,19 +584,25 @@ namespace PixelBoardDevice.UI
         public Visibility ExternalTagVisibility { get; set; }
 
         public Visibility TextVisibility { get; set; }
-        public void AllowText(bool value)
+        private void AllowText(bool value)
         {
             TextVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
+        public Visibility TextEditingVisibility { get; set; }
+        private void AllowTextEditing(bool value)
+        {
+            TextEditingVisibility = value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
         public Visibility ClockVisibility { get; set; }
-        public void AllowClock(bool value)
+        private void AllowClock(bool value)
         {
             ClockVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public Visibility TickerVisibility { get; set; }
-        public void AllowTicker(bool value)
+        private void AllowTicker(bool value)
         {
             TickerVisibility = value ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -653,30 +656,24 @@ namespace PixelBoardDevice.UI
             set
             {
                 _selectedZone = value;
-                if (!_selectedZone.IsNull())
+                if (_selectedZone.IsNull())
                 {
-                    ZoneLeft = _selectedZone.X;
-                    ZoneTop = _selectedZone.Y;
-                    ZoneHeight = _selectedZone.Height;
-                    ZoneWidth = _selectedZone.Width;
+                    return;
                 }
+                ZoneLeft = _selectedZone.X;
+                ZoneTop = _selectedZone.Y;
+                ZoneHeight = _selectedZone.Height;
+                ZoneWidth = _selectedZone.Width;
                 OnPropertyChanged(nameof(SelectedZone));
                 OnPropertyChanged(nameof(AllowZoneCoordinates));
                 var currentZoneType = ZoneTypes.FirstOrDefault(z => z.ZoneCondition(_selectedZone));
                 if (currentZoneType.IsNull() || SelectedZoneType.IsNull() || SelectedZoneType.Id != currentZoneType.Id)
                 {
                     SelectedZoneType = currentZoneType;
-                    AllowAnimation(currentZoneType?.AllowAnimation ?? false);
-                    AllowBitmap(currentZoneType?.AllowBitmap ?? false);
-                    AllowFont = currentZoneType?.AllowFont ?? false;
-                    AllowExternalTag(currentZoneType?.AllowMQTT ?? false);
-                    AllowText(currentZoneType?.AllowText ?? false);
-                    AllowTextEditing = currentZoneType?.AllowTextEditing ?? false;
-                    AllowClock(currentZoneType?.AllowClock ?? false);
-                    AllowTicker(currentZoneType?.AllowTicker ?? false);
+                    ShowAllowedTunes(currentZoneType);
                     OnPropertyChanged(nameof(SelectedZoneType));
                 }
-                if (!_selectedZone.IsNull() && _selectedZone.IsFonted)
+                if (!_selectedZone.IsNull() && IsZoneFonted(_selectedZone))
                 {
                     var fontId = _selectedZone.FontId;
                     var binaryFont = Device.Fonts.FirstOrDefault(bf => bf.Id == fontId);
@@ -720,6 +717,17 @@ namespace PixelBoardDevice.UI
                 }
 
             }
+        }
+
+        private void ShowAllowedTunes(ZoneType currentZoneType)
+        {
+            AllowAnimation(currentZoneType?.AllowAnimation ?? false);
+            AllowBitmap(currentZoneType?.AllowBitmap ?? false);
+            AllowExternalTag(currentZoneType?.AllowMQTT ?? false);
+            AllowText(currentZoneType?.AllowText ?? false);
+            AllowTextEditing(currentZoneType?.AllowTextEditing ?? false);
+            AllowClock(currentZoneType?.AllowClock ?? false);
+            AllowTicker(currentZoneType?.AllowTicker ?? false);
         }
 
         private string _text;
@@ -767,7 +775,6 @@ namespace PixelBoardDevice.UI
             {
                 _allowClockFormat = value;
                 AllowText(true);
-                AllowFont = value;
                 OnPropertyChanged(nameof(AllowClockFormat));
             }
         }
@@ -836,14 +843,15 @@ namespace PixelBoardDevice.UI
                 if (SelectedZone.IsNull())
                     return;
                 var newZone = value.Customize();
+                ShowAllowedTunes(value);
                 newZone.Id = SelectedZone.Id;
                 newZone.X = SelectedZone.X;
                 newZone.Y = SelectedZone.Y;
                 newZone.Width = SelectedZone.Width;
                 newZone.Height = SelectedZone.Height;
-                if (newZone.IsFonted)
+                if (IsZoneFonted(newZone))
                 {
-                    newZone.FontId = (SelectedZone.IsFonted) ? SelectedZone.FontId : null;
+                    newZone.FontId = (IsZoneFonted(SelectedZone)) ? SelectedZone.FontId : null;
                 }
                 if (newZone.Name != SelectedZone.Name)
                 {
