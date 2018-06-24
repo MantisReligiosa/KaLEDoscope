@@ -9,7 +9,7 @@ namespace BitmapProcessing
 {
     public static class BitmapProcessor
     {
-        public static string GenerateBase64FontMono(string text, Font.FontFamily newFont, bool itallic, 
+        public static string GenerateBase64FontMono(string text, string source, bool itallic, 
             bool bold, int newFontSize)
         {
             var bitmapChars = new List<bool[,]>();
@@ -28,7 +28,7 @@ namespace BitmapProcessing
                 {
                     style = FontStyle.Bold;
                 }
-                var font = new System.Drawing.Font(newFont.Source, (float)newFontSize, style, GraphicsUnit.Pixel);
+                var font = new System.Drawing.Font(source, (float)newFontSize, style, GraphicsUnit.Pixel);
                 var image = DrawTextImage(c.ToString(), font, Color.White, Color.Black, Size.Empty) as Bitmap;
                 var trimmedToHeightImage = image.Clone(new Rectangle(0, image.Height - newFontSize, image.Width,
                     newFontSize), image.PixelFormat);
