@@ -25,6 +25,14 @@ namespace PixelBoardDevice.UI
         public event EventHandler ModelChanged;
         public readonly PixelBoard Device;
         private readonly ILogger _logger;
+        private readonly string _alphabet =
+    "0123456789" +
+    "abcdefghijklmnopqrstuvwxyz" +
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+    "абвгдеёжзийклмнопрстуфхцчшщъыъэюя" +
+    "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЮЬЭЮЯ" +
+    "`~!@#$%^&*()[]{}-_+=*:;\"',.<>/\\| ";
+
         private readonly List<ZoneType> _zoneTypes = new List<ZoneType>
         {
             new ZoneType

@@ -15,14 +15,12 @@ namespace PixelBoardDevice.Serialization
         public SerializablePixelDevice(PixelBoard device)
             : base(device)
         {
-            Alphabet = device.Alphabet;
             BoardSize = (SerializableBoardSize)device.BoardSize;
             Fonts = device.Fonts.Select(f => (SerializableFont)f).ToList();
             Programs = device.Programs.Select(p => (SerializableProgram)p).ToList();
             BinaryImages = device.BinaryImages.Select(i => (SerializableBinaryImage)i).ToList();
         }
 
-        public string Alphabet { get; set; }
         public SerializableBoardSize BoardSize { get; set; }
         public List<SerializableFont> Fonts { get; set; }
         public List<SerializableProgram> Programs { get; set; }
@@ -37,7 +35,6 @@ namespace PixelBoardDevice.Serialization
         {
             var pixelBoard = new PixelBoard();
             serializableDevice.FillBasicParameters(pixelBoard);
-            pixelBoard.Alphabet = serializableDevice.Alphabet;
             pixelBoard.BoardSize = (BoardSize)serializableDevice.BoardSize;
             pixelBoard.Fonts = serializableDevice.Fonts.Select(f => (BinaryFont)f).ToList();
             pixelBoard.Programs = serializableDevice.Programs.Select(p => (Program)p).ToList();
