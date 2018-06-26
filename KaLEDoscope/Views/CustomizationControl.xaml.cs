@@ -21,8 +21,7 @@ namespace KaLEDoscope.Views
 
         internal void SetCustomizationControl(UserControl customizationControl)
         {
-            grid.Children.Add(customizationControl);
-            Grid.SetRow(customizationControl, 3);
+            controlArea.Content = customizationControl;
         }
 
         internal void AddToolbarItems(IEnumerable<object> toolbarItems)

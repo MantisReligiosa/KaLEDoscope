@@ -48,5 +48,6 @@
             </ToolBar.Items>
         </ToolBar>
         <ScrollViewer x:Name="previewArea" Grid.Row="0"/>
+        <ScrollViewer x:Name="controlArea" Grid.Row="3"/>
     </Grid>
 </UserControl>
