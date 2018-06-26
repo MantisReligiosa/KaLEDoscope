@@ -107,25 +107,12 @@ namespace KaLEDoscope.ViewModel
 
         private bool ParceSubnet(string mask, out byte subnetMaskByte)
         {
-#warning Есть в Extensions
             subnetMaskByte = default(byte);
             var bytesStr = mask.Split('.');
             if (bytesStr.Length != 4)
             {
-                subnetMaskByte = 24;
+                return false;
             }
-            var fullByte = (byte)0xff;
-            var allowedBytes = new Dictionary<byte, byte>
-                {
-                    {0,0 },
-                    {1,128 },
-                    {2,192 },
-                    {3,224 },
-                    {4,240 },
-                    {5,248 },
-                    {6,252 },
-                    {7,254 }
-                };
             var bytes = new List<byte>();
             foreach (var byteStr in bytesStr)
             {
@@ -138,29 +125,7 @@ namespace KaLEDoscope.ViewModel
                     return false;
                 }
             }
-            bool terminate = false;
-            foreach (var b in bytes)
-            {
-                if (terminate && b != 0)
-                {
-                    return false;
-                }
-                if (b == fullByte)
-                {
-                    subnetMaskByte += 8;
-                }
-                else
-                {
-                    if (!allowedBytes.Any(kvp => kvp.Value == b))
-                    {
-                        return false;
-                    }
-                    var pair = allowedBytes.FirstOrDefault(kvp => kvp.Value == b);
-                    terminate = true;
-                    subnetMaskByte += pair.Key;
-                }
-            }
-            return true;
+            return bytes.ToArray().TrySubnetToByte(0, out subnetMaskByte);
         }
 
         public byte SubnetMaskByte

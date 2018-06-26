@@ -9,7 +9,15 @@ namespace Testing
         public void SubnetToByte()
         {
             var bytes = new byte[] { 0, 255, 255, 255, 0b11000000, 0 };
-            Assert.Equal(26, bytes.SubnetToByte(1));
+            Assert.True(bytes.TrySubnetToByte(1, out byte subnetByte));
+            Assert.Equal(26, subnetByte);
+        }
+
+        [Fact]
+        public void SubnetToByte_Fails()
+        {
+            var bytes = new byte[] { 0, 255, 0, 255, 0b11000000, 0 };
+            Assert.False(bytes.TrySubnetToByte(1, out byte subnetByte));
         }
 
         [Fact]
