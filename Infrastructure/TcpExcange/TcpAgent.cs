@@ -22,7 +22,7 @@ namespace TcpExcange
 
         public void Listen<TResponce, T>(int port, Action<TResponce> responceHandler)
             where TResponce : IResponce<T>, new()
-            where T : class, new()
+            where T : class
         {
             _isClosed = false;
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, port));

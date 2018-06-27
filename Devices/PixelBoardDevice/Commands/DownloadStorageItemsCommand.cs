@@ -13,7 +13,7 @@ namespace PixelBoardDevice.Commands
 {
     public abstract class DownloadStorageItemsCommand<TStorageItemResponce, TStorageItem> : DeviceCommand<Device>
         where TStorageItemResponce : Responce<TStorageItem>, new()
-        where TStorageItem : class, new()
+        where TStorageItem : class
     {
         private readonly int _port;
         private readonly int _timeout;

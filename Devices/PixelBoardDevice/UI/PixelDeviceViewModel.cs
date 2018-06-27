@@ -4,6 +4,7 @@ using BitmapProcessing;
 using Extensions;
 using Microsoft.Win32;
 using PixelBoardDevice.DomainObjects;
+using PixelBoardDevice.DomainObjects.Zones;
 using PixelBoardDevice.UI.POCO;
 using ServiceInterfaces;
 using System;
@@ -44,12 +45,10 @@ namespace PixelBoardDevice.UI
                 AllowText = true,
                 AllowTextEditing = true,
                 AllowClock = false,
-                ZoneCondition = (z) => (!z.IsNull()) && z.ZoneType == (int)DomainObjects.ZoneTypes.Text,
-                Customize = () => new Zone
+                ZoneCondition = (z) => z is TextZone,
+                Customize = () => new TextZone
                 {
-                    ZoneType = (int)DomainObjects.ZoneTypes.Text,
                     IsValid = true,
-                    Name = "Текст",
                 },
             },
             new ZoneType
@@ -62,13 +61,10 @@ namespace PixelBoardDevice.UI
                 AllowMQTT = false,
                 AllowTextEditing = false,
                 AllowClock = false,
-                ZoneCondition = (z) => (!z.IsNull()) && z.ZoneType == (int)DomainObjects.ZoneTypes.Sensor,
-                Customize = () => new Zone{
-                    ZoneType = (int)DomainObjects.ZoneTypes.Sensor,
+                ZoneCondition = (z) => z is SensorZone,
+                Customize = () => new SensorZone{
                     IsValid = true,
-                    Name = "Датчик",
-                },
-                UseWholeAlphabet = true
+                }
             },
             new ZoneType
             {
@@ -80,13 +76,10 @@ namespace PixelBoardDevice.UI
                 AllowMQTT = true,
                 AllowTextEditing = false,
                 AllowClock = false,
-                ZoneCondition = (z) => (!z.IsNull()) && z.ZoneType == (int)DomainObjects.ZoneTypes.MQTT,
-                Customize = () => new Zone{
-                    ZoneType = (int)DomainObjects.ZoneTypes.MQTT,
+                ZoneCondition = (z) => z is TagZone,
+                Customize = () => new TagZone{
                     IsValid = true,
-                    Name = "Тэг внешнего сервера",
-                },
-                UseWholeAlphabet = true
+                }
             },
             new ZoneType
             {
@@ -96,11 +89,9 @@ namespace PixelBoardDevice.UI
                 AllowBitmap = true,
                 AllowText = false,
                 AllowClock = false,
-                ZoneCondition = (z) => (!z.IsNull()) && z.ZoneType == (int)DomainObjects.ZoneTypes.Picture,
-                Customize = () => new Zone{
-                    ZoneType = (int)DomainObjects.ZoneTypes.Picture,
+                ZoneCondition = (z) => z is BitmapZone,
+                Customize = () => new BitmapZone{
                     IsValid = true,
-                    Name = "Изображение",
                 }
             },
             new ZoneType
@@ -112,13 +103,11 @@ namespace PixelBoardDevice.UI
                 AllowText = true,
                 AllowTextEditing = false,
                 AllowClock = true,
-                ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType == (int)DomainObjects.ZoneTypes.Clock,
-                Customize = () => new Zone{
+                ZoneCondition = (z) => z is ClockZone,
+                Customize = () => new ClockZone{
                     IsValid = true,
-                    ZoneType = (int)DomainObjects.ZoneTypes.Clock,
-                    Name = "Часы",
                 },
-                Alphabet = "1234567890:."
+
             },
             new ZoneType
             {
@@ -130,13 +119,10 @@ namespace PixelBoardDevice.UI
                 AllowTextEditing = false,
                 AllowClock = false,
                 AllowTicker = true,
-                ZoneCondition = (z) => (!z.IsNull())&&z.ZoneType == (int)DomainObjects.ZoneTypes.Ticker,
-                Customize = () => new Zone{
+                ZoneCondition = (z) => z is TickerZone,
+                Customize = () => new TickerZone{
                     IsValid = true,
-                    ZoneType = (int)DomainObjects.ZoneTypes.Ticker,
-                    Name = "Таймер",
-                },
-                Alphabet = "1234567890:."
+                }
             },
         };
         private static readonly List<TickerType> _tickerTypes = new List<TickerType>
@@ -313,7 +299,7 @@ namespace PixelBoardDevice.UI
                 if (_allowPeriodicSync == value)
                     return;
                 _allowPeriodicSync = value;
-                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as ClockZone;
                 if (!deviceZone.IsNull())
                 {
                     deviceZone.AllowPeriodicTimeSync = value.Value;
@@ -330,7 +316,7 @@ namespace PixelBoardDevice.UI
             set
             {
                 _PeriodSyncInterval = value;
-                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as ClockZone;
                 if (!deviceZone.IsNull())
                 {
                     deviceZone.PeriodicSyncInterval = value;
@@ -348,7 +334,7 @@ namespace PixelBoardDevice.UI
                 if (_allowScheduledSync == value)
                     return;
                 _allowScheduledSync = value;
-                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as ClockZone;
                 if (!deviceZone.IsNull())
                 {
                     deviceZone.AllowScheduledSync = value.Value;
@@ -372,7 +358,7 @@ namespace PixelBoardDevice.UI
                     timeSpan = new TimeSpan(0, 0, 0);
                 }
                 _scheduledTimeSync = timeSpan.ToString(@"hh\:mm");
-                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as ClockZone;
                 if (!deviceZone.IsNull())
                 {
                     deviceZone.ScheduledTimeSync = timeSpan;
@@ -395,7 +381,7 @@ namespace PixelBoardDevice.UI
                     timeSpan = new TimeSpan(0, 0, 0);
                 }
                 _tickerCountDownStartValue = timeSpan.ToString(@"mm\:ss\.ffff");
-                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as TickerZone;
                 if (!deviceZone.IsNull())
                 {
                     deviceZone.TickerCountDownStartValue = timeSpan;
@@ -451,15 +437,10 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        private bool IsZoneFonted(Zone zone)
-        {
-            return _zoneTypes.Any(t => t.Id == zone.ZoneType && t.AllowText);
-        }
-
         private void UpdateZoneFont(Program program, Zone zone, Font.FontFamily newFont, int newFontSize, bool italic, bool bold)
         {
-            var deviceZone = GetDeviceZone(program.Id, zone.Id);
-            if (!IsZoneFonted(deviceZone))
+            var deviceZone = GetDeviceZone(program.Id, zone.Id) as IFontableZone;
+            if (deviceZone.IsNull())
             {
                 return;
             }
@@ -468,7 +449,8 @@ namespace PixelBoardDevice.UI
             var existBinaryFont = Device.Fonts.FirstOrDefault(bf => bf.Id == deviceZone.FontId);
             if (!existBinaryFont.IsNull())
             {
-                var numberOfFontEntry = Device.Programs.Sum(s => s.Zones.Count(f => IsZoneFonted(f) && f.FontId == existBinaryFont.Id));
+                var numberOfFontEntry = Device.Programs.Sum(s => s.Zones.OfType<IFontableZone>()
+                        .Count(f => f.FontId == existBinaryFont.Id));
                 if (numberOfFontEntry <= 1)
                 {
                     Device.Fonts.Remove(existBinaryFont);
@@ -490,20 +472,20 @@ namespace PixelBoardDevice.UI
                     Height = newFontSize,
                     Bold = bold,
                     Italic = italic,
-                    //Base64Bitmap = BitmapProcessor.GenerateBase64FontMono(Device.Alphabet, newFont.Source, italic, bold, newFontSize)
                 };
                 Device.Fonts.Add(newBinaryFont);
                 RenderFont(newBinaryFont);
             }
             deviceZone.FontId = newBinaryFont.Id;
-            GetDeviceZone(program.Id, zone.Id).FontId = newBinaryFont.Id;
+            (GetDeviceZone(program.Id, zone.Id) as IFontableZone).FontId = newBinaryFont.Id;
         }
 
         private void RenderFont(BinaryFont newBinaryFont)
         {
-            var zones = Device.Programs.SelectMany(p => p.Zones).Where(z => z.FontId == newBinaryFont.Id).ToList();
+            var zones = Device.Programs.SelectMany(p => p.Zones)
+                .OfType<IFontableZone>().Where(z => z.FontId == newBinaryFont.Id).ToList();
             var fontAlphabet = string.Empty;
-            if (zones.Any(z => _zoneTypes.Any(zt => zt.Id == z.ZoneType && zt.UseWholeAlphabet)))
+            if (zones.Any(z => z.UseWholeAlphabet))
             {
                 fontAlphabet = _alphabet;
             }
@@ -512,10 +494,9 @@ namespace PixelBoardDevice.UI
                 var chars = new List<char>();
                 foreach (var zone in zones)
                 {
-                    var zoneType = _zoneTypes.FirstOrDefault(zt => zt.Id == zone.ZoneType);
-                    if (!String.IsNullOrEmpty(zoneType.Alphabet))
+                    if (!String.IsNullOrEmpty(zone.Alphabet))
                     {
-                        foreach (var c in zoneType.Alphabet)
+                        foreach (var c in zone.Alphabet)
                         {
                             if (!chars.Contains(c))
                             {
@@ -523,9 +504,9 @@ namespace PixelBoardDevice.UI
                             }
                         }
                     }
-                    else if (!String.IsNullOrEmpty(zone.Text))
+                    else if (zone is TextZone textZone)
                     {
-                        foreach (var c in zone.Text)
+                        foreach (var c in textZone.Text)
                         {
                             if (!chars.Contains(c))
                             {
@@ -736,9 +717,9 @@ namespace PixelBoardDevice.UI
                     ShowAllowedTunes(currentZoneType);
                     OnPropertyChanged(nameof(SelectedZoneType));
                 }
-                if (!_selectedZone.IsNull() && IsZoneFonted(_selectedZone))
+                if (_selectedZone is IFontableZone fontableZone)
                 {
-                    var fontId = _selectedZone.FontId;
+                    var fontId = fontableZone.FontId;
                     var binaryFont = Device.Fonts.FirstOrDefault(bf => bf.Id == fontId);
                     if (binaryFont.IsNull())
                     {
@@ -752,31 +733,31 @@ namespace PixelBoardDevice.UI
                         IsBold = binaryFont.Bold;
                     }
                 }
-                if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Text)
+                if (_selectedZone is TextZone textZone)
                 {
-                    Text = _selectedZone.Text;
+                    Text = textZone.Text;
                 }
                 else
                 {
                     Text = String.Empty;
                 }
-                if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
+                if (_selectedZone is ClockZone clockZone)
                 {
-                    SelectedClockType = _clockTypes.FirstOrDefault(ct => ct.Id == _selectedZone.ClockType);
-                    SelectedClockFormat = _clockFormats.FirstOrDefault(cf => cf.Id == _selectedZone.ClockFormat);
-                    AllowPeriodicSync = _selectedZone.AllowPeriodicTimeSync;
-                    AllowScheduledSync = _selectedZone.AllowScheduledSync;
-                    PeriodicSyncInterval = _selectedZone.PeriodicSyncInterval;
-                    ScheduledTimeSync = _selectedZone.ScheduledTimeSync.ToString(@"hh\:mm");
+                    SelectedClockType = _clockTypes.FirstOrDefault(ct => ct.Id == clockZone.ClockType);
+                    SelectedClockFormat = _clockFormats.FirstOrDefault(cf => cf.Id == clockZone.ClockFormat);
+                    AllowPeriodicSync = clockZone.AllowPeriodicTimeSync;
+                    AllowScheduledSync = clockZone.AllowScheduledSync;
+                    PeriodicSyncInterval = clockZone.PeriodicSyncInterval;
+                    ScheduledTimeSync = clockZone.ScheduledTimeSync.ToString(@"hh\:mm");
                 }
-                if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.MQTT)
+                if (_selectedZone is TagZone tagZone)
                 {
-                    ExternalSourceTag = _selectedZone.ExternalSourceTag;
+                    ExternalSourceTag = tagZone.ExternalSourceTag;
                 }
-                if (_selectedZone.ZoneType == (int)DomainObjects.ZoneTypes.Ticker)
+                if (_selectedZone is TickerZone tickerZone)
                 {
-                    SelectedTickerType = _tickerTypes.FirstOrDefault(tt => tt.Id == _selectedZone.TickerType);
-                    TickerCountDownStartValue = _selectedZone.TickerCountDownStartValue.ToString(@"mm\:ss\.ffff");
+                    SelectedTickerType = _tickerTypes.FirstOrDefault(tt => tt.Id == tickerZone.TickerType);
+                    TickerCountDownStartValue = tickerZone.TickerCountDownStartValue.ToString(@"mm\:ss\.ffff");
                 }
 
             }
@@ -800,10 +781,10 @@ namespace PixelBoardDevice.UI
             set
             {
                 _text = value;
-                var ticker = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (ticker.ZoneType == (int)DomainObjects.ZoneTypes.Text)
+                var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                if (zone is TextZone textZone)
                 {
-                    ticker.Text = value;
+                    textZone.Text = value;
                     UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, SelectedFontSize, IsItalic, IsBold);
                 }
                 OnPropertyChanged(nameof(Text));
@@ -818,9 +799,9 @@ namespace PixelBoardDevice.UI
             {
                 _selectedClockType = value;
                 var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
+                if (zone is ClockZone clockZone)
                 {
-                    zone.ClockType = value?.Id ?? 0;
+                    clockZone.ClockType = value?.Id ?? 0;
                 }
                 OnPropertyChanged(nameof(SelectedClockType));
                 AllowClockFormat = value?.AllowFormat ?? false;
@@ -851,10 +832,10 @@ namespace PixelBoardDevice.UI
             {
                 _selectedClockFormat = value;
                 var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Clock)
+                if (zone is ClockZone clockZone)
                 {
-                    zone.ClockFormat = value?.Id ?? 0;
-                    zone.Text = value?.Sample ?? string.Empty;
+                    clockZone.ClockFormat = value?.Id ?? 0;
+                    clockZone.Sample = value?.Sample ?? string.Empty;
                 }
                 OnPropertyChanged(nameof(SelectedClockFormat));
             }
@@ -868,9 +849,9 @@ namespace PixelBoardDevice.UI
             {
                 _selectedTickerType = value;
                 var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (zone.ZoneType == (int)DomainObjects.ZoneTypes.Ticker)
+                if (zone is TickerZone tickerZone)
                 {
-                    zone.TickerType = value?.Id ?? 0;
+                    tickerZone.TickerType = value?.Id ?? 0;
                     AllowTickerCountDown = value?.AllowStartValue ?? false;
                 }
                 OnPropertyChanged(nameof(SelectedTickerType));
@@ -887,9 +868,9 @@ namespace PixelBoardDevice.UI
             {
                 _externalSourceTag = value;
                 var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
-                if (zone.ZoneType == (int)DomainObjects.ZoneTypes.MQTT)
+                if (zone is TagZone tagZone)
                 {
-                    zone.ExternalSourceTag = value;
+                    tagZone.ExternalSourceTag = value;
                 }
                 OnPropertyChanged(nameof(ExternalSourceTag));
             }
@@ -913,9 +894,10 @@ namespace PixelBoardDevice.UI
                 newZone.Y = SelectedZone.Y;
                 newZone.Width = SelectedZone.Width;
                 newZone.Height = SelectedZone.Height;
-                if (IsZoneFonted(newZone))
+                if (newZone is IFontableZone fontableZone)
                 {
-                    newZone.FontId = (IsZoneFonted(SelectedZone)) ? SelectedZone.FontId : null;
+                    var selectedFontableZone = SelectedZone as IFontableZone;
+                    fontableZone.FontId = selectedFontableZone?.FontId ?? null;
                 }
                 if (newZone.Name != SelectedZone.Name)
                 {
@@ -964,7 +946,7 @@ namespace PixelBoardDevice.UI
                 {
                     _invertBitmap = new DelegateCommand((o) =>
                     {
-                        var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
+                        var deviceZone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as BitmapZone;
                         var bitmapId = deviceZone.BinaryImageId;
                         var binaryImage = Device.BinaryImages.FirstOrDefault(b => b.Id == bitmapId);
                         var base64String = binaryImage.Base64String;
@@ -986,7 +968,7 @@ namespace PixelBoardDevice.UI
                 {
                     _clearBitmap = new DelegateCommand((o) =>
                     {
-                        UpdateZoneImage(SelectedProgram, SelectedZone, null);
+                        UpdateZoneImage(SelectedProgram, SelectedZone as BitmapZone, null);
                         IsImageProcessingEnabled = false;
                     });
                 }
@@ -1013,16 +995,16 @@ namespace PixelBoardDevice.UI
                           }
                           IsImageProcessingEnabled = true;
                           var image = Image.FromFile(dialog.FileName);
-                          UpdateZoneImage(SelectedProgram, SelectedZone, image);
+                          UpdateZoneImage(SelectedProgram, SelectedZone as BitmapZone, image);
                       });
                 }
                 return _loadBitmap;
             }
         }
 
-        private void UpdateZoneImage(Program program, Zone zone, Image image)
+        private void UpdateZoneImage(Program program, BitmapZone zone, Image image)
         {
-            var deviceZone = GetDeviceZone(program.Id, zone.Id);
+            var deviceZone = GetDeviceZone(program.Id, zone.Id) as BitmapZone;
             if (image.IsNull())
             {
                 var deletedBitmapImage = Device.BinaryImages.FirstOrDefault(i => i.Id == zone.BinaryImageId);
@@ -1101,12 +1083,10 @@ namespace PixelBoardDevice.UI
                     _addZone = new DelegateCommand((o) =>
                     {
                         var nextId = Programs.Max(s => s.Zones.Any() ? s.Zones.Max(z => z.Id) : 0) + 1;
-                        var zone = new Zone
+                        var zone = new TextZone
                         {
-                            ZoneType = (int)DomainObjects.ZoneTypes.Text,
                             Id = nextId,
                             ProgramId = SelectedProgram.Id,
-                            Name = "Текст",
                             X = 0,
                             Y = 0,
                             Height = 10,

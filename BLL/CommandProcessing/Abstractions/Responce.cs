@@ -5,7 +5,7 @@ using ServiceInterfaces;
 namespace CommandProcessing
 {
     public abstract class Responce<T> : IResponce<T>
-        where T : class, new()
+        where T : class
     {
         protected byte[] _bytes;
         public Resultativity Resultativity { get; private set; }

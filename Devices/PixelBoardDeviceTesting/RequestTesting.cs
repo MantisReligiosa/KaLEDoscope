@@ -1,4 +1,5 @@
 ﻿using PixelBoardDevice.DomainObjects;
+using PixelBoardDevice.DomainObjects.Zones;
 using PixelBoardDevice.DTO;
 using PixelBoardDevice.Requests;
 using System;
@@ -107,7 +108,7 @@ namespace PixelBoardDeviceTesting
             {
                 DeviceID = 0xaa
             };
-            request.SetRequestData(new Zone
+            request.SetRequestData(new TextZone
             {
                 Id = 16,
                 ProgramId = 1,
@@ -116,7 +117,6 @@ namespace PixelBoardDeviceTesting
                 Width = 256,
                 Height = 64,
                 Name = "Zone",
-                ZoneType = 1,
                 FontId = 5,
                 Text = "Text"
             });
@@ -135,7 +135,7 @@ namespace PixelBoardDeviceTesting
             {
                 DeviceID = 0xaa
             };
-            request.SetRequestData(new Zone
+            request.SetRequestData(new SensorZone
             {
                 Id = 2,
                 ProgramId = 10,
@@ -144,7 +144,6 @@ namespace PixelBoardDeviceTesting
                 Width = 50,
                 Height = 8,
                 Name = "Zone",
-                ZoneType = 2,
                 FontId = 6
             });
             Assert.Equal(new byte[]
@@ -162,7 +161,7 @@ namespace PixelBoardDeviceTesting
             {
                 DeviceID = 0xaa
             };
-            request.SetRequestData(new Zone
+            request.SetRequestData(new BitmapZone
             {
                 Id = 2,
                 ProgramId = 10,
@@ -171,7 +170,6 @@ namespace PixelBoardDeviceTesting
                 Width = 50,
                 Height = 8,
                 Name = "Zone",
-                ZoneType = 3,
                 BinaryImageId = 255
             });
             Assert.Equal(new byte[]
@@ -189,7 +187,7 @@ namespace PixelBoardDeviceTesting
             {
                 DeviceID = 0xaa
             };
-            request.SetRequestData(new Zone
+            request.SetRequestData(new TagZone
             {
                 Id = 2,
                 ProgramId = 10,
@@ -198,7 +196,6 @@ namespace PixelBoardDeviceTesting
                 Width = 50,
                 Height = 8,
                 Name = "Zone",
-                ZoneType = 4,
                 FontId = 7,
                 ExternalSourceTag = "Main.Tag"
             });
@@ -218,7 +215,7 @@ namespace PixelBoardDeviceTesting
             {
                 DeviceID = 0xaa
             };
-            request.SetRequestData(new Zone
+            request.SetRequestData(new ClockZone
             {
                 Id = 2,
                 ProgramId = 10,
@@ -227,7 +224,6 @@ namespace PixelBoardDeviceTesting
                 Width = 50,
                 Height = 8,
                 Name = "Zone",
-                ZoneType = 5,
                 ClockType = 1,
                 ClockFormat = 1,
                 AllowPeriodicTimeSync = true,
@@ -249,7 +245,7 @@ namespace PixelBoardDeviceTesting
             {
                 DeviceID = 0xaa
             };
-            request.SetRequestData(new Zone
+            request.SetRequestData(new ClockZone
             {
                 Id = 2,
                 ProgramId = 10,
@@ -258,7 +254,6 @@ namespace PixelBoardDeviceTesting
                 Width = 50,
                 Height = 8,
                 Name = "Zone",
-                ZoneType = 5,
                 ClockType = 2,
                 AllowPeriodicTimeSync = false,
                 AllowScheduledSync = true,
@@ -279,7 +274,7 @@ namespace PixelBoardDeviceTesting
             {
                 DeviceID = 0xaa
             };
-            request.SetRequestData(new Zone
+            request.SetRequestData(new TickerZone
             {
                 Id = 2,
                 ProgramId = 10,
@@ -288,7 +283,6 @@ namespace PixelBoardDeviceTesting
                 Width = 50,
                 Height = 8,
                 Name = "Zone",
-                ZoneType = 6,
                 TickerType = 2,
                 TickerCountDownStartValue = new TimeSpan(0, 0, 5, 20, 555)
             });

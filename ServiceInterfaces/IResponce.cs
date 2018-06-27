@@ -1,6 +1,6 @@
 ﻿namespace ServiceInterfaces
 {
-    public interface IResponce<out T> where T : class, new()
+    public interface IResponce<out T> where T : class
     {
         byte ResponceID { get; }
         Resultativity Resultativity { get; }

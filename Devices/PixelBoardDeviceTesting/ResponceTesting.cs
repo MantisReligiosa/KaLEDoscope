@@ -1,4 +1,5 @@
-﻿using PixelBoardDevice.Responces;
+﻿using PixelBoardDevice.DomainObjects.Zones;
+using PixelBoardDevice.Responces;
 using System;
 using Xunit;
 
@@ -79,7 +80,7 @@ namespace PixelBoardDeviceTesting
                 0x00, 0x40, 0x04, 0x5a, 0x6f, 0x6e, 0x65, 0x01, 0x05, 0x04, 0x54, 0x65, 0x78,
                 0x74
             });
-            var zone = responce.Cast();
+            var zone = responce.Cast() as TextZone;
             Assert.Equal(16, zone.Id);
             Assert.Equal(1, zone.ProgramId);
             Assert.Equal(100, zone.X);
@@ -101,7 +102,7 @@ namespace PixelBoardDeviceTesting
                 0x00, 0xaa, 0x25, 0x00, 0x11, 0x02, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32,
                 0x00, 0x08, 0x04, 0x5a, 0x6f, 0x6e, 0x65, 0x02, 0x06,
             });
-            var zone = responce.Cast();
+            var zone = responce.Cast() as SensorZone;
             Assert.Equal(2, zone.Id);
             Assert.Equal(10, zone.ProgramId);
             Assert.Equal(0, zone.X);
@@ -122,7 +123,7 @@ namespace PixelBoardDeviceTesting
                 0x00, 0xaa, 0x25, 0x00, 0x11, 0x02, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32,
                 0x00, 0x08, 0x04, 0x5a, 0x6f, 0x6e, 0x65, 0x03, 0x07,
             });
-            var zone = responce.Cast();
+            var zone = responce.Cast() as BitmapZone;
             Assert.Equal(2, zone.Id);
             Assert.Equal(10, zone.ProgramId);
             Assert.Equal(0, zone.X);
@@ -144,7 +145,7 @@ namespace PixelBoardDeviceTesting
                 0x00, 0x08, 0x04, 0x5a, 0x6f, 0x6e, 0x65, 0x04, 0x07, 0x08, 0x4d, 0x61, 0x69,
                 0x6e, 0x2e, 0x54, 0x61, 0x67,
             });
-            var zone = responce.Cast();
+            var zone = responce.Cast() as TagZone;
             Assert.Equal(2, zone.Id);
             Assert.Equal(10, zone.ProgramId);
             Assert.Equal(0, zone.X);
@@ -166,7 +167,7 @@ namespace PixelBoardDeviceTesting
                 0x00, 0xaa, 0x25, 0x00, 0x13, 0x02, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32,
                 0x00, 0x08, 0x04, 0x5a, 0x6f, 0x6e, 0x65, 0x05, 0x06, 0x00, 0x1e
             });
-            var zone = responce.Cast();
+            var zone = responce.Cast() as ClockZone;
             Assert.Equal(2, zone.Id);
             Assert.Equal(10, zone.ProgramId);
             Assert.Equal(0, zone.X);
@@ -191,7 +192,7 @@ namespace PixelBoardDeviceTesting
                 0x00, 0xaa, 0x25, 0x00, 0x13, 0x02, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x32,
                 0x00, 0x08, 0x04, 0x5a, 0x6f, 0x6e, 0x65, 0x05, 0x1d, 0x01, 0x1e
             });
-            var zone = responce.Cast();
+            var zone = responce.Cast() as ClockZone;
             Assert.Equal(2, zone.Id);
             Assert.Equal(10, zone.ProgramId);
             Assert.Equal(0, zone.X);
@@ -217,7 +218,7 @@ namespace PixelBoardDeviceTesting
                 0x00, 0x08, 0x04, 0x5a, 0x6f, 0x6e, 0x65, 0x06, 0x01, 0x00, 0x05, 0x14, 0x02,
                 0x2b
             });
-            var zone = responce.Cast();
+            var zone = responce.Cast() as TickerZone;
             Assert.Equal(2, zone.Id);
             Assert.Equal(10, zone.ProgramId);
             Assert.Equal(0, zone.X);

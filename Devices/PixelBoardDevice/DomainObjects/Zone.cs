@@ -1,32 +1,18 @@
 ﻿using Extensions;
-using System;
-using System.Linq;
 
 namespace PixelBoardDevice.DomainObjects
 {
-    public class Zone
+    public abstract class Zone
     {
-        public virtual string Name { get; set; }
+        public abstract string Name { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
         public int Height { get; set; }
         public int Width { get; set; }
         public int Id { get; set; }
         public bool IsValid { get; set; }
-        public int ZoneType { get; set; }
-        public int? FontId { get; set; }
-        public string Text { get; set; }
+        public abstract int ZoneType { get; }
         public int ProgramId { get; set; }
-        public string ExternalSourceTag { get; set; }
-        public int BinaryImageId { get; set; }
-        public int ClockType { get; set; }
-        public int ClockFormat { get; set; }
-        public bool AllowPeriodicTimeSync { get; set; }
-        public bool AllowScheduledSync { get; set; }
-        public int PeriodicSyncInterval { get; set; }
-        public TimeSpan ScheduledTimeSync { get; set; }
-        public int TickerType { get; set; }
-        public TimeSpan TickerCountDownStartValue { get; set; }
 
         public bool IntersectWith(Zone z)
         {

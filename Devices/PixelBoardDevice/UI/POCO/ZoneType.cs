@@ -16,7 +16,5 @@ namespace PixelBoardDevice.UI.POCO
         public bool AllowClock { get; set; }
         public bool AllowTextEditing { get; set; }
         public bool AllowTicker { get; set; }
-        public bool UseWholeAlphabet { get; set; } = false;
-        public string Alphabet { get; set; }
     }
 }

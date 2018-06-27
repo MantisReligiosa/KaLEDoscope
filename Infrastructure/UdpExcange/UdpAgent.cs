@@ -36,7 +36,7 @@ namespace UdpExcange
 
         public void Listen<TResponce, T>(int port, Action<TResponce> responceHandler)
             where TResponce : IResponce<T>, new()
-            where T : class, new()
+            where T : class
         {
             _isClosed = false;
             var endPoint = new IPEndPoint(IPAddress.Any, port);

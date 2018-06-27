@@ -1,6 +1,7 @@
 ﻿using Abstractions;
 using Extensions;
 using PixelBoardDevice.DomainObjects;
+using PixelBoardDevice.DomainObjects.Zones;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,10 +74,22 @@ namespace PixelBoardDevice.UI
                     var renderer = zoneRenders.FirstOrDefault(kvp => kvp.Key(zone));
                     if (renderer.Key != null && renderer.Value != null)
                     {
+                        BinaryFont binaryFont = null;
+                        BinaryImage binaryImage = null;
+                        if (zone is IFontableZone fontableZone && fontableZone.FontId.HasValue)
+                        {
+                            binaryFont = _model.Device.Fonts
+                                .FirstOrDefault(f => f.Id == fontableZone.FontId);
+                        }
+                        if (zone is BitmapZone bitmapZone)
+                        {
+                            binaryImage = _model.Device.BinaryImages
+                                .FirstOrDefault(i => i.Id == bitmapZone.BinaryImageId);
+                        }
                         renderer.Value(zone,
                                        PreviewContent,
-                                       _model.Device.Fonts.FirstOrDefault(f => f.Id == zone.FontId),
-                                       _model.Device.BinaryImages.FirstOrDefault(i => i.Id == zone.BinaryImageId),
+                                       binaryFont,
+                                       binaryImage,
                                        _model.PreviewScale);
                     }
                 }
@@ -314,42 +327,43 @@ namespace PixelBoardDevice.UI
             = new Dictionary<Func<Zone, bool>, Action<Zone, Canvas, BinaryFont, BinaryImage, double>>
             {
                 {
-                    (z) => z.ZoneType==(int)ZoneTypes.Text,
+                    (z) => z is TextZone,
                     (zone, canvas, font, image, scale) =>
                     {
-                        RenderText(canvas, font, zone.Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderText(canvas, font, ((TextZone)zone).Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
-                    (z) => z.ZoneType==(int)ZoneTypes.Sensor,
+                    (z) => z is SensorZone,
                     (zone, canvas, font, image, scale) =>
                     {
                         RenderText(canvas, font, "[Sensor]", zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
-                    (z) => z.ZoneType==(int)ZoneTypes.MQTT,
+                    (z) => z is TagZone,
                     (zone, canvas, font, image, scale) =>
                     {
                         RenderText(canvas, font, "[MQTT]", zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
-                    (z) => z.ZoneType==(int)ZoneTypes.Picture,
+                    (z) => z is BitmapZone,
                     (zone, canvas, font, image, scale) =>
                     {
                         RenderBitmap(canvas, image?.Base64String ?? String.Empty, image?.Height ?? 0, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
-                    (z) => (z.ZoneType==(int)ZoneTypes.Clock && z.ClockType == 1), //Текстовые часы
+                    (z) => (z is ClockZone clockZone && clockZone.ClockType == 1), //Текстовые часы
                     (zone, canvas, font, image, scale) =>
                     {
-                        RenderText(canvas, font, zone.Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        var clockZone = zone as ClockZone;
+                        RenderText(canvas, font, clockZone.Sample, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
-                    (z) => (z.ZoneType==(int)ZoneTypes.Clock && z.ClockType == 2), //Графические часы
+                    (z) => (z is ClockZone clockZone && clockZone.ClockType == 2), //Графические часы
                     (zone, canvas, font, image, scale) =>
                     {
                         DrawClockPicture(canvas, zone.X, zone.Y, zone.Width, zone.Height, scale);

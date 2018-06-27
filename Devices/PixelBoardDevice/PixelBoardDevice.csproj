@@ -92,8 +92,15 @@
     <Compile Include="DomainObjects\BinaryFont.cs" />
     <Compile Include="DomainObjects\BinaryImage.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
+    <Compile Include="DomainObjects\IFontableZone.cs" />
     <Compile Include="DomainObjects\Program.cs" />
     <Compile Include="DomainObjects\Zone.cs" />
+    <Compile Include="DomainObjects\Zones\BitmapZone.cs" />
+    <Compile Include="DomainObjects\Zones\ClockZone.cs" />
+    <Compile Include="DomainObjects\Zones\SensorZone.cs" />
+    <Compile Include="DomainObjects\Zones\TagZone.cs" />
+    <Compile Include="DomainObjects\Zones\TextZone.cs" />
+    <Compile Include="DomainObjects\Zones\TickerZone.cs" />
     <Compile Include="DTO\IdList.cs" />
     <Compile Include="DTO\StorageItemIndex.cs" />
     <Compile Include="MouseBehaviour.cs" />
