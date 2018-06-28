@@ -1,3 +1,5 @@
+#tool "nuget:?package=xunit.runner.console"
+
 var configuration = Argument("configuration", "Release");
 var publishDir = "_publish";
 
@@ -14,6 +16,14 @@ Task("Build")
         .WithProperty("TreatWarningsAsErrors", "false")
     );
 	
+});
+
+Task("RunUnitTests")
+.Does(() =>
+{
+	XUnit2("./Testing/bin/Release/Testing.dll");
+	XUnit2("./Devices/PixelBoardDeviceTesting/bin/Release/PixelBoardDeviceTesting.dll");
+	XUnit2("./Devices/SevenSegmentTesting/bin/Release/SevenSegmentTesting.dll");
 });
 
 Task("ReCreatePublishDir")
@@ -34,32 +44,40 @@ Task("CopyKaLEDoscope")
 {
 	var sourceDir = $"./KaLEDoscope/bin/Release";
 	var targetDir = $"{publishDir}/KaLEDoscope";
-	CreateDirectory(targetDir);
-	var files = GetFiles($"{sourceDir}/*.*");
-	CopyFiles(files, targetDir);
+	CopyBase(sourceDir, targetDir);
 });
 
-Task("CreateZipPackage")
+Task("CopyKeygen")
+.Does(() =>
+{
+	var sourceDir = $"./Keygen/bin/Release";
+	var targetDir = $"{publishDir}/Keygen";
+	CopyBase(sourceDir, targetDir);
+});
+
+
+private void CopyBase(string sourceDir, string targetDir)
+{
+	var ignoredExts = new string[] { ".pdb" };
+	if (!DirectoryExists(targetDir))
+	{
+		CreateDirectory(targetDir);
+	}
+	var files = GetFiles($"{sourceDir}/*.*")
+		.Where(f => !ignoredExts.Contains(f.GetExtension().ToLower()));
+	CopyFiles(files, targetDir);
+}
+
+Task("ZipKaLEDoscope")
 .Does(() =>
 {
 	Zip($"./{publishDir}/KaLEDoscope", $"./{publishDir}/KaLEDoscope.zip");
-	/*
-	//удалим папки
-	foreach (var subDir in GetSubDirectories(publishDir)) {
-		DeleteDirectory(subDir, new DeleteDirectorySettings {
-			Recursive = true,
-			Force = true
-		});
-	}
-	
-	удалим файлы
-	var files = GetFiles(publishDir + "/*");
-	foreach(var file in files)
-	{
-		if(!file.ToString().Contains("KaLEDoscope.zip"))
-			DeleteFile(file);
-	}
- */
+});
+
+Task("ZipKeygen")
+.Does(() =>
+{
+	Zip($"./{publishDir}/Keygen", $"./{publishDir}/Keygen.zip");
 });
 
 Task("BuildSetup")
@@ -100,8 +118,14 @@ RunTarget("UpdateVersion");
 
 RunTarget("Build");
 
+RunTarget("RunUnitTests");
+
 RunTarget("CopyKaLEDoscope");
- 
+
+RunTarget("CopyKeygen");
+
 RunTarget("BuildSetup");
 
-RunTarget("CreateZipPackage");
+RunTarget("ZipKaLEDoscope");
+
+RunTarget("ZipKeygen");
