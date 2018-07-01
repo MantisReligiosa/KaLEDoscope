@@ -121,6 +121,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DropDownButtonBehavior.cs" />
+    <Compile Include="EventArgs\TrialExpirationEventArgs.cs" />
     <Compile Include="Models\AggregationNode.cs" />
     <Compile Include="Models\DeviceNode.cs" />
     <Compile Include="Models\FolderNode.cs" />
@@ -136,8 +137,12 @@
     <Compile Include="Serialization\SerializableContainer.cs" />
     <Compile Include="Serialization\SerializableFolder.cs" />
     <Compile Include="TreeViewBehaviour.cs" />
+    <Compile Include="ViewModel\ActivationViewModel.cs" />
     <Compile Include="ViewModel\CustomizationViewModel.cs" />
     <Compile Include="ViewModel\RenameDialogViewModel.cs" />
+    <Compile Include="Views\ActivationWindow.xaml.cs">
+      <DependentUpon>ActivationWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\BaseDeviceControl.xaml.cs">
       <DependentUpon>BaseDeviceControl.xaml</DependentUpon>
     </Compile>
@@ -156,6 +161,10 @@
     <Compile Include="Views\RenameDialog.xaml.cs">
       <DependentUpon>RenameDialog.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\ActivationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\BaseDeviceControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -242,6 +251,10 @@
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
       <Name>Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\Activation\Activation.csproj">
+      <Project>{F1AC927D-0F23-448D-B122-49A725A9E55B}</Project>
+      <Name>Activation</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure\BaseDeviceSerialization\BaseDeviceSerialization.csproj">
       <Project>{802F2818-55B8-43E0-80E8-A72FB8E15054}</Project>
       <Name>BaseDeviceSerialization</Name>
@@ -269,6 +282,10 @@
     <ProjectReference Include="..\Infrastructure\UiCommands\UiCommands.csproj">
       <Project>{B5DC8FEC-81FA-42DD-B356-E58C95C0E48A}</Project>
       <Name>UiCommands</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SerialNumberInput\SerialNumberInput.csproj">
+      <Project>{6a5abb21-29e3-4afc-ba8c-b1a8a40f9530}</Project>
+      <Name>SerialNumberInput</Name>
     </ProjectReference>
     <ProjectReference Include="..\ServiceInterfaces\ServiceInterfaces.csproj">
       <Project>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</Project>

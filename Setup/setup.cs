@@ -1,8 +1,7 @@
-using Microsoft.Deployment.WindowsInstaller;
-using Setups.Common.Managers;
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using WixSharp;
 using WixSharp.Forms;
 
@@ -13,13 +12,13 @@ namespace Setup
         private static string[] _dependentLibraries => new[]
         {
             "Setups.Common.dll",
-            "BCrypt.Net-Next.dll"
+        //    "BCrypt.Net-Next.dll"
         };
 
         [STAThread]
         static public void Main(string[] args)
         {
-            AssemblyManager.GetAssemblyInfo(@".\..\_publish\KaLEDoscope\KaLEDoscope.exe",
+            GetAssemblyInfo(@".\..\_publish\KaLEDoscope\KaLEDoscope.exe",
                 out Guid guid, out Version version);
 
             var project =
@@ -49,7 +48,7 @@ namespace Setup
 
             project.ManagedUI = new ManagedUI();
             project.ManagedUI.InstallDialogs.Add(Dialogs.Welcome)
-                                        .Add<ActivationDialog>()
+                                        //.Add<ActivationDialog>()
                                         .Add(Dialogs.InstallDir)
                                         .Add(Dialogs.Progress)
                                         .Add(Dialogs.Exit);
@@ -63,15 +62,18 @@ namespace Setup
 
         private static void UIInitialized(SetupEventArgs e)
         {
-            try
-            {
-                e.Session["RequestId"] = new LicenseManager().GetRequestCode();
-            }
-            catch (Exception ex)
-            {
-                NotificationManager.ShowExclamationMessage(ex.Message);
-                e.Result = ActionResult.Failure;
-            }
+        }
+
+        private static void GetAssemblyInfo(string assemblyPath,
+            out Guid guid, out Version version)
+        {
+            var assembly = System.Reflection.Assembly.LoadFrom(assemblyPath);
+
+            var guidValue = ((GuidAttribute)assembly.GetCustomAttributes(typeof(GuidAttribute), true)
+                .First()).Value;
+
+            guid = new Guid(guidValue);
+            version = new Version(assembly.GetName().Version.ToString(3));
         }
     }
 }

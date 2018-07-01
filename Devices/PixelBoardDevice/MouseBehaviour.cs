@@ -44,7 +44,7 @@ namespace PixelBoardDevice
         {
             FrameworkElement element = (FrameworkElement)d;
 
-            element.MouseUp += new MouseButtonEventHandler(Element_MouseUp);
+            element.MouseLeftButtonUp += new MouseButtonEventHandler(Element_MouseUp);
         }
 
         private static void Element_MouseUp(object sender, MouseButtonEventArgs e)
@@ -73,7 +73,7 @@ namespace PixelBoardDevice
         {
             FrameworkElement element = (FrameworkElement)d;
 
-            element.MouseDown += new MouseButtonEventHandler(Element_MouseDown);
+            element.MouseLeftButtonDown += new MouseButtonEventHandler(Element_MouseDown);
         }
 
         private static void Element_MouseDown(object sender, MouseButtonEventArgs e)

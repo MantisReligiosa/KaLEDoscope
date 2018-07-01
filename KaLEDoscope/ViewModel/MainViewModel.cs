@@ -30,6 +30,7 @@ namespace KaLEDoscope
     {
         private ILogger _logger { get; set; }
         private ICompressor _compressor { get; set; }
+        private IActivationManager _activationManager;
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
@@ -51,6 +52,8 @@ namespace KaLEDoscope
 
         public event EventHandler ShowOptions;
         public event EventHandler QuitApplication;
+        public event EventHandler ActivationRequired;
+        public event EventHandler TrialExpired;
 
         public TabItem SelectedTabItem { get; set; }
         public string StructureFileName { get; set; } = string.Empty;
@@ -70,12 +73,14 @@ namespace KaLEDoscope
             ILogger logger,
             ICompressor compressor,
             INetworkAgent networkScanAgent,
-            INetworkAgent networkExchangeAgent)
+            INetworkAgent networkExchangeAgent,
+            IActivationManager activationManager)
         {
             _logger = logger;
             _compressor = compressor;
             _networkScanAgent = networkScanAgent;
             _networkExchangeAgent = networkExchangeAgent;
+            _activationManager = activationManager;
             _logger.InfoRaised += (sender, message) => LogMessage(new LogItem
             {
                 LogLevel = LogLevel.Info,
@@ -113,6 +118,19 @@ namespace KaLEDoscope
                     Command = AddNewDevice,
                     CommandParameter = deviceItem.Model
                 });
+            }
+        }
+
+        public void CheckActivation()
+        {
+            if (!_activationManager.IsActivationInfoExists)
+            {
+                ActivationRequired?.Invoke(this, EventArgs.Empty);
+            }
+            else if (!_activationManager.IsFullAccess 
+                && _activationManager.TrialExpirationDate < DateTime.Now)
+            {
+                TrialExpired?.Invoke(this, EventArgs.Empty);
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using Setups.Common.Exceptions;
-using System;
+﻿using System;
 using System.Linq;
 using System.Management;
 using System.Security.Cryptography;
@@ -63,18 +62,11 @@ namespace Setups.Common.Managers
         /// <returns></returns>
         private static string GetHardwareParameter(string hardwareArea, string parameterName)
         {
-            try
-            {
                 using (var searcher = new ManagementObjectSearcher($"SELECT * FROM {hardwareArea}"))
                     return searcher.Get()
                         .Cast<ManagementObject>()
                         .First()[parameterName]
                         ?.ToString() ?? string.Empty;
-            }
-            catch (Exception e)
-            {
-                throw new LicenseException("Ошибка генерации кода запроса", e);
-            }
         }
 
         /// <summary>

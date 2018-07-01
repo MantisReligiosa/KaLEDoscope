@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Activation;
+using System;
 using System.Windows.Forms;
-using SetupManagers = Setups.Common.Managers;
 
 namespace Keygen
 {
@@ -18,11 +11,6 @@ namespace Keygen
             InitializeComponent();
         }
 
-        /// <summary>
-        /// Обработчик нажатия на кнопку "Paste"
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void PasteFromClipboardHandler(object sender, EventArgs e)
         {
             var iData = Clipboard.GetDataObject();
@@ -33,25 +21,21 @@ namespace Keygen
             }
         }
 
-        /// <summary>
-        /// Обработчик нажатия на кнопку "Copy"
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void CopyToClipboardHandler(object sender, EventArgs e)
         {
             Clipboard.SetDataObject(serialNumberInputControl2.SerialNumber);
         }
 
-        /// <summary>
-        /// Обработчик нажатия на кнопку "Generate"
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void GenerateActivationCodeHahdler(object sender, EventArgs e)
         {
-            var licenseManager = new SetupManagers.LicenseManager();
-            serialNumberInputControl2.SerialNumber = licenseManager.GetActivationCode(serialNumberInputControl1.SerialNumber);
+            var licenseManager = new ActivationManager(null);
+            serialNumberInputControl2.SerialNumber = licenseManager.GetFullyActivationKey(serialNumberInputControl1.SerialNumber);
+        }
+
+        private void GenerateTrialCodeHandler(object sender, EventArgs e)
+        {
+            var licenseManager = new ActivationManager(null);
+            serialNumberInputControl2.SerialNumber = licenseManager.GetTrialActivationKey(serialNumberInputControl1.SerialNumber);
         }
     }
 }

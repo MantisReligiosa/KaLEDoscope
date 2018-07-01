@@ -1,17 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BE701549-33D0-4895-83D3-3A809CC0EAA6}</ProjectGuid>
+    <ProjectGuid>{F1AC927D-0F23-448D-B122-49A725A9E55B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ServiceInterfaces</RootNamespace>
-    <AssemblyName>ServiceInterfaces</AssemblyName>
+    <RootNamespace>Activation</RootNamespace>
+    <AssemblyName>Activation</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,8 +30,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BCrypt.Net-Next, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\BCrypt.Net-Next.3.0.1\lib\net452\BCrypt.Net-Next.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,33 +47,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExceptionEventArgs.cs" />
-    <Compile Include="IActivationManager.cs" />
-    <Compile Include="IDeviceCommand.cs" />
-    <Compile Include="ICompressor.cs" />
-    <Compile Include="ILogger.cs" />
-    <Compile Include="INetworkAgent.cs" />
-    <Compile Include="IRequest.cs" />
-    <Compile Include="IResponce.cs" />
+    <Compile Include="ActivationInfo.cs" />
+    <Compile Include="ActivationManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SuccessCommandEventArgs.cs" />
+    <Compile Include="TrialInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Domain\BaseDevice\BaseDevice.csproj">
-      <Project>{677b5fde-5da7-4065-b446-014822533cbc}</Project>
-      <Name>BaseDevice</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Domain\Extensions\Extensions.csproj">
+    <ProjectReference Include="..\..\Domain\Extensions\Extensions.csproj">
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
       <Name>Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\ServiceInterfaces\ServiceInterfaces.csproj">
+      <Project>{be701549-33d0-4895-83d3-3a809cc0eaa6}</Project>
+      <Name>ServiceInterfaces</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

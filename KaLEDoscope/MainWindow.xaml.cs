@@ -1,4 +1,7 @@
-﻿using Compression;
+﻿using Activation;
+using Compression;
+using KaLEDoscope.ViewModel;
+using KaLEDoscope.Views;
 using Logger;
 using System;
 using System.Windows;
@@ -12,6 +15,8 @@ namespace KaLEDoscope
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly ActivationManager _activationManager;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -19,10 +24,48 @@ namespace KaLEDoscope
             var compressor = new Compressor();
             var networkScanAgent = new UdpAgent();
             var networkExcangeAgent = new TcpAgent();
-            var viewModel = new MainViewModel(logger, compressor, networkScanAgent, networkExcangeAgent);
+            _activationManager = new ActivationManager(compressor);
+            var viewModel = new MainViewModel(logger, compressor, networkScanAgent, networkExcangeAgent,
+                _activationManager);
+            viewModel.ActivationRequired += new EventHandler(OnActivationRequired);
+            viewModel.TrialExpired += new EventHandler(OnTrialExpired);
             viewModel.ShowOptions += new EventHandler(OnShowOptions);
             viewModel.QuitApplication += new EventHandler(OnQuitApplication);
             DataContext = trvMenu.DataContext = viewModel;
+            viewModel.CheckActivation();
+        }
+
+        private void OnTrialExpired(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Пробный период истек.\r\n" +
+                "Необходимо активировать приложение\r\n" +
+                "Перейти к активации?", "Требуется активация", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+                == MessageBoxResult.No)
+            {
+                Close();
+            }
+            ProceedActivation();
+        }
+
+        private void OnActivationRequired(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Приложение не активировано.\r\n" +
+                "Без активации работа приложения невозможна\r\n" +
+                "Перейти к активации?", "Требуется активация", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+                == MessageBoxResult.No)
+            {
+                Close();
+            }
+            ProceedActivation();
+        }
+
+        private void ProceedActivation()
+        {
+            var activationViewModel = new ActivationViewModel(_activationManager);
+            var activationWindow = new ActivationWindow(activationViewModel);
+            activationViewModel.GenerateRequestCode();
+            if (activationWindow.ShowDialog() == false)
+                Close();
         }
 
         private void OnQuitApplication(object sender, EventArgs e)
