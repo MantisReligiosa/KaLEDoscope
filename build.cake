@@ -77,7 +77,7 @@ Task("ZipKaLEDoscope")
 Task("ZipKeygen")
 .Does(() =>
 {
-	Zip($"./{publishDir}/Keygen", $"./{publishDir}/Keygen.zip");
+	Zip($"./{publishDir}/Keygen", $"./{publishDir}/KaLEDoscope Keygen.zip");
 });
 
 Task("BuildSetup")
