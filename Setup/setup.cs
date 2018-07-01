@@ -9,9 +9,9 @@ namespace Setup
 {
     public static class Script
     {
-        private static string[] _dependentLibraries => new[]
+        private static string[] _dependentLibraries => new string[]
         {
-            "Setups.Common.dll",
+            //"Setups.Common.dll",
         //    "BCrypt.Net-Next.dll"
         };
 
