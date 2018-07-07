@@ -1,0 +1,17 @@
+﻿<UserControl x:Class="SevenSegmentBoardDevice.UI.Preview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SevenSegmentBoardDevice.UI"
+             mc:Ignorable="d" Background="Black">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type Label}">
+            <Setter Property="FontSize" Value="80"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Label Content="{Binding Text}" Visibility="{Binding PixelVisibility}" FontFamily="/SevenSegmentBoardDevice;component/fonts/#Digital-7 Mono" Foreground="#FFFB0000" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Label Content="{Binding Text}" Visibility="{Binding DigitalVisibility}" FontFamily="/SevenSegmentBoardDevice;component/fonts/#Advanced LED Board-7" Foreground="#FF00720A" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Grid>
+</UserControl>

@@ -17,26 +17,59 @@ namespace SevenSegmentBoardDevice
     {
         public string Model => "boardClock";
         public string DisplayName => "Семисегментные часы";
+        private TimerDeviceViewModel _model;
+        private PreviewViewModel _previewModel;
+
 
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var pack = new ControlsPack();
-            var model = new TimerDeviceViewModel(device, logger);
+            _model = new TimerDeviceViewModel(device, logger);
             var timerControl = new TimerControl
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
-                DataContext = model
+                DataContext = _model
             };
             pack.CustomizationControl = timerControl;
-            pack.PreviewControl = new UserControl
+            _previewModel = new PreviewViewModel
             {
-                Content = new Label
-                {
-                    Content = "Тут будет предпросмотр для часов"
-                }
+                IsDigit = true,
+                Text = String.Empty
             };
+            var previewControl = new Preview
+            {
+                DataContext = _previewModel
+            };
+            pack.PreviewControl = previewControl;
+            _model.PropertyChanged += RedrawPreview;
             return pack;
+        }
+
+        private void RedrawPreview(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(_model.DisplayType)))
+            {
+                _previewModel.IsDigit = (_model.DisplayType.Id != 0);
+            }
+            if (e.PropertyName.Equals(nameof(_model.DisplayFormat)))
+            {
+                switch (_model.DisplayFormat.Capacity)
+                {
+                    case 3:
+                        _previewModel.Text = "123";
+                        break;
+                    case 4:
+                        _previewModel.Text = DateTime.Now.ToString("hh:mm");
+                        return;
+                    case 6:
+                        _previewModel.Text = DateTime.Now.ToString("hh:mm:ss");
+                        return;
+                    case 9:
+                        _previewModel.Text = DateTime.Now.ToString("hh:mm:ss.fff");
+                        return;
+                }
+            }
         }
 
         public Device UpdateCustomSettings(Device device)
