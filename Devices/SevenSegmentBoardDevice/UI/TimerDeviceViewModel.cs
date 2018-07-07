@@ -4,6 +4,7 @@ using Extensions;
 using ServiceInterfaces;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -264,7 +265,9 @@ namespace SevenSegmentBoardDevice.UI
             DisplayType = Refs.DisplayTypes.FirstOrDefault(d => d == _device.BoardType.DisplayType);
             FontTypes = new ObservableCollection<FontType>(Refs.FontTypes);
             FontType = Refs.FontTypes.FirstOrDefault(f => f == _device.BoardType?.FontType);
-            DisplayFrames = new ObservableCollection<DisplayFrame>(Refs.DisplayFrames);
+            DisplayFrames = new ObservableCollection<DisplayFrame>();
+            DisplayFrames.CollectionChanged += DisplayFrames_CollectionChanged;
+            Refs.DisplayFrames.ForEach(f => DisplayFrames.Add(f));
             DisplayFormats = new ObservableCollection<DisplayFormat>(Refs.DisplayFormats);
             DisplayFormat = Refs.DisplayFormats.FirstOrDefault(d => d == _device.BoardType.DisplayFormat);
             CountdownTypes = new ObservableCollection<CountdownType>(Refs.CountdownTypes);
@@ -278,6 +281,23 @@ namespace SevenSegmentBoardDevice.UI
             TimeSyncServerIp = _device.TimeSyncParameters.ServerAddress;
             TimeSyncServerPort = _device.TimeSyncParameters.ServerPort;
             AlarmSchedule = new ObservableCollection<Alarm>(_device.AlarmSchedule);
+
+        }
+
+        private void DisplayFrames_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
+        {
+            if (args.OldItems != null)
+                foreach (var oldItem in args.OldItems)
+                    ((Notified)oldItem).PropertyChanged -= YourItem_PropertyChanged;
+
+            if (args.NewItems != null)
+                foreach (var newItem in args.NewItems)
+                    ((Notified)newItem).PropertyChanged += YourItem_PropertyChanged;
+        }
+
+        private void YourItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            _device.DisplayFrames = DisplayFrames.Where(f => f.IsChecked).ToList();
         }
 
         private DelegateCommand _addAlarm;
