@@ -106,7 +106,7 @@
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Справка">
-                    <MenuItem Header="О программе...">
+                    <MenuItem Header="О программе..." Command="{Binding About}">
                         <MenuItem.Icon>
                             <Image Source="Resources\Help.png"/>
                         </MenuItem.Icon>

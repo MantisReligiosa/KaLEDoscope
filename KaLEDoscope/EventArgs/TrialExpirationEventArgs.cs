@@ -2,7 +2,7 @@
 
 namespace KaLEDoscope
 {
-    public class TrialExpirationEventArgs : EventArgs
+    public class TrialExpirationEventArgs : System.EventArgs
     {
         public DateTime ExpirationDate { get; set; }
     }

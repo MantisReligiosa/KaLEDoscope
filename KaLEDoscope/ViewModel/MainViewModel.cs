@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -54,6 +55,7 @@ namespace KaLEDoscope
         public event EventHandler QuitApplication;
         public event EventHandler ActivationRequired;
         public event EventHandler TrialExpired;
+        public event EventHandler<ShowAboutEventArgs> ShowAbout;
 
         public TabItem SelectedTabItem { get; set; }
         public string StructureFileName { get; set; } = string.Empty;
@@ -127,7 +129,7 @@ namespace KaLEDoscope
             {
                 ActivationRequired?.Invoke(this, EventArgs.Empty);
             }
-            else if (!_activationManager.IsFullAccess 
+            else if (!_activationManager.IsFullAccess
                 && _activationManager.TrialExpirationDate < DateTime.Now)
             {
                 TrialExpired?.Invoke(this, EventArgs.Empty);
@@ -659,6 +661,26 @@ namespace KaLEDoscope
                     });
                 }
                 return _showDevicePlugin;
+            }
+        }
+
+        private DelegateCommand _about;
+        public Input.ICommand About
+        {
+            get
+            {
+                if (_about.IsNull())
+                {
+                    _about = new DelegateCommand((o) =>
+                    {
+                        ShowAbout?.Invoke(this, new ShowAboutEventArgs
+                        {
+                            Version = Assembly.GetExecutingAssembly().GetName().Version.ToString()
+
+                        });
+                    });
+                }
+                return _about;
             }
         }
 

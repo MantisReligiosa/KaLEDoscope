@@ -31,8 +31,15 @@ namespace KaLEDoscope
             viewModel.TrialExpired += new EventHandler(OnTrialExpired);
             viewModel.ShowOptions += new EventHandler(OnShowOptions);
             viewModel.QuitApplication += new EventHandler(OnQuitApplication);
+            viewModel.ShowAbout += new EventHandler<ShowAboutEventArgs>(OnShowAbout);
             DataContext = trvMenu.DataContext = viewModel;
             viewModel.CheckActivation();
+        }
+
+        private void OnShowAbout(object sender, ShowAboutEventArgs e)
+        {
+            var aboutWindow = new AboutWindow(e.Version);
+            aboutWindow.ShowDialog();
         }
 
         private void OnTrialExpired(object sender, EventArgs e)
