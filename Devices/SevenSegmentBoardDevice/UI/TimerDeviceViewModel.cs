@@ -151,30 +151,27 @@ namespace SevenSegmentBoardDevice.UI
             }
         }
 
-        private string _timeSyncPeriod;
-        public string TimeSyncPeriod
+        private string _syncIntervalStr;
+        public string SyncIntervalStr
         {
             get
             {
-                return _timeSyncPeriod;
+                return _syncIntervalStr;
             }
             set
             {
-                if (_timeSyncPeriod?.Equals(value) ?? false)
+                if (int.TryParse(value, out int interval))
                 {
-                    return;
-                }
-                if (TimeSpan.TryParseExact(value, @"h\:mm", CultureInfo.CurrentCulture, out TimeSpan timeSpan))
-                {
-                    _timeSyncPeriod = value;
-                    TimeSyncPeriodValue = timeSpan;
+                    _syncIntervalStr = value;
+                    
                 }
                 else
                 {
-                    _timeSyncPeriod = "2:00";
-                    TimeSyncPeriodValue = new TimeSpan(12, 0, 0);
+                    _syncIntervalStr = "30";
+                    interval = 30;
                 }
-                OnPropertyChanged(nameof(TimeSyncPeriod));
+                TimeSyncPeriodValue = new TimeSpan(0, interval, 0);
+                OnPropertyChanged(nameof(SyncIntervalStr));
                 OnPropertyChanged(nameof(TimeSyncPeriodValue));
             }
         }
@@ -192,9 +189,9 @@ namespace SevenSegmentBoardDevice.UI
                     return;
                 }
                 _device.TimeSyncParameters.SyncPeriod = value;
-                TimeSyncPeriod = value.ToString(@"hh\:mm");
+                SyncIntervalStr = value.TotalMinutes.ToString();
                 OnPropertyChanged(nameof(TimeSyncPeriodValue));
-                OnPropertyChanged(nameof(TimeSyncPeriod));
+                OnPropertyChanged(nameof(SyncIntervalStr));
             }
         }
 

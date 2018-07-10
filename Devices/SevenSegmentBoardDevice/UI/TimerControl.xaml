@@ -119,13 +119,22 @@
                 <Label Grid.Row="1" Grid.Column="0" Content="Часовой пояс" IsEnabled="{Binding SyncSource.AllowTimezones}"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding TimeZones}" IsEnabled="{Binding SyncSource.AllowTimezones}" DisplayMemberPath="DisplayName" SelectedItem="{Binding TimeZone}"/>
                 <Label Grid.Row="2" Grid.ColumnSpan="2" Content="Параметры синхронизации" HorizontalContentAlignment="Center" IsEnabled="{Binding SyncSource.IsCutomized}"/>
-                <Label Grid.Row="3" Grid.Column="0" Content="Период синхронизации (час:мин)" IsEnabled="{Binding SyncSource.IsCutomized}"/>
-                <xctk:TimePicker Grid.Row="3" 
+                <Label Grid.Row="3" Grid.Column="0" Content="Период синхронизации, минут" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <ComboBox Grid.Row="3" Grid.Column="1" 
+                                      Text="{Binding SyncIntervalStr}" 
+                                      IsEditable="True" 
+                                      IsSynchronizedWithCurrentItem="False" StaysOpenOnEdit="True">
+                    <ListBoxItem Content="15"/>
+                    <ListBoxItem Content="30"/>
+                    <ListBoxItem Content="45"/>
+                    <ListBoxItem Content="60"/>
+                </ComboBox>
+                <!--<xctk:TimePicker Grid.Row="3" 
                                          Grid.Column="1"
                                          Text="{Binding TimeSyncPeriod}"
                                          IsEnabled="{Binding SyncSource.IsCutomized}"
                                  DefaultValue="2:00"
-                                         Format="ShortTime"/>
+                                         Format="ShortTime"/>-->
                 <Label Grid.Row="4" Grid.Column="0" Content="Адрес сервера" IsEnabled="{Binding SyncSource.IsCutomized}"/>
                 <TextBox Grid.Row="4" Grid.Column="1" IsEnabled="{Binding SyncSource.IsCutomized}" Text="{Binding TimeSyncServerIp}"/>
                 <Label Grid.Row="5" Grid.Column="0" Content="Порт" IsEnabled="{Binding SyncSource.IsCutomized}"/>
