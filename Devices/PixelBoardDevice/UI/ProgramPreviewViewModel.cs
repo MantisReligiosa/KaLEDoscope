@@ -457,8 +457,9 @@ namespace PixelBoardDevice.UI
                 System.Drawing.Color.Red,
                 System.Drawing.Color.Transparent,
                 System.Drawing.Size.Empty) as System.Drawing.Bitmap;
+            var top = y + (height - font.Height) / 2;
 
-            PutBitmapOnCanvas(bitmap, canvas, x, y, width, height, scale);
+            PutBitmapOnCanvas(bitmap, canvas, x, top, width, height, scale);
         }
 
         private static void PutBitmapOnCanvas(System.Drawing.Bitmap bitmap, Canvas canvas, int x, int y, int width, int height, double scale)
