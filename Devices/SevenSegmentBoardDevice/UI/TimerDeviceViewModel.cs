@@ -164,14 +164,14 @@ namespace SevenSegmentBoardDevice.UI
                 {
                     return;
                 }
-                if (TimeSpan.TryParseExact(value, @"hh\:mm", CultureInfo.CurrentCulture, out TimeSpan timeSpan))
+                if (TimeSpan.TryParseExact(value, @"h\:mm", CultureInfo.CurrentCulture, out TimeSpan timeSpan))
                 {
                     _timeSyncPeriod = value;
                     TimeSyncPeriodValue = timeSpan;
                 }
                 else
                 {
-                    _timeSyncPeriod = "12:00";
+                    _timeSyncPeriod = "2:00";
                     TimeSyncPeriodValue = new TimeSpan(12, 0, 0);
                 }
                 OnPropertyChanged(nameof(TimeSyncPeriod));
