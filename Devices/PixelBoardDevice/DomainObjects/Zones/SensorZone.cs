@@ -7,5 +7,6 @@
         public int? FontId { get; set; }
         public bool UseWholeAlphabet => true;
         public string Alphabet => string.Empty;
+        public int? Alignment { get; set; }
     }
 }

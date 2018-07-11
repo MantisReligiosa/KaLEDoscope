@@ -29,12 +29,14 @@ namespace PixelBoardDevice.Requests
             if (zone is TextZone textZone)
             {
                 bytes.Add((byte)textZone.FontId);
+                bytes.Add((byte)(textZone.Alignment ?? 0));
                 bytes.Add((byte)textZone.Text.Length);
                 bytes.AddRange(textZone.Text.ToBytes());
             }
             else if (zone is SensorZone sensorZone)
             {
                 bytes.Add((byte)sensorZone.FontId);
+                bytes.Add((byte)(sensorZone.Alignment ?? 0));
             }
             else if (zone is BitmapZone bitmapZone)
             {
@@ -43,6 +45,7 @@ namespace PixelBoardDevice.Requests
             else if (zone is TagZone tagZone)
             {
                 bytes.Add((byte)tagZone.FontId);
+                bytes.Add((byte)(tagZone.Alignment ?? 0));
                 bytes.Add((byte)tagZone.ExternalSourceTag.Length);
                 bytes.AddRange(tagZone.ExternalSourceTag.ToBytes());
             }

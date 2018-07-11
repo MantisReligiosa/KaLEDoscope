@@ -29,12 +29,14 @@ namespace PixelBoardDevice.Serialization
 
         public int ProgramId { get; set; }
         public int? BinaryImageId { get; set; }
+        public int? Alignment { get; set; }
 
         public static explicit operator SeriazableZone(Zone zone)
         {
             var seriazableZone = new SeriazableZone
             {
                 FontId = (zone is IFontableZone fontableZone) ? fontableZone.FontId : default(int?),
+                Alignment = (zone is IFontableZone fontableZone1) ? fontableZone1.Alignment : default(int?),
                 Height = zone.Height,
                 Id = zone.Id,
                 Name = zone.Name,
@@ -81,14 +83,16 @@ namespace PixelBoardDevice.Serialization
                     var textZone = new TextZone()
                     {
                         FontId = serializableZone.FontId,
-                        Text = serializableZone.Text
+                        Text = serializableZone.Text,
+                        Alignment = serializableZone.Alignment
                     };
                     zoneResult = textZone;
                     break;
                 case 2:
                     var sensorZone = new SensorZone
                     {
-                        FontId = serializableZone.FontId
+                        FontId = serializableZone.FontId,
+                        Alignment = serializableZone.Alignment
                     };
                     zoneResult = sensorZone;
                     break;
@@ -103,7 +107,8 @@ namespace PixelBoardDevice.Serialization
                     var tagZone = new TagZone
                     {
                         FontId = serializableZone.FontId,
-                        ExternalSourceTag = serializableZone.ExternalSourceTag
+                        ExternalSourceTag = serializableZone.ExternalSourceTag,
+                        Alignment = serializableZone.Alignment
                     };
                     zoneResult = tagZone;
                     break;
@@ -117,8 +122,10 @@ namespace PixelBoardDevice.Serialization
                     if (clockZone.ClockType == 1)
                     {
                         clockZone.ClockFormat = serializableZone.ClockFormat.Value;
+                        clockZone.FontId = serializableZone.FontId;
+                        clockZone.Alignment = serializableZone.Alignment;
                     }
-                    
+
                     if (clockZone.AllowScheduledSync)
                     {
                         clockZone.ScheduledTimeSync = serializableZone.ScheduledTimeSync.Value;
@@ -133,7 +140,9 @@ namespace PixelBoardDevice.Serialization
                     var tickerZone = new TickerZone
                     {
                         TickerType = serializableZone.TickerType.Value,
-                        TickerCountDownStartValue = serializableZone.TickerCountDownStartValue.Value
+                        TickerCountDownStartValue = serializableZone.TickerCountDownStartValue.Value,
+                        FontId = serializableZone.FontId,
+                        Alignment = serializableZone.Alignment
                     };
                     zoneResult = tickerZone;
                     break;

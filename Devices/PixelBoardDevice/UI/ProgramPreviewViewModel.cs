@@ -330,21 +330,21 @@ namespace PixelBoardDevice.UI
                     (z) => z is TextZone,
                     (zone, canvas, font, image, scale) =>
                     {
-                        RenderText(canvas, font, ((TextZone)zone).Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderText(canvas, font, ((IFontableZone)zone).Alignment, ((TextZone)zone).Text, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
                     (z) => z is SensorZone,
                     (zone, canvas, font, image, scale) =>
                     {
-                        RenderText(canvas, font, "[Sensor]", zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderText(canvas, font, ((IFontableZone)zone).Alignment, "[Sensor]", zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
                     (z) => z is TagZone,
                     (zone, canvas, font, image, scale) =>
                     {
-                        RenderText(canvas, font, "[MQTT]", zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderText(canvas, font, ((IFontableZone)zone).Alignment, "[MQTT]", zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
@@ -359,7 +359,7 @@ namespace PixelBoardDevice.UI
                     (zone, canvas, font, image, scale) =>
                     {
                         var clockZone = zone as ClockZone;
-                        RenderText(canvas, font, clockZone.Sample, zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderText(canvas, font, ((IFontableZone)zone).Alignment, clockZone.Sample, zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
                 {
@@ -373,7 +373,7 @@ namespace PixelBoardDevice.UI
                     (z) => z.ZoneType==(int)ZoneTypes.Ticker,
                     (zone, canvas, font, image, scale) =>
                     {
-                        RenderText(canvas, font, "00:00.0000", zone.X, zone.Y, zone.Width, zone.Height, scale);
+                        RenderText(canvas, font, ((IFontableZone)zone).Alignment, "00:00.0000", zone.X, zone.Y, zone.Width, zone.Height, scale);
                     }
                 },
 
@@ -426,7 +426,7 @@ namespace PixelBoardDevice.UI
             PutBitmapOnCanvas(bitmap, canvas, x, y, width, height, scale);
         }
 
-        private static void RenderText(Canvas canvas, BinaryFont font, string text, int x, int y, int width, int height, double scale)
+        private static void RenderText(Canvas canvas, BinaryFont font, int? alignment, string text, int x, int y, int width, int height, double scale)
         {
             if (font.IsNull())
             {
@@ -457,14 +457,32 @@ namespace PixelBoardDevice.UI
                 System.Drawing.Color.Red,
                 System.Drawing.Color.Transparent,
                 System.Drawing.Size.Empty) as System.Drawing.Bitmap;
-            var delta = (height - font.Height) / 2;
-            if (delta < 0)
+            var deltaY = (height - font.Height) / 2;
+            if (deltaY < 0)
             {
-                delta = 0;
+                deltaY = 0;
             }
-            var top = y + delta;
+            var top = y + deltaY;
 
-            PutBitmapOnCanvas(bitmap, canvas, x, top, width, height, scale);
+            var align = alignment ?? 0;
+            int deltaX;
+            if (align == 1)
+            {
+                deltaX = (width - bitmap.Width);
+            }
+            else if (align == 2)
+            {
+                deltaX = (width - bitmap.Width) / 2;
+            }
+            else
+            {
+                deltaX = 0;
+            }
+            if (deltaX < 0)
+                deltaX = 0;
+
+            var left = x + deltaX;
+            PutBitmapOnCanvas(bitmap, canvas, left, top, width, height, scale);
         }
 
         private static void PutBitmapOnCanvas(System.Drawing.Bitmap bitmap, Canvas canvas, int x, int y, int width, int height, double scale)

@@ -18,18 +18,20 @@ namespace PixelBoardDevice.Responces
             switch (zoneType)
             {
                 case 1:
-                    var textLength = _bytes[18 + nameLength];
+                    var textLength = _bytes[19 + nameLength];
                     var textZone = new TextZone()
                     {
                         FontId = _bytes[17 + nameLength],
-                        Text = _bytes.ExtractString(19 + nameLength, textLength)
+                        Alignment = _bytes[18 + nameLength],
+                        Text = _bytes.ExtractString(20 + nameLength, textLength)
                     };
                     zone = textZone;
                     break;
                 case 2:
                     var sensorZone = new SensorZone
                     {
-                        FontId = _bytes[17 + nameLength]
+                        FontId = _bytes[17 + nameLength],
+                        Alignment = _bytes[18 + nameLength],
                     };
                     zone = sensorZone;
                     break;
@@ -41,11 +43,12 @@ namespace PixelBoardDevice.Responces
                     zone = bitmapZone;
                     break;
                 case 4:
-                    var tagLength = _bytes[18 + nameLength];
+                    var tagLength = _bytes[19 + nameLength];
                     var tagZone = new TagZone
                     {
                         FontId = _bytes[17 + nameLength],
-                        ExternalSourceTag = _bytes.ExtractString(19 + nameLength, tagLength)
+                        Alignment = _bytes[18 + nameLength],
+                        ExternalSourceTag = _bytes.ExtractString(20 + nameLength, tagLength)
                     };
                     zone = tagZone;
                     break;

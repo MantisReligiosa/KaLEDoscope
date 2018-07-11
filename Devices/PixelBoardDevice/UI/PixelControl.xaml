@@ -183,22 +183,27 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="23*"/>
-                                <ColumnDefinition Width="151*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="auto"/>
                             </Grid.ColumnDefinitions>
-                            <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}"  DisplayMemberPath="Source" Grid.ColumnSpan="2"></ComboBox>
-                            <ComboBox Grid.Row="0" Grid.Column="2" 
+                            <ComboBox Grid.Row="0" Grid.Column="0"  ItemsSource="{Binding Fonts}" SelectedItem="{Binding SelectedFont}"  DisplayMemberPath="Source"></ComboBox>
+                            <ComboBox Grid.Row="0" Grid.Column="1" 
                                       ItemsSource="{Binding FontSizes}" 
                                       Width="45" 
                                       Text="{Binding SelectedFontSizeStr}" 
                                       IsEditable="True" 
                                       IsSynchronizedWithCurrentItem="False" StaysOpenOnEdit="True"/>
-                            <ToggleButton Grid.Row="0" Grid.Column="3" IsChecked="{Binding IsBold}" Width="22" FontWeight="Bold">B</ToggleButton>
-                            <ToggleButton Grid.Row="0" Grid.Column="4" IsChecked="{Binding IsItalic}" Width="22" FontStyle="Italic" >I</ToggleButton>
-                            <TextBox Grid.Row="1" Grid.ColumnSpan="5" AcceptsReturn="True" 
+                            <ToggleButton Grid.Row="0" Grid.Column="2" IsChecked="{Binding IsBold}" Width="22" FontWeight="Bold">B</ToggleButton>
+                            <ToggleButton Grid.Row="0" Grid.Column="3" IsChecked="{Binding IsItalic}" Width="22" FontStyle="Italic" >I</ToggleButton>
+                            <ToggleButton Grid.Row="0" Grid.Column="4" IsChecked="{Binding AlignmentLeft}" Width="22" Content="&lt;" ></ToggleButton>
+                            <ToggleButton Grid.Row="0" Grid.Column="5" IsChecked="{Binding AlignmentCenter}" Width="22" >I</ToggleButton>
+                            <ToggleButton Grid.Row="0" Grid.Column="6" IsChecked="{Binding AlignmentRight}" Width="22" Content="&gt;" />
+                            <TextBox Grid.Row="1" Grid.ColumnSpan="10" AcceptsReturn="True" 
                                      Height="100"
                                      TextWrapping="WrapWithOverflow"
                                      FontFamily="{Binding SelectedFont}"
@@ -206,7 +211,7 @@
                                      FontStyle="{Binding FontStyle}"
                                      FontWeight="{Binding FontWeight}"
                                      Text="{Binding Text}"
-                                     Visibility="{Binding TextEditingVisibility}" Margin="0,0,0,1">
+                                     Visibility="{Binding TextEditingVisibility}" Margin="0,0,0,1" TextAlignment="{Binding TextAlignment}">
                             </TextBox>
                         </Grid>
                     </GroupBox>

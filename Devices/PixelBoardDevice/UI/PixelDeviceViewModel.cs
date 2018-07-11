@@ -212,6 +212,7 @@ namespace PixelBoardDevice.UI
             Zones.CollectionChanged += (s, e) => ValidateAndInvokePreview();
             SelectedProgram = Programs.FirstOrDefault();
             FontSizes = new ObservableCollection<int>(_fontSizes);
+            TextAlignment = TextAlignment.Left;
             AllowChangeBoardSize = allowChangeBoardSize;
             PreviewScale = 1;
             PreviewScaleMinRate = .2;
@@ -579,6 +580,73 @@ namespace PixelBoardDevice.UI
                 }
                 OnPropertyChanged(nameof(IsBold));
                 OnPropertyChanged(nameof(FontWeight));
+            }
+        }
+
+        private TextAlignment _textAlignment;
+        public TextAlignment TextAlignment
+        {
+            get
+            {
+                return _textAlignment;
+            }
+            set
+            {
+                if (_textAlignment == value)
+                    return;
+                _textAlignment = value;
+                var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as IFontableZone;
+                zone.Alignment = (int)value;
+                OnPropertyChanged(nameof(TextAlignment));
+                OnPropertyChanged(nameof(AlignmentLeft));
+                OnPropertyChanged(nameof(AlignmentCenter));
+                OnPropertyChanged(nameof(AlignmentRight));
+            }
+        }
+
+        public bool AlignmentLeft
+        {
+            get
+            {
+                return TextAlignment == TextAlignment.Left;
+            }
+            set
+            {
+                if (!value)
+                    return;
+                TextAlignment = TextAlignment.Left;
+                OnPropertyChanged(nameof(AlignmentLeft));
+                OnPropertyChanged(nameof(TextAlignment));
+            }
+        }
+        public bool AlignmentCenter
+        {
+            get
+            {
+                return TextAlignment == TextAlignment.Center;
+            }
+            set
+            {
+                if (!value)
+                    return;
+                TextAlignment = TextAlignment.Center;
+                OnPropertyChanged(nameof(AlignmentCenter));
+                OnPropertyChanged(nameof(TextAlignment));
+            }
+        }
+        public bool AlignmentRight
+        {
+            get
+            {
+                return TextAlignment == TextAlignment.Right;
+            }
+            set
+            {
+                if (!value)
+                    return;
+                TextAlignment = TextAlignment.Right;
+                OnPropertyChanged(nameof(AlignmentRight));
+                OnPropertyChanged(nameof(TextAlignment));
             }
         }
 

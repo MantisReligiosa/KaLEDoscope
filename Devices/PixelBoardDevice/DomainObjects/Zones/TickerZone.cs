@@ -11,5 +11,6 @@ namespace PixelBoardDevice.DomainObjects.Zones
         public TimeSpan TickerCountDownStartValue { get; set; }
         public bool UseWholeAlphabet => false;
         public string Alphabet => "1234567890:.";
+        public int? Alignment { get; set; }
     }
 }

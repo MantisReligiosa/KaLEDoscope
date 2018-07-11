@@ -16,5 +16,6 @@ namespace PixelBoardDevice.DomainObjects.Zones
         public bool UseWholeAlphabet => false;
         public string Alphabet => "1234567890:.";
         public string Sample { get; set; }
+        public int? Alignment { get; set; }
     }
 }
