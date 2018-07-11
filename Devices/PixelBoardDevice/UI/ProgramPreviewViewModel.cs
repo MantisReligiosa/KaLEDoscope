@@ -457,7 +457,12 @@ namespace PixelBoardDevice.UI
                 System.Drawing.Color.Red,
                 System.Drawing.Color.Transparent,
                 System.Drawing.Size.Empty) as System.Drawing.Bitmap;
-            var top = y + (height - font.Height) / 2;
+            var delta = (height - font.Height) / 2;
+            if (delta < 0)
+            {
+                delta = 0;
+            }
+            var top = y + delta;
 
             PutBitmapOnCanvas(bitmap, canvas, x, top, width, height, scale);
         }
