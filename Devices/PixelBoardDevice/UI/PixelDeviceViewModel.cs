@@ -21,7 +21,7 @@ using Input = System.Windows.Input;
 
 namespace PixelBoardDevice.UI
 {
-    public class PixelDeviceViewModel : Notified
+    public class PixelDeviceViewModel : Notified, IDeviceViewModel
     {
         public event EventHandler ModelChanged;
         public readonly PixelBoard Device;
@@ -1241,6 +1241,8 @@ namespace PixelBoardDevice.UI
                 }
             }
         }
+
+        Device IDeviceViewModel.BaseDevice => throw new NotImplementedException();
 
         public readonly double PreviewScaleMinRate;
         public readonly double PreviewScaleMaxRate;

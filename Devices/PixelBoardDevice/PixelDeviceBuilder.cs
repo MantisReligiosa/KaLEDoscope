@@ -31,6 +31,7 @@ namespace PixelBoardDevice
                     VerticalAlignment = VerticalAlignment.Stretch,
                     DataContext = _model
                 },
+                Device = device
             };
             _model.PropertyChanged += (o, args) => pack.NotifyThatModelChanged();
             var previewModel = new ProgramPreviewViewModel(_model);

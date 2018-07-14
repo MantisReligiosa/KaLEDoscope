@@ -42,6 +42,7 @@ namespace SevenSegmentBoardDevice
                 DataContext = _previewModel
             };
             pack.PreviewControl = previewControl;
+            pack.Device = device;
             _model.PropertyChanged += RedrawPreview;
             return pack;
         }

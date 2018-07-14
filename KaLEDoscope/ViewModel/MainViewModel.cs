@@ -798,10 +798,12 @@ namespace KaLEDoscope
             SelectedTabItem = newTabItem;
         }
 
+        private ControlsPack _activeControlsPackInAggregation;
         private UserControl GetAggregationGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
         {
-            var previewControl = GetAggregationPreviewGrid(aggregationNode, selectedDeviceNode);
             var pack = _deviceFactory.GetControlsPack(selectedDeviceNode.Device, _logger);
+            _activeControlsPackInAggregation = pack;
+            var previewControl = GetAggregationPreviewGrid(aggregationNode, selectedDeviceNode);
             return GetDeviceItemGrid(selectedDeviceNode, previewControl, pack.CustomizationControl, pack.MenuItems, pack.OnPreviewAreaMouseDown);
         }
 
@@ -813,7 +815,7 @@ namespace KaLEDoscope
             }
             if (aggregationNode.Nodes.Count == 1)
             {
-                var pack = _deviceFactory.GetControlsPack(selectedDeviceNode.Device, _logger);
+                var pack = _activeControlsPackInAggregation;
                 return pack.PreviewControl;
             }
             var control = new UserControl();
@@ -845,6 +847,10 @@ namespace KaLEDoscope
                     Width = new GridLength(1, GridUnitType.Star)
                 });
                 var pack = _deviceFactory.GetControlsPack(((DeviceNode)node).Device, _logger);
+                if (pack.Equals(_activeControlsPackInAggregation))
+                {
+                    pack = _activeControlsPackInAggregation;
+                }
                 var devicePreview = pack.PreviewControl;
                 devicePreview.HorizontalAlignment = HorizontalAlignment.Stretch;
                 devicePreview.VerticalAlignment = VerticalAlignment.Stretch;

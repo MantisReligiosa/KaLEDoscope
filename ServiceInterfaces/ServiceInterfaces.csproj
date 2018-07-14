@@ -45,6 +45,7 @@
     <Compile Include="IActivationManager.cs" />
     <Compile Include="IDeviceCommand.cs" />
     <Compile Include="ICompressor.cs" />
+    <Compile Include="IDeviceViewModel.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="INetworkAgent.cs" />
     <Compile Include="IRequest.cs" />
