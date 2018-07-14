@@ -16,6 +16,7 @@ namespace KaLEDoscope
     public partial class MainWindow : Window
     {
         private readonly ActivationManager _activationManager;
+        private readonly MainViewModel _viewModel;
 
         public MainWindow()
         {
@@ -25,15 +26,15 @@ namespace KaLEDoscope
             var networkScanAgent = new UdpAgent();
             var networkExcangeAgent = new TcpAgent();
             _activationManager = new ActivationManager(compressor);
-            var viewModel = new MainViewModel(logger, compressor, networkScanAgent, networkExcangeAgent,
+            _viewModel = new MainViewModel(logger, compressor, networkScanAgent, networkExcangeAgent,
                 _activationManager);
-            viewModel.ActivationRequired += new EventHandler(OnActivationRequired);
-            viewModel.TrialExpired += new EventHandler(OnTrialExpired);
-            viewModel.ShowOptions += new EventHandler(OnShowOptions);
-            viewModel.QuitApplication += new EventHandler(OnQuitApplication);
-            viewModel.ShowAbout += new EventHandler<ShowAboutEventArgs>(OnShowAbout);
-            DataContext = trvMenu.DataContext = viewModel;
-            viewModel.CheckActivation();
+            _viewModel.ActivationRequired += new EventHandler(OnActivationRequired);
+            _viewModel.TrialExpired += new EventHandler(OnTrialExpired);
+            _viewModel.ShowOptions += new EventHandler(OnShowOptions);
+            _viewModel.QuitApplication += new EventHandler(OnQuitApplication);
+            _viewModel.ShowAbout += new EventHandler<ShowAboutEventArgs>(OnShowAbout);
+            DataContext = trvMenu.DataContext = _viewModel;
+            _viewModel.CheckActivation();
         }
 
         private void OnShowAbout(object sender, ShowAboutEventArgs e)

@@ -58,7 +58,7 @@ Task("CopyKeygen")
 
 private void CopyBase(string sourceDir, string targetDir)
 {
-	var ignoredExts = new string[] { ".pdb", ".key" };
+	var ignoredExts = new string[] { ".pdb", ".key",".struct" };
 	if (!DirectoryExists(targetDir))
 	{
 		CreateDirectory(targetDir);

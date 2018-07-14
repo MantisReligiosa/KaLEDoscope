@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -31,7 +32,7 @@ namespace KaLEDoscope
     {
         private ILogger _logger { get; set; }
         private ICompressor _compressor { get; set; }
-        private IActivationManager _activationManager;
+        private readonly IActivationManager _activationManager;
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
@@ -40,10 +41,14 @@ namespace KaLEDoscope
         private readonly ObservableCollection<LogItem> _logItems = new ObservableCollection<LogItem>();
         private readonly INetworkAgent _networkScanAgent;
         private readonly INetworkAgent _networkExchangeAgent;
+        private readonly Timer _timer;
 
         private const string _defaultStructureFileName = "Структура";
         private const string _defaultStructureFileExtension = ".struct";
+        private const string _temporaryStructureFileName = "temp";
         private const string _defaultStructureFilter = "Structure file (.struct)|*.struct|All files (*.*)|*.*";
+        private const string _appName = "KaLEDoscope";
+        private const int _timerPeriod = 60000;
 
 
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
@@ -69,7 +74,30 @@ namespace KaLEDoscope
         public int Warnings { get; set; }
         public bool AllowErrorLog { get; set; } = true;
         public int Errors { get; set; }
+        public string Title
+        {
+            get
+            {
+                return (String.IsNullOrEmpty(StructureFileName) ? string.Empty : $"{StructureFileName} - ") +
+                    $"{_appName}" +
+                    $"{(HaveUnsavedData ? "*" : String.Empty)}";
+            }
+        }
 
+        private bool _haveUnsavedData = false;
+        public bool HaveUnsavedData
+        {
+            get
+            {
+                return _haveUnsavedData;
+            }
+            set
+            {
+                _haveUnsavedData = value;
+                OnPropertyChanged(nameof(HaveUnsavedData));
+                OnPropertyChanged(nameof(Title));
+            }
+        }
 
         public MainViewModel(
             ILogger logger,
@@ -121,6 +149,15 @@ namespace KaLEDoscope
                     CommandParameter = deviceItem.Model
                 });
             }
+            LoadStructure(String.Empty);
+            StructureNodes.CollectionChanged += (s, e) => HaveUnsavedData = true;
+            _timer = new Timer(_timerPeriod);
+            _timer.Elapsed += (s, e) =>
+            {
+                if (HaveUnsavedData)
+                    SaveExistStructure();
+            };
+            _timer.Start();
         }
 
         public void CheckActivation()
@@ -161,6 +198,7 @@ namespace KaLEDoscope
                         AllowUpload = true
                     });
                 }
+                HaveUnsavedData = devices.Any();
             });
             IsScanEnabled = true;
         }
@@ -193,27 +231,27 @@ namespace KaLEDoscope
                         if (SelectedNode.IsNull())
                             return;
                         var renameDialog = new RenameDialog();
-                        if (!(SelectedNode as FolderNode).IsNull())
+                        if (SelectedNode is FolderNode folderNode)
                         {
-                            var folderNode = SelectedNode as FolderNode;
                             renameDialog.NameField = folderNode.Name;
                             if (renameDialog.ShowDialog() == true)
                             {
+                                HaveUnsavedData = !folderNode.Name.Equals(renameDialog.NameField);
                                 folderNode.Name = renameDialog.NameField;
                                 folderNode.Folder.Name = renameDialog.NameField;
                             }
                         }
-                        else if (!(SelectedNode as AggregationNode).IsNull())
+                        else if (SelectedNode is AggregationNode aggregationNode)
                         {
-                            var aggregationNode = SelectedNode as AggregationNode;
                             renameDialog.NameField = aggregationNode.Name;
                             if (renameDialog.ShowDialog() == true)
                             {
+                                HaveUnsavedData = !aggregationNode.Name.Equals(renameDialog.NameField);
                                 aggregationNode.Name = renameDialog.NameField;
                                 aggregationNode.Aggregation.Name = renameDialog.NameField;
                             }
                         }
-                        else if (!(SelectedNode as DeviceNode).IsNull())
+                        else if (SelectedNode is DeviceNode deviceNode)
                         {
                             ShowDevicePlugin.Execute(null);
                         }
@@ -232,6 +270,8 @@ namespace KaLEDoscope
                 {
                     _quit = new DelegateCommand((o) =>
                     {
+                        if (HaveUnsavedData)
+                            SaveExistStructure();
                         QuitApplication?.Invoke(this, EventArgs.Empty);
                     });
                 }
@@ -486,81 +526,97 @@ namespace KaLEDoscope
                         };
                         if (dialog.ShowDialog() != true)
                             return;
-                        DeviceTabs.Clear();
-                        StructureNodes.Clear();
-                        StructureFileName = dialog.FileName;
-                        var bytes = System.IO.File.ReadAllBytes(StructureFileName);
-                        var text = _compressor.Unzip(bytes);
-                        var serializableContainers = JsonConvert.DeserializeObject<List<SerializableContainer>>(text);
-                        foreach (var serializableContainer in serializableContainers)
-                        {
-                            if (serializableContainer.ContentType == ContentType.Folder)
-                            {
-                                var serializableFolder = (serializableContainer.Content as JObject)
-                                    .ToObject<SerializableFolder>();
-                                StructureNodes.Add(new FolderNode
-                                {
-                                    Folder = new Folder
-                                    {
-                                        Id = serializableFolder.Id,
-                                        Name = serializableFolder.Name
-                                    },
-                                    Name = serializableFolder.Name
-                                });
-                            }
-                            if (serializableContainer.ContentType == ContentType.Aggregator)
-                            {
-                                var serializableAggregation = (serializableContainer.Content as JObject)
-                                    .ToObject<SerializableAggregation>();
-                                StructureNodes.Add(new AggregationNode
-                                {
-                                    Aggregation = new Aggregation
-                                    {
-                                        Id = serializableAggregation.Id,
-                                        Name = serializableAggregation.Name
-                                    },
-                                    Name = serializableAggregation.Name
-                                });
-                            }
-                            if (serializableContainer.ContentType == ContentType.Device)
-                            {
-                                var baseDevice = (serializableContainer.Content as JObject)
-                                    .ToObject<SerializableBaseDevice>();
-                                var device = _deviceFactory.FromSerializable(baseDevice.Model, serializableContainer.Content);
-                                var deviceNode = new DeviceNode
-                                {
-                                    Device = device,
-                                    Name = device.Name,
-                                    AllowDownload = false,
-                                    AllowLoad = true,
-                                    AllowSave = true,
-                                    AllowUpload = false,
-                                };
-                                if (device.AggregationId.HasValue)
-                                {
-                                    var aggregationNode = StructureNodes.OfType<AggregationNode>()
-                                        .FirstOrDefault(n => n.Aggregation.Id == device.AggregationId);
-                                    deviceNode.Parent = aggregationNode;
-                                    aggregationNode.Nodes.Add(deviceNode);
-                                }
-                                else if (device.FolderId.HasValue)
-                                {
-                                    var folderNode = StructureNodes.OfType<FolderNode>()
-                                        .FirstOrDefault(n => n.Folder.Id == device.FolderId);
-                                    deviceNode.Parent = folderNode;
-                                    folderNode.Nodes.Add(deviceNode);
-                                }
-                                else
-                                {
-                                    StructureNodes.Add(deviceNode);
-                                }
-                            }
-                        }
-                        _logger.Info(this, "Структура загружена успешно");
+
+                        LoadStructure(dialog.FileName);
                     });
                 }
                 return _openStructure;
             }
+        }
+
+        private void LoadStructure(string filename)
+        {
+            if (String.IsNullOrEmpty(filename))
+            {
+                filename = String.Concat(_temporaryStructureFileName, _defaultStructureFileExtension);
+            }
+            else
+            {
+                StructureFileName = filename;
+            }
+            if (!System.IO.File.Exists(filename))
+                return;
+            DeviceTabs.Clear();
+            StructureNodes.Clear();
+
+            var bytes = System.IO.File.ReadAllBytes(filename);
+            var text = _compressor.Unzip(bytes);
+            var serializableContainers = JsonConvert.DeserializeObject<List<SerializableContainer>>(text);
+            foreach (var serializableContainer in serializableContainers)
+            {
+                if (serializableContainer.ContentType == ContentType.Folder)
+                {
+                    var serializableFolder = (serializableContainer.Content as JObject)
+                        .ToObject<SerializableFolder>();
+                    StructureNodes.Add(new FolderNode
+                    {
+                        Folder = new Folder
+                        {
+                            Id = serializableFolder.Id,
+                            Name = serializableFolder.Name
+                        },
+                        Name = serializableFolder.Name
+                    });
+                }
+                if (serializableContainer.ContentType == ContentType.Aggregator)
+                {
+                    var serializableAggregation = (serializableContainer.Content as JObject)
+                        .ToObject<SerializableAggregation>();
+                    StructureNodes.Add(new AggregationNode
+                    {
+                        Aggregation = new Aggregation
+                        {
+                            Id = serializableAggregation.Id,
+                            Name = serializableAggregation.Name
+                        },
+                        Name = serializableAggregation.Name
+                    });
+                }
+                if (serializableContainer.ContentType == ContentType.Device)
+                {
+                    var baseDevice = (serializableContainer.Content as JObject)
+                        .ToObject<SerializableBaseDevice>();
+                    var device = _deviceFactory.FromSerializable(baseDevice.Model, serializableContainer.Content);
+                    var deviceNode = new DeviceNode
+                    {
+                        Device = device,
+                        Name = device.Name,
+                        AllowDownload = false,
+                        AllowLoad = true,
+                        AllowSave = true,
+                        AllowUpload = false,
+                    };
+                    if (device.AggregationId.HasValue)
+                    {
+                        var aggregationNode = StructureNodes.OfType<AggregationNode>()
+                            .FirstOrDefault(n => n.Aggregation.Id == device.AggregationId);
+                        deviceNode.Parent = aggregationNode;
+                        aggregationNode.Nodes.Add(deviceNode);
+                    }
+                    else if (device.FolderId.HasValue)
+                    {
+                        var folderNode = StructureNodes.OfType<FolderNode>()
+                            .FirstOrDefault(n => n.Folder.Id == device.FolderId);
+                        deviceNode.Parent = folderNode;
+                        folderNode.Nodes.Add(deviceNode);
+                    }
+                    else
+                    {
+                        StructureNodes.Add(deviceNode);
+                    }
+                }
+            }
+            _logger.Info(this, "Структура загружена успешно");
         }
 
         private void SaveExistStructure()
@@ -604,8 +660,12 @@ namespace KaLEDoscope
             }
             var serialized = JsonConvert.SerializeObject(serializableContainers);
             var datas = _compressor.Zip(serialized);
-            System.IO.File.WriteAllBytes(StructureFileName, datas);
-            _logger.Info(this, $"Структура сохранена в {StructureFileName}");
+            var fileName = String.IsNullOrEmpty(StructureFileName) ?
+                String.Concat(_temporaryStructureFileName, _defaultStructureFileExtension) :
+                StructureFileName;
+            System.IO.File.WriteAllBytes(fileName, datas);
+            _logger.Info(this, $"Структура сохранена в {fileName}");
+            HaveUnsavedData = false;
         }
 
         private SerializableContainer GetDeviceSerializableContainer(DeviceNode node)
@@ -694,6 +754,7 @@ namespace KaLEDoscope
             }
             IEnumerable<object> menuItems = null;
             var pack = _deviceFactory.GetControlsPack(deviceNode.Device, _logger);
+            pack.DataChanged += (o, args) => HaveUnsavedData = true;
             menuItems = pack.MenuItems;
 
             var grid = GetDeviceItemGrid(deviceNode, pack.PreviewControl, pack.CustomizationControl, menuItems, pack.OnPreviewAreaMouseDown);

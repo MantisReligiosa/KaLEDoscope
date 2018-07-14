@@ -1,17 +1,17 @@
-﻿using PixelBoardDevice.DomainObjects;
-using BaseDevice;
+﻿using BaseDevice;
 using DeviceBuilding;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using PixelBoardDevice.Commands;
+using PixelBoardDevice.DomainObjects;
+using PixelBoardDevice.Serialization;
 using PixelBoardDevice.UI;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using PixelBoardDevice.Serialization;
-using Newtonsoft.Json;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Newtonsoft.Json.Linq;
-using PixelBoardDevice.Commands;
 
 namespace PixelBoardDevice
 {
@@ -32,8 +32,9 @@ namespace PixelBoardDevice
                     DataContext = _model
                 },
             };
+            _model.PropertyChanged += (o, args) => pack.NotifyThatModelChanged();
             var previewModel = new ProgramPreviewViewModel(_model);
-            pack.OnPreviewAreaMouseDown = () => 
+            pack.OnPreviewAreaMouseDown = () =>
             {
                 previewModel.OnMouseUp();
             };

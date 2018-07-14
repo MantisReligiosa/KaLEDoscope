@@ -9,7 +9,6 @@ using SevenSegmentBoardDevice.UI;
 using System;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace SevenSegmentBoardDevice
 {
@@ -25,6 +24,7 @@ namespace SevenSegmentBoardDevice
         {
             var pack = new ControlsPack();
             _model = new TimerDeviceViewModel(device, logger);
+            _model.PropertyChanged += (o, args) => pack.NotifyThatModelChanged();
             var timerControl = new TimerControl
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -88,12 +88,18 @@ namespace SevenSegmentBoardDevice
                     Mode = BrightnessMode.Auto
                 },
                 WorkSchedule = castedDevice?.WorkSchedule ?? new WorkSchedule(),
-                BoardType = castedDevice?.BoardType ?? new BoardType(),
+                BoardType = castedDevice?.BoardType ?? new BoardType
+                {
+                    DisplayFormat = new DisplayFormat(),
+                    DisplayType = new DisplayType(),
+                    FontType = new FontType()
+                },
                 StopWatchParameters = castedDevice?.StopWatchParameters ?? new StopWatchParameters(),
                 TimeSyncParameters = castedDevice?.TimeSyncParameters ?? new TimeSyncParameters
                 {
                     ServerAddress = string.Empty
-                }
+                },
+                DisplayFrames = castedDevice?.DisplayFrames ?? new List<DisplayFrame>()
             };
             sevenSegmentBoard.Name = String.IsNullOrEmpty(device.Name) ? DisplayName : device.Name;
             return sevenSegmentBoard;
