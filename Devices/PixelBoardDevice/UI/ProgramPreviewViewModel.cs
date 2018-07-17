@@ -456,33 +456,13 @@ namespace PixelBoardDevice.UI
                 drawingFont,
                 System.Drawing.Color.Red,
                 System.Drawing.Color.Transparent,
-                System.Drawing.Size.Empty) as System.Drawing.Bitmap;
-            var deltaY = (height - font.Height) / 2;
-            if (deltaY < 0)
-            {
-                deltaY = 0;
-            }
-            var top = y + deltaY;
+                new System.Drawing.Size
+                {
+                    Height = height,
+                    Width = width
+                }, alignment) as System.Drawing.Bitmap;
 
-            var align = alignment ?? 0;
-            int deltaX;
-            if (align == 1)
-            {
-                deltaX = (width - bitmap.Width);
-            }
-            else if (align == 2)
-            {
-                deltaX = (width - bitmap.Width) / 2;
-            }
-            else
-            {
-                deltaX = 0;
-            }
-            if (deltaX < 0)
-                deltaX = 0;
-
-            var left = x + deltaX;
-            PutBitmapOnCanvas(bitmap, canvas, left, top, width, height, scale);
+            PutBitmapOnCanvas(bitmap, canvas, x, y, width, height, scale);
         }
 
         private static void PutBitmapOnCanvas(System.Drawing.Bitmap bitmap, Canvas canvas, int x, int y, int width, int height, double scale)

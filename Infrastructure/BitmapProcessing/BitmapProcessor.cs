@@ -9,7 +9,7 @@ namespace BitmapProcessing
 {
     public static class BitmapProcessor
     {
-        public static string GenerateBase64FontMono(string text, string source, bool itallic, 
+        public static string GenerateBase64FontMono(string text, string source, bool itallic,
             bool bold, int newFontSize)
         {
             var bitmapChars = new List<bool[,]>();
@@ -210,20 +210,24 @@ namespace BitmapProcessing
             return monochrome;
         }
 
-        public static Image DrawTextImage(String text, System.Drawing.Font font, Color textColor, Color backColor, Size minSize)
+        public static Image DrawTextImage(String text, System.Drawing.Font font, Color textColor, Color backColor, Size zoneSize, int? alignment = null)
         {
             //first, create a dummy bitmap just to get a graphics object
             SizeF textSize;
-            using (Image img = new Bitmap(1, 1))
+            if (!zoneSize.IsEmpty)
             {
-                using (Graphics drawing = Graphics.FromImage(img))
+                textSize = zoneSize;
+            }
+            else
+            {
+                using (Image img = new Bitmap(1, 1))
                 {
-                    //measure the string to see how big the image needs to be
-                    textSize = drawing.MeasureString(text, font);
-                    if (!minSize.IsEmpty)
+                    using (Graphics drawing = Graphics.FromImage(img))
                     {
-                        textSize.Width = textSize.Width > minSize.Width ? textSize.Width : minSize.Width;
-                        textSize.Height = textSize.Height > minSize.Height ? textSize.Height : minSize.Height;
+                        //measure the string to see how big the image needs to be
+                        textSize = drawing.MeasureString(text, font);
+                        textSize.Width = textSize.Width > zoneSize.Width ? textSize.Width : zoneSize.Width;
+                        textSize.Height = textSize.Height > zoneSize.Height ? textSize.Height : zoneSize.Height;
                     }
                 }
             }
@@ -233,7 +237,19 @@ namespace BitmapProcessing
                 drawing.Clear(backColor);
                 using (Brush textBrush = new SolidBrush(textColor))
                 {
-                    drawing.DrawString(text, font, textBrush, 0, 0);
+                    StringAlignment hAlignment;
+                    if (!alignment.HasValue || alignment.Value == 0)
+                        hAlignment = StringAlignment.Near;
+                    else if (alignment.Value == 2)
+                        hAlignment = StringAlignment.Center;
+                    else
+                        hAlignment = StringAlignment.Far;
+
+                    drawing.DrawString(text, font, textBrush, new RectangleF(0, 0, textSize.Width, textSize.Height), new StringFormat
+                    {
+                        LineAlignment = StringAlignment.Center,
+                        Alignment = hAlignment
+                    });
                     drawing.Save();
                 }
             }
