@@ -43,7 +43,7 @@ namespace PixelBoardDevice
             {
                 DataContext = previewModel
             };
-            pack.PreviewControl = _previewControl;
+            pack.DesignPreviewControl = _previewControl;
             var slider = new Slider
             {
                 Width = 300,

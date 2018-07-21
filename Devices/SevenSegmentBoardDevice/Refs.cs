@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SevenSegmentBoardDevice
 {
@@ -85,7 +86,19 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 45,
                 IsEnabled = true,
                 IsChecked = true,
-                CharLenght = 4
+                CharLenght = 4,
+                Preview = (capacity) =>
+                {
+                    switch (capacity)
+                    {
+                        case 6:
+                            return DateTime.Now.ToString("HH:mm:ss");
+                        case 9:
+                            return DateTime.Now.ToString("HH:mm:ss.fff");
+                        default:
+                            return DateTime.Now.ToString("HH:mm");
+                    }
+                }
             },
             new DisplayFrame
             {
@@ -94,7 +107,8 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 35,
                 IsEnabled = false,
                 IsChecked = false,
-                CharLenght = 6
+                CharLenght = 6,
+                Preview = (i) => DateTime.Now.ToString("dd.MM.yy")
             },
             new DisplayFrame
             {
@@ -103,7 +117,8 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 35,
                 IsEnabled = true,
                 IsChecked = false,
-                CharLenght = 4
+                CharLenght = 4,
+                Preview = (i) => DateTime.Now.ToString("dd.MM")
             },
             new DisplayFrame
             {
@@ -112,7 +127,8 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 20,
                 IsEnabled = true,
                 IsChecked = false,
-                CharLenght = 4
+                CharLenght = 4,
+                Preview = (i) => DateTime.Now.ToString("yyyy")
             },
             new DisplayFrame
             {
@@ -121,7 +137,8 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 25,
                 IsEnabled = true,
                 IsChecked = false,
-                CharLenght = 2
+                CharLenght = 2,
+                Preview = (i) => "-4"
             },
             new DisplayFrame
             {
@@ -130,7 +147,8 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 25,
                 IsEnabled = true,
                 IsChecked = false,
-                CharLenght = 3
+                CharLenght = 3,
+                Preview = (i) => "75"
             },
             new DisplayFrame
             {
@@ -139,7 +157,8 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 5,
                 IsEnabled = true,
                 IsChecked = false,
-                CharLenght = 3
+                CharLenght = 3,
+                Preview = (i) => "760"
             },
             new DisplayFrame
             {
@@ -148,7 +167,8 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 5,
                 IsEnabled = true,
                 IsChecked = false,
-                CharLenght = 4
+                CharLenght = 4,
+                Preview = (i) => "00000"
             },
             new DisplayFrame
             {
@@ -157,7 +177,8 @@ namespace SevenSegmentBoardDevice
                 DisplayPeriod = 5,
                 IsEnabled = false,
                 IsChecked = false,
-                CharLenght = 5
+                CharLenght = 5,
+                Preview = (i) => "12345"
             }
         };
 

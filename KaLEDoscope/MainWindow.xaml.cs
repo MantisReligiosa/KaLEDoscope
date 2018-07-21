@@ -33,8 +33,20 @@ namespace KaLEDoscope
             _viewModel.ShowOptions += new EventHandler(OnShowOptions);
             _viewModel.QuitApplication += new EventHandler(OnQuitApplication);
             _viewModel.ShowAbout += new EventHandler<ShowAboutEventArgs>(OnShowAbout);
+            _viewModel.ShowPreview += new EventHandler<ShowPreviewEventArgs>(OnShowPreview);
             DataContext = trvMenu.DataContext = _viewModel;
             _viewModel.CheckActivation();
+        }
+
+        private void OnShowPreview(object sender, ShowPreviewEventArgs e)
+        {
+            var previewWindow = new PreviewWindow
+            {
+                DataContext = e.ViewModel,
+                Owner = this
+            };
+            previewWindow.LoadPreviewControl(e.PreviewControl);
+            previewWindow.ShowDialog();
         }
 
         private void OnShowAbout(object sender, ShowAboutEventArgs e)

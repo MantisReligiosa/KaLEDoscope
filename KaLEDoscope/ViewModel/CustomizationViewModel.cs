@@ -23,10 +23,11 @@ namespace KaLEDoscope.ViewModel
         private const string _defaultStructureFileExtension = ".device";
         private const string _defaultStructureFilter = "Device file (.device)|*.device|All files (*.*)|*.*";
 
-        public event EventHandler<DeviceNode> OnNodeRenamed;
+        public event EventHandler<DeviceNode> NodeRenamed;
         public event EventHandler<DeviceNode> BeforeGettingSettings;
         public event EventHandler<Device> AfterGetingSettings;
         public event EventHandler MouseUpEvent;
+        public event EventHandler<Device> ShowPreview;
 
         public CustomizationViewModel(
             DeviceNode deviceNode,
@@ -44,6 +45,23 @@ namespace KaLEDoscope.ViewModel
             _compressor = compressor;
         }
 
+        private DelegateCommand _preview;
+        public Input.ICommand Preview
+        {
+            get
+            {
+                if (_preview.IsNull())
+                {
+                    _preview = new DelegateCommand((o) =>
+                    {
+                        var deviceNode = o as DeviceNode;
+                        ShowPreview?.Invoke(this, deviceNode.Device);
+                    });
+                }
+                return _preview;
+            }
+        }
+
         private DelegateCommand _commonSettings;
         public Input.ICommand CommonSettings
         {
@@ -59,7 +77,7 @@ namespace KaLEDoscope.ViewModel
                         baseDeviceViewModel.OnRenamed += ((device) =>
                         {
                             deviceNode.Name = device.Name;
-                            OnNodeRenamed?.Invoke(this, deviceNode);
+                            NodeRenamed?.Invoke(this, deviceNode);
                         });
                         commonSettingsWindow.ShowDialog();
                     });
@@ -170,7 +188,7 @@ namespace KaLEDoscope.ViewModel
             {
                 if (_mouseUp.IsNull())
                 {
-                    _mouseUp = new DelegateCommand((d) => 
+                    _mouseUp = new DelegateCommand((d) =>
                     {
                         MouseUpEvent?.Invoke(this, EventArgs.Empty);
                     });

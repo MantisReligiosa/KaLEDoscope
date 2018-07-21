@@ -1,4 +1,5 @@
 ﻿using Abstractions;
+using System;
 
 namespace SevenSegmentBoardDevice
 {
@@ -46,5 +47,7 @@ namespace SevenSegmentBoardDevice
         public int CharLenght { get; set; }
 
         public int DisplayPeriod { get; set; }
+
+        public Func<int, string> Preview { get; set; }
     }
 }

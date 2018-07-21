@@ -122,6 +122,7 @@
     </ApplicationDefinition>
     <Compile Include="DropDownButtonBehavior.cs" />
     <Compile Include="EventArgs\ShowAboutEventArgs.cs" />
+    <Compile Include="EventArgs\ShowPreviewEventArgs.cs" />
     <Compile Include="EventArgs\TrialExpirationEventArgs.cs" />
     <Compile Include="Models\AggregationNode.cs" />
     <Compile Include="Models\DeviceNode.cs" />
@@ -140,6 +141,7 @@
     <Compile Include="TreeViewBehaviour.cs" />
     <Compile Include="ViewModel\ActivationViewModel.cs" />
     <Compile Include="ViewModel\CustomizationViewModel.cs" />
+    <Compile Include="ViewModel\PreviewViewModel.cs" />
     <Compile Include="ViewModel\RenameDialogViewModel.cs" />
     <Compile Include="Views\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
@@ -161,6 +163,9 @@
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="Views\CustomizationControl.xaml.cs">
       <DependentUpon>CustomizationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\PreviewWindow.xaml.cs">
+      <DependentUpon>PreviewWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\RenameDialog.xaml.cs">
       <DependentUpon>RenameDialog.xaml</DependentUpon>
@@ -198,6 +203,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\CustomizationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\PreviewWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -388,6 +397,14 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\logoms34.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\pause.png" />
+    <Resource Include="Resources\play.png" />
+    <Resource Include="Resources\stop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\repeat.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.2.4.4\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.4\build\Fody.targets')" />
