@@ -1,5 +1,6 @@
 ﻿using BaseDevice;
 using DeviceBuilding;
+using Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PixelBoardDevice.Commands;
@@ -9,6 +10,7 @@ using PixelBoardDevice.UI;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -20,9 +22,34 @@ namespace PixelBoardDevice
         public string Model => "pixelBoard";
         public string DisplayName => "Электронное табло";
 
+        private ProgramPreviewViewModel _previewViewModel;
+
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var _model = new PixelDeviceViewModel(device, logger);
+            var previewController = new PreviewController()
+            {
+                Duration = _model.Programs.Sum(p => p.Period) * 1000
+            };
+            previewController.NeedRedrawPosition += (o, position) => 
+            {
+                var programs = _model.Programs.ToList();
+                Program actualProgram = null;
+                var periodStart = 0;
+                foreach (var program in programs)
+                {
+                    if (position.Between(periodStart * 1000, (periodStart + program.Period) * 1000))
+                    {
+                        actualProgram = program;
+                        break;
+                    }
+                    periodStart += program.Period;
+                }
+                if (!actualProgram.IsNull())
+                {
+                    _model.PreviewedProgram = actualProgram;
+                }
+            };
             var pack = new ControlsPack
             {
                 CustomizationControl = new PixelControl
@@ -31,19 +58,30 @@ namespace PixelBoardDevice
                     VerticalAlignment = VerticalAlignment.Stretch,
                     DataContext = _model
                 },
-                Device = device
+                Device = device,
+                PreviewController = previewController
             };
-            _model.PropertyChanged += (o, args) => pack.NotifyThatModelChanged();
-            var previewModel = new ProgramPreviewViewModel(_model);
+            var designViewModel = new ProgramPreviewViewModel(_model);
+            _previewViewModel = new ProgramPreviewViewModel(_model, true);
+            _model.PropertyChanged += (o, args) =>
+            {
+                previewController.Duration = _model.Programs.Sum(p => p.Period) * 1000;
+                pack.NotifyThatModelChanged();
+            };
             pack.OnPreviewAreaMouseDown = () =>
             {
-                previewModel.OnMouseUp();
+                designViewModel.OnMouseUp();
             };
-            var _previewControl = new ProgramPreviewControl
+            var designViewControl = new ProgramPreviewControl
             {
-                DataContext = previewModel
+                DataContext = designViewModel
             };
-            pack.DesignPreviewControl = _previewControl;
+            var previewViewControl = new ProgramPreviewControl
+            {
+                DataContext = _previewViewModel
+            };
+            pack.DesignPreviewControl = designViewControl;
+            pack.PreviewPreviewControl = previewViewControl;
             var slider = new Slider
             {
                 Width = 300,

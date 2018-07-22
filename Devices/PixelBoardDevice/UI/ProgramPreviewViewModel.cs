@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using UiCommands;
 using Input = System.Windows.Input;
 
@@ -21,6 +22,8 @@ namespace PixelBoardDevice.UI
         private readonly PixelDeviceViewModel _model;
         private MouseState _currentMouseState;
         private MouseState _suggestedMouseState;
+        private readonly bool _previewMode;
+        private readonly Dispatcher _dispatcher;
 
         public Canvas PreviewContent { get; set; }
 
@@ -28,11 +31,18 @@ namespace PixelBoardDevice.UI
         public int ViewWidht { get; set; }
         public Cursor Cursor { get; set; }
 
-        public ProgramPreviewViewModel(PixelDeviceViewModel pixelDeviceViewModel)
+        public ProgramPreviewViewModel(PixelDeviceViewModel pixelDeviceViewModel, bool previewMode = false)
         {
+            _dispatcher = Dispatcher.CurrentDispatcher;
             PreviewContent = new Canvas();
             _model = pixelDeviceViewModel;
-            _model.PropertyChanged += (s, e) => Redraw();
+            _model.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(_model.PreviewedProgram) && !_previewMode)
+                    return;
+                Redraw();
+            };
+            _previewMode = previewMode;
             Redraw();
             _currentMouseState = _suggestedMouseState = MouseState.Movement;
         }
@@ -45,64 +55,79 @@ namespace PixelBoardDevice.UI
             {
                 return;
             }
-            if (_model.SelectedProgram.IsNull())
+            Program program;
+            if (!_previewMode)
+            {
+                program = _model.SelectedProgram;
+            }
+            else
+            {
+                program = _model.PreviewedProgram;
+            }
+            if (program.IsNull())
             {
                 return;
             }
-            PreviewContent.Children.Clear();
-            foreach (var zone in _model.SelectedProgram.Zones)
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                var rect = new Rectangle
+                PreviewContent.Children.Clear();
+                foreach (var zone in program.Zones)
                 {
-                    StrokeDashArray = new DoubleCollection
+                    var rect = new Rectangle
+                    {
+                        StrokeDashArray = new DoubleCollection
                         {
                             4, 2
                         },
-                    StrokeThickness = 1
-                };
-                if (zone.IsValid)
-                {
-                    if (zone.Id == (_model.SelectedZone?.Id ?? int.MinValue))
+                        StrokeThickness = 1
+                    };
+                    if (zone.IsValid)
                     {
-                        rect.Stroke = Brushes.Yellow;
-                        rect.StrokeThickness = 2;
+                        if (zone.Id == (_model.SelectedZone?.Id ?? int.MinValue))
+                        {
+                            rect.Stroke = Brushes.Yellow;
+                            rect.StrokeThickness = 2;
+                        }
+                        else
+                        {
+                            rect.Stroke = Brushes.Gray;
+                        }
+                        var renderer = zoneRenders.FirstOrDefault(kvp => kvp.Key(zone));
+                        if (renderer.Key != null && renderer.Value != null)
+                        {
+                            BinaryFont binaryFont = null;
+                            BinaryImage binaryImage = null;
+                            if (zone is IFontableZone fontableZone && fontableZone.FontId.HasValue)
+                            {
+                                binaryFont = _model.Device.Fonts
+                                    .FirstOrDefault(f => f.Id == fontableZone.FontId);
+                            }
+                            if (zone is BitmapZone bitmapZone)
+                            {
+                                binaryImage = _model.Device.BinaryImages
+                                    .FirstOrDefault(i => i.Id == bitmapZone.BinaryImageId);
+                            }
+                            renderer.Value(zone,
+                                           PreviewContent,
+                                           binaryFont,
+                                           binaryImage,
+                                           _model.PreviewScale);
+                        }
                     }
                     else
                     {
-                        rect.Stroke = Brushes.Gray;
+                        rect.Stroke = Brushes.Red;
                     }
-                    var renderer = zoneRenders.FirstOrDefault(kvp => kvp.Key(zone));
-                    if (renderer.Key != null && renderer.Value != null)
+                    Canvas.SetTop(rect, zone.Y * _model.PreviewScale);
+                    Canvas.SetLeft(rect, zone.X * _model.PreviewScale);
+                    rect.Width = zone.Width * _model.PreviewScale;
+                    rect.Height = zone.Height * _model.PreviewScale;
+                    if (!_previewMode || (_previewMode && !zone.IsValid))
                     {
-                        BinaryFont binaryFont = null;
-                        BinaryImage binaryImage = null;
-                        if (zone is IFontableZone fontableZone && fontableZone.FontId.HasValue)
-                        {
-                            binaryFont = _model.Device.Fonts
-                                .FirstOrDefault(f => f.Id == fontableZone.FontId);
-                        }
-                        if (zone is BitmapZone bitmapZone)
-                        {
-                            binaryImage = _model.Device.BinaryImages
-                                .FirstOrDefault(i => i.Id == bitmapZone.BinaryImageId);
-                        }
-                        renderer.Value(zone,
-                                       PreviewContent,
-                                       binaryFont,
-                                       binaryImage,
-                                       _model.PreviewScale);
+                        PreviewContent.Children.Add(rect);
                     }
                 }
-                else
-                {
-                    rect.Stroke = Brushes.Red;
-                }
-                Canvas.SetTop(rect, zone.Y * _model.PreviewScale);
-                Canvas.SetLeft(rect, zone.X * _model.PreviewScale);
-                rect.Width = zone.Width * _model.PreviewScale;
-                rect.Height = zone.Height * _model.PreviewScale;
-                PreviewContent.Children.Add(rect);
-            }
+            });
         }
 
         private DelegateCommand _mouseLeave;
@@ -114,6 +139,8 @@ namespace PixelBoardDevice.UI
                 {
                     _mouseLeave = new DelegateCommand((o) =>
                       {
+                          if (_previewMode)
+                              return;
                           if (_currentMouseState == MouseState.Movement)
                           {
                               _suggestedMouseState = MouseState.Movement;
@@ -134,6 +161,8 @@ namespace PixelBoardDevice.UI
                 {
                     _mouseMove = new DelegateCommand((o) =>
                     {
+                        if (_previewMode)
+                            return;
                         var args = (MouseEventArgs)o;
                         var cursorViewX = Convert.ToInt32(args.GetPosition(PreviewContent).X);
                         var cursorViewY = Convert.ToInt32(args.GetPosition(PreviewContent).Y);
@@ -219,6 +248,8 @@ namespace PixelBoardDevice.UI
                 {
                     _mouseDown = new DelegateCommand((o) =>
                     {
+                        if (_previewMode)
+                            return;
                         if (_suggestedMouseState == MouseState.Movement)
                         {
                             return;
@@ -276,6 +307,8 @@ namespace PixelBoardDevice.UI
                 {
                     _mouseWheel = new DelegateCommand((o) =>
                     {
+                        if (_previewMode)
+                            return;
                         if (_currentMouseState != MouseState.Movement)
                             return;
                         var increment = .1;
@@ -307,6 +340,8 @@ namespace PixelBoardDevice.UI
                 {
                     _mouseUp = new DelegateCommand((o) =>
                     {
+                        if (_previewMode)
+                            return;
                         OnMouseUp();
                     });
                 }
@@ -316,6 +351,8 @@ namespace PixelBoardDevice.UI
 
         public void OnMouseUp()
         {
+            if (_previewMode)
+                return;
             if (_suggestedMouseState == MouseState.Movement)
             {
                 return;
