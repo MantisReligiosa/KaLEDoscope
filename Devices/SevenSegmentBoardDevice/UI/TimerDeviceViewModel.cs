@@ -163,7 +163,6 @@ namespace SevenSegmentBoardDevice.UI
                 if (int.TryParse(value, out int interval))
                 {
                     _syncIntervalStr = value;
-                    
                 }
                 else
                 {
@@ -264,7 +263,21 @@ namespace SevenSegmentBoardDevice.UI
             FontType = Refs.FontTypes.FirstOrDefault(f => f == _device.BoardType?.FontType);
             DisplayFrames = new ObservableCollection<DisplayFrame>();
             DisplayFrames.CollectionChanged += DisplayFrames_CollectionChanged;
-            Refs.DisplayFrames.ForEach(f => DisplayFrames.Add(f));
+            Refs.DisplayFrames.ForEach(f =>
+            {
+                DisplayFrame displayFrame;
+                var deviceFrame = _device.DisplayFrames.FirstOrDefault(df => df.Id == f.Id);
+                if (!deviceFrame.IsNull())
+                {
+                    displayFrame = deviceFrame;
+                }
+                else
+                {
+                    displayFrame = f;
+                }
+                DisplayFrames.Add(displayFrame);
+                displayFrame.PropertyChanged += ((s, e) => { OnPropertyChanged(nameof(DisplayFrames)); });
+            });
             DisplayFormats = new ObservableCollection<DisplayFormat>(Refs.DisplayFormats);
             DisplayFormat = Refs.DisplayFormats.FirstOrDefault(d => d == _device.BoardType.DisplayFormat);
             CountdownTypes = new ObservableCollection<CountdownType>(Refs.CountdownTypes);

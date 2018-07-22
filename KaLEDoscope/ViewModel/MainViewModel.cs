@@ -61,6 +61,7 @@ namespace KaLEDoscope
         public event EventHandler ActivationRequired;
         public event EventHandler TrialExpired;
         public event EventHandler<ShowAboutEventArgs> ShowAbout;
+        public event EventHandler<ShowPreviewEventArgs> ShowPreview;
 
         public TabItem SelectedTabItem { get; set; }
         public string StructureFileName { get; set; } = string.Empty;
@@ -757,7 +758,7 @@ namespace KaLEDoscope
             pack.DataChanged += (o, args) => HaveUnsavedData = true;
             menuItems = pack.MenuItems;
 
-            var grid = GetDeviceItemGrid(deviceNode, pack.PreviewControl, pack.CustomizationControl, menuItems, pack.OnPreviewAreaMouseDown);
+            var grid = GetDeviceItemGrid(deviceNode, pack.DesignPreviewControl, pack.CustomizationControl, menuItems, pack.OnPreviewAreaMouseDown);
             var newTabItem = new ClosableTab
             {
                 Title = GetDeviceTabItemTitle(deviceNode),
@@ -816,7 +817,7 @@ namespace KaLEDoscope
             if (aggregationNode.Nodes.Count == 1)
             {
                 var pack = _activeControlsPackInAggregation;
-                return pack.PreviewControl;
+                return pack.DesignPreviewControl;
             }
             var control = new UserControl();
             var grid = new Grid();
@@ -851,7 +852,7 @@ namespace KaLEDoscope
                 {
                     pack = _activeControlsPackInAggregation;
                 }
-                var devicePreview = pack.PreviewControl;
+                var devicePreview = pack.DesignPreviewControl;
                 devicePreview.HorizontalAlignment = HorizontalAlignment.Stretch;
                 devicePreview.VerticalAlignment = VerticalAlignment.Stretch;
                 if (selectedDeviceNode == node)
@@ -904,7 +905,7 @@ namespace KaLEDoscope
         private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems, Action OnMouseUp)
         {
             var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _logger);
-            model.OnNodeRenamed += ((sender, node) =>
+            model.NodeRenamed += ((sender, node) =>
             {
                 var tab = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);
                 if (!tab.IsNull())
@@ -918,12 +919,22 @@ namespace KaLEDoscope
                 _tabItem = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);
             });
             model.AfterGetingSettings += ((sender, device) =>
-              {
-                  _updatedNode.Device = device;
-                  var pack = _deviceFactory.GetControlsPack(_updatedNode.Device, _logger);
-                  _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, pack.PreviewControl, pack.CustomizationControl, pack.MenuItems, pack.OnPreviewAreaMouseDown));
-                  _tabItem.DataContext = device;
-              });
+            {
+                _updatedNode.Device = device;
+                var pack = _deviceFactory.GetControlsPack(_updatedNode.Device, _logger);
+                _dispatcher.Invoke(() => _tabItem.Content = GetDeviceItemGrid(_updatedNode, pack.DesignPreviewControl, pack.CustomizationControl, pack.MenuItems, pack.OnPreviewAreaMouseDown));
+                _tabItem.DataContext = device;
+            });
+            model.ShowPreview += ((sender, device) =>
+            {
+                var pack = _deviceFactory.GetControlsPack(device, _logger);
+                var previewViewModel = new PreviewViewModel(pack.PreviewController);
+                ShowPreview?.Invoke(this, new ShowPreviewEventArgs
+                {
+                    ViewModel = previewViewModel,
+                    PreviewControl = pack.PreviewPreviewControl
+                });
+            });
             var control = new CustomizationControl
             {
                 DataContext = model

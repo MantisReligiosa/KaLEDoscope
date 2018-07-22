@@ -1244,6 +1244,8 @@ namespace PixelBoardDevice.UI
 
         Device IDeviceViewModel.BaseDevice => throw new NotImplementedException();
 
+        public Program PreviewedProgram { get; set; }
+
         public readonly double PreviewScaleMinRate;
         public readonly double PreviewScaleMaxRate;
     }

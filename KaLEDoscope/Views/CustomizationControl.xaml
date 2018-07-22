@@ -13,8 +13,15 @@
             <RowDefinition Height="1*" MinHeight="100"/>
         </Grid.RowDefinitions>
         <GridSplitter Grid.Row="1" Height="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" ResizeDirection="Rows"/>
-        <ToolBar x:Name="toolbar" Grid.Row="2" Height="27">
+        <ToolBar x:Name="toolbar" Grid.Row="2" Height="27" ScrollViewer.VerticalScrollBarVisibility="Disabled" ToolBarTray.IsLocked="True">
             <ToolBar.Items>
+                <Button Command="{Binding Preview}" CommandParameter="{Binding DeviceNode}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="..\Resources\play.png" Stretch="UniformToFill"/>
+                        <Label Padding="0">Просмотр</Label>
+                    </StackPanel>
+                </Button>
+                <Separator/>
                 <Button  Command="{Binding CommonSettings}" CommandParameter="{Binding DeviceNode}">
                     <StackPanel Orientation="Horizontal">
                         <Image Source="..\Resources\configure.png" Stretch="UniformToFill"/>

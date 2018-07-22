@@ -7,8 +7,10 @@ namespace DeviceBuilding
 {
     public class ControlsPack
     {
-        public UserControl PreviewControl { get; set; }
+        public UserControl DesignPreviewControl { get; set; }
+        public UserControl PreviewPreviewControl { get; set; }
         public Device Device { get; set; }
+        public PreviewController PreviewController { get; set; }
         public UserControl CustomizationControl { get; set; }
         public IEnumerable<object> MenuItems { get; set; }
         public Action OnPreviewAreaMouseDown { get; set; }

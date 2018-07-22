@@ -23,7 +23,7 @@ namespace SevenSegmentBoardDevice.Serialization
             return new SerializableBoardType
             {
                 DisplayFormatId = boardType.DisplayFormat.Id,
-                FontTypeId = boardType.FontType.Id,
+                FontTypeId = boardType.FontType?.Id ?? 0,
                 TypeId = boardType.DisplayType.Id
             };
         }

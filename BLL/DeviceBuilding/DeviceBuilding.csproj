@@ -47,6 +47,7 @@
     <Compile Include="ControlsPack.cs" />
     <Compile Include="DeviceFactory.cs" />
     <Compile Include="IDeviceBuilder.cs" />
+    <Compile Include="PreviewController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
