@@ -406,6 +406,10 @@
   <ItemGroup>
     <Resource Include="Resources\repeat.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\next.png" />
+    <Resource Include="Resources\previous.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.2.4.4\build\Fody.targets" Condition="Exists('..\packages\Fody.2.4.4\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

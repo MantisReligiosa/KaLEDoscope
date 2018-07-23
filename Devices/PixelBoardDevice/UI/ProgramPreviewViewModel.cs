@@ -13,7 +13,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using UiCommands;
-using Input = System.Windows.Input;
 
 namespace PixelBoardDevice.UI
 {
@@ -23,7 +22,6 @@ namespace PixelBoardDevice.UI
         private MouseState _currentMouseState;
         private MouseState _suggestedMouseState;
         private readonly bool _previewMode;
-        private readonly Dispatcher _dispatcher;
 
         public Canvas PreviewContent { get; set; }
 
@@ -33,7 +31,6 @@ namespace PixelBoardDevice.UI
 
         public ProgramPreviewViewModel(PixelDeviceViewModel pixelDeviceViewModel, bool previewMode = false)
         {
-            _dispatcher = Dispatcher.CurrentDispatcher;
             PreviewContent = new Canvas();
             _model = pixelDeviceViewModel;
             _model.PropertyChanged += (s, e) =>
@@ -68,7 +65,7 @@ namespace PixelBoardDevice.UI
             {
                 return;
             }
-            Application.Current.Dispatcher.Invoke((Action)delegate
+            Application.Current.Dispatcher.Invoke(delegate
             {
                 PreviewContent.Children.Clear();
                 foreach (var zone in program.Zones)
@@ -131,7 +128,7 @@ namespace PixelBoardDevice.UI
         }
 
         private DelegateCommand _mouseLeave;
-        public Input.ICommand MouseLeave
+        public ICommand MouseLeave
         {
             get
             {
@@ -153,7 +150,7 @@ namespace PixelBoardDevice.UI
         }
 
         private DelegateCommand _mouseMove;
-        public Input.ICommand MouseMove
+        public ICommand MouseMove
         {
             get
             {
@@ -240,7 +237,7 @@ namespace PixelBoardDevice.UI
         private int _capturedCursorY;
 
         private DelegateCommand _mouseDown;
-        public Input.ICommand MouseDown
+        public ICommand MouseDown
         {
             get
             {
@@ -299,7 +296,7 @@ namespace PixelBoardDevice.UI
         }
 
         private DelegateCommand _mouseWheel;
-        public Input.ICommand MouseWheel
+        public ICommand MouseWheel
         {
             get
             {
@@ -332,7 +329,7 @@ namespace PixelBoardDevice.UI
         }
 
         private DelegateCommand _mouseUp;
-        public Input.ICommand MouseUp
+        public ICommand MouseUp
         {
             get
             {

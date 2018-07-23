@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using UiCommands;
 using Input = System.Windows.Input;
@@ -603,6 +604,11 @@ namespace KaLEDoscope
                             .FirstOrDefault(n => n.Aggregation.Id == device.AggregationId);
                         deviceNode.Parent = aggregationNode;
                         aggregationNode.Nodes.Add(deviceNode);
+                        if (!device.AggregationOrder.HasValue)
+                        {
+                            var order = aggregationNode.Nodes.OfType<DeviceNode>().Max(d => d.Device.AggregationOrder ?? 0) + 1;
+                            device.AggregationOrder = order;
+                        }
                     }
                     else if (device.FolderId.HasValue)
                     {
@@ -803,6 +809,7 @@ namespace KaLEDoscope
         private UserControl GetAggregationGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
         {
             var pack = _deviceFactory.GetControlsPack(selectedDeviceNode.Device, _logger);
+            pack.DataChanged += (o, args) => HaveUnsavedData = true;
             _activeControlsPackInAggregation = pack;
             var previewControl = GetAggregationPreviewGrid(aggregationNode, selectedDeviceNode);
             return GetDeviceItemGrid(selectedDeviceNode, previewControl, pack.CustomizationControl, pack.MenuItems, pack.OnPreviewAreaMouseDown);
@@ -826,8 +833,18 @@ namespace KaLEDoscope
             {
                 Width = new GridLength(1, GridUnitType.Star)
             });
+            grid.RowDefinitions.Add(new RowDefinition
+            {
+                Height = new GridLength(1, GridUnitType.Star)
+            });
+            grid.RowDefinitions.Add(new RowDefinition
+            {
+                Height = GridLength.Auto
+            });
             var column = 1;
-            foreach (var node in aggregationNode.Nodes)
+            var nodeCount = aggregationNode.Nodes.Count();
+            var deviceIndex = 1;
+            foreach (var node in aggregationNode.Nodes.OrderBy(n => ((DeviceNode)n).Device.AggregationOrder))
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition
                 {
@@ -842,7 +859,13 @@ namespace KaLEDoscope
                 };
                 grid.Children.Add(splitter);
                 Grid.SetColumn(splitter, column++);
+                Grid.SetRow(splitter, 0);
+                Grid.SetRowSpan(splitter, 2);
 
+                grid.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = new GridLength(1, GridUnitType.Star)
+                });
                 grid.ColumnDefinitions.Add(new ColumnDefinition
                 {
                     Width = new GridLength(1, GridUnitType.Star)
@@ -864,13 +887,50 @@ namespace KaLEDoscope
                         Content = devicePreview
                     };
                     grid.Children.Add(controlWrapper);
-                    Grid.SetColumn(controlWrapper, column++);
+                    Grid.SetColumn(controlWrapper, column);
+                    Grid.SetColumnSpan(controlWrapper, 2);
+                    Grid.SetRow(controlWrapper, 0);
                 }
                 else
                 {
                     grid.Children.Add(devicePreview);
-                    Grid.SetColumn(devicePreview, column++);
+                    Grid.SetColumn(devicePreview, column);
+                    Grid.SetColumnSpan(devicePreview, 2);
+                    Grid.SetRow(devicePreview, 0);
                 }
+                var toLeftButton = new Button
+                {
+                    Height = 27,
+                    Content = new Image
+                    {
+                        Source = new BitmapImage(new Uri(@"pack://application:,,,/"
+                        + Assembly.GetExecutingAssembly().GetName().Name
+                        + ";component/"
+                        + "Resources/previous.png", UriKind.Absolute))
+                    },
+                    IsEnabled = deviceIndex != 1
+                };
+                toLeftButton.Click += (o, e) => ChangeOrder(node, aggregationNode, -1);
+                grid.Children.Add(toLeftButton);
+                Grid.SetColumn(toLeftButton, column++);
+                Grid.SetRow(toLeftButton, 1);
+                var toRightButton = new Button
+                {
+                    Height = 27,
+                    Content = new Image
+                    {
+                        Source = new BitmapImage(new Uri(@"pack://application:,,,/"
+                        + Assembly.GetExecutingAssembly().GetName().Name
+                        + ";component/"
+                        + "Resources/next.png", UriKind.Absolute))
+                    },
+                    IsEnabled = deviceIndex != nodeCount
+                };
+                toRightButton.Click += (o, e) => ChangeOrder(node, aggregationNode, 1);
+                grid.Children.Add(toRightButton);
+                Grid.SetColumn(toRightButton, column++);
+                Grid.SetRow(toRightButton, 1);
+                deviceIndex++;
             }
             grid.ColumnDefinitions.Add(new ColumnDefinition
             {
@@ -890,6 +950,20 @@ namespace KaLEDoscope
                 Width = new GridLength(1, GridUnitType.Star)
             });
             return control;
+        }
+
+        private void ChangeOrder(NodeItem node, AggregationNode aggregationNode, int increment)
+        {
+            var currentDevide = ((DeviceNode)node).Device;
+            var currentDeviceOrder = currentDevide.AggregationOrder.Value;
+            var targetDevice = aggregationNode.Nodes.Select(n => ((DeviceNode)n).Device).FirstOrDefault(d => d.AggregationOrder == currentDevide.AggregationOrder + increment);
+            currentDevide.AggregationOrder = targetDevice.AggregationOrder;
+            targetDevice.AggregationOrder = currentDeviceOrder;
+            HaveUnsavedData = true;
+            if (DeviceTabs.Any(t => t.DataContext == aggregationNode))
+            {
+                ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
+            }
         }
 
         private static string GetDeviceTabItemTitle(DeviceNode deviceNode)

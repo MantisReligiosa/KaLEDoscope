@@ -12,5 +12,6 @@
         public bool IsStandaloneConfiguration { get; set; }
         public int? FolderId { get; set; }
         public int? AggregationId { get; set; }
+        public int? AggregationOrder { get; set; }
     }
 }

@@ -619,6 +619,7 @@ namespace PixelBoardDevice.UI
                 OnPropertyChanged(nameof(TextAlignment));
             }
         }
+
         public bool AlignmentCenter
         {
             get
@@ -634,6 +635,7 @@ namespace PixelBoardDevice.UI
                 OnPropertyChanged(nameof(TextAlignment));
             }
         }
+
         public bool AlignmentRight
         {
             get
