@@ -26,10 +26,10 @@ namespace PixelBoardDevice.Serialization
         public TimeSpan? ScheduledTimeSync { get; set; }
         public int? TickerType { get; set; }
         public TimeSpan? TickerCountDownStartValue { get; set; }
-
         public int ProgramId { get; set; }
         public int? BinaryImageId { get; set; }
         public int? Alignment { get; set; }
+        public int? AnimationId { get; set; }
 
         public static explicit operator SeriazableZone(Zone zone)
         {
@@ -40,7 +40,6 @@ namespace PixelBoardDevice.Serialization
                 Height = zone.Height,
                 Id = zone.Id,
                 Name = zone.Name,
-                Text = (zone is TextZone textZone) ? textZone.Text : null,
                 Width = zone.Width,
                 X = zone.X,
                 Y = zone.Y,
@@ -48,6 +47,11 @@ namespace PixelBoardDevice.Serialization
                 AllowPeriodicTimeSync = (zone is ClockZone clockZone2) ? clockZone2.AllowPeriodicTimeSync : default(bool?),
                 ProgramId = zone.ProgramId
             };
+            if (zone is TextZone textZone)
+            {
+                seriazableZone.Text = textZone.Text;
+                seriazableZone.AnimationId = textZone.AnimationId;
+            }
             if (zone is BitmapZone bitmapZone)
             {
                 seriazableZone.BinaryImageId = bitmapZone.BinaryImageId;
@@ -84,7 +88,8 @@ namespace PixelBoardDevice.Serialization
                     {
                         FontId = serializableZone.FontId,
                         Text = serializableZone.Text,
-                        Alignment = serializableZone.Alignment
+                        Alignment = serializableZone.Alignment,
+                        AnimationId = serializableZone.AnimationId,
                     };
                     zoneResult = textZone;
                     break;

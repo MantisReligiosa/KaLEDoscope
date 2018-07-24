@@ -9,5 +9,6 @@
         public bool UseWholeAlphabet => true;
         public string Alphabet => string.Empty;
         public int? Alignment { get; set; }
+        public int? AnimationId { get; set; }
     }
 }

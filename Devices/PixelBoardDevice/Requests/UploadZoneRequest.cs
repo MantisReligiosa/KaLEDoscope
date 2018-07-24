@@ -30,6 +30,7 @@ namespace PixelBoardDevice.Requests
             {
                 bytes.Add((byte)textZone.FontId);
                 bytes.Add((byte)(textZone.Alignment ?? 0));
+                bytes.Add((byte)(textZone.AnimationId ?? 0));
                 bytes.Add((byte)textZone.Text.Length);
                 bytes.AddRange(textZone.Text.ToBytes());
             }

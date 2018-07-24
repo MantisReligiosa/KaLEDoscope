@@ -200,13 +200,13 @@
                                       IsSynchronizedWithCurrentItem="False" StaysOpenOnEdit="True"/>
                             <ToggleButton Grid.Row="0" Grid.Column="2" IsChecked="{Binding IsBold}" Width="22" FontWeight="Bold">B</ToggleButton>
                             <ToggleButton Grid.Row="0" Grid.Column="3" IsChecked="{Binding IsItalic}" Width="22" FontStyle="Italic" >I</ToggleButton>
-                            <ToggleButton Grid.Row="0" Grid.Column="4" IsChecked="{Binding AlignmentLeft}" Width="22">
+                            <ToggleButton Grid.Row="0" Grid.Column="4" IsChecked="{Binding AlignmentLeft}" Width="22" IsEnabled="{Binding AnimationType.NoAnimationType}">
                                 <Image Source="/PixelBoardDevice;component/Resources/if_align-left_226596.png" />
                             </ToggleButton>
-                            <ToggleButton Grid.Row="0" Grid.Column="5" IsChecked="{Binding AlignmentCenter}" Width="22" >
+                            <ToggleButton Grid.Row="0" Grid.Column="5" IsChecked="{Binding AlignmentCenter}" Width="22" IsEnabled="{Binding AnimationType.NoAnimationType}">
                                 <Image Source="/PixelBoardDevice;component/Resources/if_align-center_2561319.png" />
                             </ToggleButton>
-                            <ToggleButton Grid.Row="0" Grid.Column="6" IsChecked="{Binding AlignmentRight}" Width="22">
+                            <ToggleButton Grid.Row="0" Grid.Column="6" IsChecked="{Binding AlignmentRight}" Width="22" IsEnabled="{Binding AnimationType.NoAnimationType}">
                                 <Image Source="/PixelBoardDevice;component/Resources/if_align-right_2561324.png" />
                             </ToggleButton>
                             <TextBox Grid.Row="1" Grid.ColumnSpan="10" AcceptsReturn="True" 
@@ -222,7 +222,7 @@
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="3" Header="Анимация" Visibility="{Binding AnimationVisibility}" Style="{StaticResource GroupBoxStyle}">
-                        <ComboBox Grid.Column="1"></ComboBox>
+                        <ComboBox Grid.Column="1" ItemsSource="{Binding AnimationTypes}" SelectedItem="{Binding AnimationType}" DisplayMemberPath="Name"/>
                     </GroupBox>
                     <GroupBox Grid.Row="6" Header="Растр" Visibility="{Binding BitmapVisibility}" Style="{StaticResource GroupBoxStyle}">
                         <Grid>

@@ -18,12 +18,13 @@ namespace PixelBoardDevice.Responces
             switch (zoneType)
             {
                 case 1:
-                    var textLength = _bytes[19 + nameLength];
+                    var textLength = _bytes[20 + nameLength];
                     var textZone = new TextZone()
                     {
                         FontId = _bytes[17 + nameLength],
                         Alignment = _bytes[18 + nameLength],
-                        Text = _bytes.ExtractString(20 + nameLength, textLength)
+                        AnimationId = _bytes[19 + nameLength],
+                        Text = _bytes.ExtractString(21 + nameLength, textLength)
                     };
                     zone = textZone;
                     break;

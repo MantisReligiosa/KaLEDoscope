@@ -125,6 +125,22 @@ namespace PixelBoardDevice.UI
                 }
             },
         };
+
+        private static readonly List<AnimationType> _animationTypes = new List<AnimationType>
+        {
+            new AnimationType
+            {
+                Id = 0,
+                Name = "Нет",
+                NoAnimationType = true
+            },
+            new AnimationType
+            {
+                Id = 1,
+                Name = "Бегущая строка"
+            }
+        };
+
         private static readonly List<TickerType> _tickerTypes = new List<TickerType>
         {
             new TickerType
@@ -196,6 +212,7 @@ namespace PixelBoardDevice.UI
         public ObservableCollection<ClockFormat> ClockFormats { get; set; }
         public ObservableCollection<ClockType> ClockTypes { get; set; }
         public ObservableCollection<TickerType> TickerTypes { get; set; }
+        public ObservableCollection<AnimationType> AnimationTypes { get; set; }
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
         {
@@ -209,6 +226,7 @@ namespace PixelBoardDevice.UI
             ClockFormats = new ObservableCollection<ClockFormat>(_clockFormats);
             ClockTypes = new ObservableCollection<ClockType>(_clockTypes);
             TickerTypes = new ObservableCollection<TickerType>(_tickerTypes);
+            AnimationTypes = new ObservableCollection<AnimationType>(_animationTypes);
             Zones.CollectionChanged += (s, e) => ValidateAndInvokePreview();
             SelectedProgram = Programs.FirstOrDefault();
             FontSizes = new ObservableCollection<int>(_fontSizes);
@@ -683,6 +701,22 @@ namespace PixelBoardDevice.UI
 
         public Visibility AnimationVisibility { get; set; }
 
+        private AnimationType _animationType;
+        public AnimationType AnimationType
+        {
+            get
+            {
+                return _animationType;
+            }
+            set
+            {
+                _animationType = value;
+                var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as TextZone;
+                zone.AnimationId = value.Id;
+                OnPropertyChanged(nameof(AnimationType));
+            }
+        }
+
         private void AllowBitmap(bool value)
         {
             BitmapVisibility = value ? Visibility.Visible : Visibility.Collapsed;
@@ -806,6 +840,7 @@ namespace PixelBoardDevice.UI
                 if (_selectedZone is TextZone textZone)
                 {
                     Text = textZone.Text;
+                    AnimationType = _animationTypes.FirstOrDefault(t => t.Id == (textZone.AnimationId ?? 0));
                 }
                 else
                 {
