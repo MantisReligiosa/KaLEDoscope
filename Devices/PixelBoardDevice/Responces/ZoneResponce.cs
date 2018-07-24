@@ -71,6 +71,11 @@ namespace PixelBoardDevice.Responces
                     {
                         clockZone.PeriodicSyncInterval = _bytes.ExtractUshort(18 + nameLength);
                     }
+                    if (clockZone.ClockType == 1) //текст
+                    {
+                        clockZone.FontId = _bytes[20 + nameLength];
+                        clockZone.Alignment = _bytes[21 + nameLength];
+                    }
                     zone = clockZone;
                     break;
                 case 6:
@@ -82,7 +87,9 @@ namespace PixelBoardDevice.Responces
                         _bytes[19 + nameLength],
                         _bytes[20 + nameLength],
                         _bytes.ExtractUshort(21 + nameLength)
-                        )
+                        ),
+                        FontId = _bytes[23 + nameLength],
+                        Alignment = _bytes[24 + nameLength]
                     };
                     zone = tickerZone;
                     break;
