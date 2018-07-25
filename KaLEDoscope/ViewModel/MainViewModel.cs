@@ -2,6 +2,7 @@
 using BaseDevice;
 using BaseDeviceSerialization;
 using CommandProcessing;
+using Configuration;
 using DeviceBuilding;
 using Extensions;
 using GongSolutions.Wpf.DragDrop;
@@ -42,14 +43,14 @@ namespace KaLEDoscope
         private readonly ObservableCollection<LogItem> _logItems = new ObservableCollection<LogItem>();
         private readonly INetworkAgent _networkScanAgent;
         private readonly INetworkAgent _networkExchangeAgent;
-        private readonly Timer _timer;
+        private readonly Timer _autosaveTimer;
 
         private const string _defaultStructureFileName = "Структура";
         private const string _defaultStructureFileExtension = ".struct";
-        private const string _temporaryStructureFileName = "temp";
+        private const string _defaultAutosaveFileName = "temp";
         private const string _defaultStructureFilter = "Structure file (.struct)|*.struct|All files (*.*)|*.*";
         private const string _appName = "KaLEDoscope";
-        private const int _timerPeriod = 60000;
+        private const int _defaultAutosavePeriod = 60000;
 
 
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
@@ -98,6 +99,25 @@ namespace KaLEDoscope
                 _haveUnsavedData = value;
                 OnPropertyChanged(nameof(HaveUnsavedData));
                 OnPropertyChanged(nameof(Title));
+            }
+        }
+
+        public string AutosaveFileName { get; set; } = _defaultAutosaveFileName;
+
+        private int _autosavePeriod;
+        public int AutosavePeriod
+        {
+            get
+            {
+                return _autosavePeriod;
+            }
+            set
+            {
+                _autosavePeriod = value;
+                if (!_autosaveTimer.IsNull() && _autosaveTimer.Interval != value)
+                {
+                    _autosaveTimer.Interval = value;
+                }
             }
         }
 
@@ -153,13 +173,33 @@ namespace KaLEDoscope
             }
             LoadStructure(String.Empty);
             StructureNodes.CollectionChanged += (s, e) => HaveUnsavedData = true;
-            _timer = new Timer(_timerPeriod);
-            _timer.Elapsed += (s, e) =>
+            var config = Config.GetConfig();
+            var configAutosavePeriod = config.GetParameter("Autosave", "Period");
+            if (configAutosavePeriod.IsNull() || !int.TryParse(configAutosavePeriod, out var result))
+            {
+                AutosavePeriod = _defaultAutosavePeriod;
+            }
+            else
+            {
+                AutosavePeriod = result;
+            }
+            var configAutosaveFileName = config.GetParameter("Autosave", "Filename");
+            if (configAutosaveFileName.IsNull())
+            {
+                AutosaveFileName = _defaultAutosaveFileName;
+            }
+            else
+            {
+                AutosaveFileName = configAutosaveFileName;
+            }
+
+            _autosaveTimer = new Timer(AutosavePeriod);
+            _autosaveTimer.Elapsed += (s, e) =>
             {
                 if (HaveUnsavedData)
                     SaveExistStructure();
             };
-            _timer.Start();
+            _autosaveTimer.Start();
         }
 
         public void CheckActivation()
@@ -274,6 +314,10 @@ namespace KaLEDoscope
                     {
                         if (HaveUnsavedData)
                             SaveExistStructure();
+                        var config = Config.GetConfig();
+                        config.SetParameter("Autosave", "Period", AutosavePeriod.ToString());
+                        config.SetParameter("Autosave", "Filename", AutosaveFileName);
+                        config.Save();
                         QuitApplication?.Invoke(this, EventArgs.Empty);
                     });
                 }
@@ -540,7 +584,7 @@ namespace KaLEDoscope
         {
             if (String.IsNullOrEmpty(filename))
             {
-                filename = String.Concat(_temporaryStructureFileName, _defaultStructureFileExtension);
+                filename = String.Concat(_defaultAutosaveFileName, _defaultStructureFileExtension);
             }
             else
             {
@@ -668,7 +712,7 @@ namespace KaLEDoscope
             var serialized = JsonConvert.SerializeObject(serializableContainers);
             var datas = _compressor.Zip(serialized);
             var fileName = String.IsNullOrEmpty(StructureFileName) ?
-                String.Concat(_temporaryStructureFileName, _defaultStructureFileExtension) :
+                String.Concat(AutosaveFileName, _defaultStructureFileExtension) :
                 StructureFileName;
             System.IO.File.WriteAllBytes(fileName, datas);
             _logger.Info(this, $"Структура сохранена в {fileName}");

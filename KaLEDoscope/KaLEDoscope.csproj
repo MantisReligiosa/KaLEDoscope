@@ -140,6 +140,7 @@
     <Compile Include="Serialization\SerializableFolder.cs" />
     <Compile Include="TreeViewBehaviour.cs" />
     <Compile Include="ViewModel\ActivationViewModel.cs" />
+    <Compile Include="ViewModel\ConfigViewModel.cs" />
     <Compile Include="ViewModel\CustomizationViewModel.cs" />
     <Compile Include="ViewModel\PreviewViewModel.cs" />
     <Compile Include="ViewModel\RenameDialogViewModel.cs" />
@@ -161,6 +162,9 @@
     </Compile>
     <Compile Include="ViewModel\CommonSettingsViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="Views\ConfigWindow.xaml.cs">
+      <DependentUpon>ConfigWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\CustomizationControl.xaml.cs">
       <DependentUpon>CustomizationControl.xaml</DependentUpon>
     </Compile>
@@ -202,6 +206,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\ConfigWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\CustomizationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -279,6 +287,10 @@
     <ProjectReference Include="..\Infrastructure\Compression\Compression.csproj">
       <Project>{7E425F1A-5E02-4C0B-BE9A-0BA0E7B2E315}</Project>
       <Name>Compression</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure\Configuration\Configuration.csproj">
+      <Project>{370CA0A3-CDE9-47F8-9E5C-5996C99C4B1C}</Project>
+      <Name>Configuration</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Logger\Logger.csproj">
       <Project>{F5C748BA-65E1-430D-8385-CFD198FE850E}</Project>
