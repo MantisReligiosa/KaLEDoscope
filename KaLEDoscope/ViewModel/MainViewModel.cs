@@ -229,20 +229,56 @@ namespace KaLEDoscope
             {
                 foreach (var device in devices)
                 {
-#warning Добавить апдейт, если устройства были заведены руками
-                    StructureNodes.Add(new DeviceNode
+                    var existsDeviceNode = FindDeviceNodeFor(device);
+                    if (!existsDeviceNode.IsNull())
                     {
-                        Device = device,
-                        Name = device.Name,
-                        AllowDownload = true,
-                        AllowLoad = true,
-                        AllowSave = true,
-                        AllowUpload = true
-                    });
+                        existsDeviceNode = new DeviceNode
+                        {
+                            Device = device,
+                            Name = device.Name,
+                            AllowDownload = true,
+                            AllowLoad = true,
+                            AllowSave = true,
+                            AllowUpload = true
+                        };
+                    }
+                    else
+                    {
+                        StructureNodes.Add(new DeviceNode
+                        {
+                            Device = device,
+                            Name = device.Name,
+                            AllowDownload = true,
+                            AllowLoad = true,
+                            AllowSave = true,
+                            AllowUpload = true
+                        });
+                    }
                 }
                 HaveUnsavedData = devices.Any();
             });
             IsScanEnabled = true;
+        }
+
+        private DeviceNode FindDeviceNodeFor(Device device)
+        {
+            DeviceNode deviceNode;
+            foreach (var aggregationNode in StructureNodes.OfType<AggregationNode>())
+            {
+                deviceNode = aggregationNode.Nodes.OfType<DeviceNode>().FirstOrDefault(n => n.Device.Id == device.Id);
+                if (!deviceNode.IsNull())
+                    return deviceNode;
+            }
+            foreach (var folderNode in StructureNodes.OfType<FolderNode>())
+            {
+                deviceNode = folderNode.Nodes.OfType<DeviceNode>().FirstOrDefault(n => n.Device.Id == device.Id);
+                if (!deviceNode.IsNull())
+                    return deviceNode;
+            }
+            deviceNode = StructureNodes.OfType<DeviceNode>().FirstOrDefault(n => n.Device.Id == device.Id);
+            if (!deviceNode.IsNull())
+                return deviceNode;
+            return null;
         }
 
         private DelegateCommand _options;
