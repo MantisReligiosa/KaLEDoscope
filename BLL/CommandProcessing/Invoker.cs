@@ -16,7 +16,8 @@ namespace CommandProcessing
         public void Invoke<T>(IDeviceCommand<T> command)
             where T : Device
         {
-            _logger.Info(this, $"{command.Name}" + ((!command.Device.IsNull()) ? $" устройства {command.Device.Name}" : String.Empty));
+            _logger.Info(this, $"{command.Name}" +
+                ((!command.Device.IsNull()) ? $" устройства {command.Device.Name}" : String.Empty));
             command.Execute();
         }
     }

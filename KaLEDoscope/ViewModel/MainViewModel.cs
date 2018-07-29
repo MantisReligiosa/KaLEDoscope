@@ -232,15 +232,12 @@ namespace KaLEDoscope
                     var existsDeviceNode = FindDeviceNodeFor(device);
                     if (!existsDeviceNode.IsNull())
                     {
-                        existsDeviceNode = new DeviceNode
-                        {
-                            Device = device,
-                            Name = device.Name,
-                            AllowDownload = true,
-                            AllowLoad = true,
-                            AllowSave = true,
-                            AllowUpload = true
-                        };
+                        existsDeviceNode.Device = device;
+                        existsDeviceNode.Name = device.Name;
+                        existsDeviceNode.AllowDownload = true;
+                        existsDeviceNode.AllowLoad = true;
+                        existsDeviceNode.AllowSave = true;
+                        existsDeviceNode.AllowUpload = true;
                     }
                     else
                     {
