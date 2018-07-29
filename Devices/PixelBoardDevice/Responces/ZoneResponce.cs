@@ -18,12 +18,13 @@ namespace PixelBoardDevice.Responces
             switch (zoneType)
             {
                 case 1:
-                    var textLength = _bytes[19 + nameLength];
+                    var textLength = _bytes[20 + nameLength];
                     var textZone = new TextZone()
                     {
                         FontId = _bytes[17 + nameLength],
                         Alignment = _bytes[18 + nameLength],
-                        Text = _bytes.ExtractString(20 + nameLength, textLength)
+                        AnimationId = _bytes[19 + nameLength],
+                        Text = _bytes.ExtractString(21 + nameLength, textLength)
                     };
                     zone = textZone;
                     break;
@@ -71,6 +72,11 @@ namespace PixelBoardDevice.Responces
                     {
                         clockZone.PeriodicSyncInterval = _bytes.ExtractUshort(18 + nameLength);
                     }
+                    if (clockZone.ClockType == 1) //текст
+                    {
+                        clockZone.FontId = _bytes[20 + nameLength];
+                        clockZone.Alignment = _bytes[21 + nameLength];
+                    }
                     zone = clockZone;
                     break;
                 case 6:
@@ -82,7 +88,9 @@ namespace PixelBoardDevice.Responces
                         _bytes[19 + nameLength],
                         _bytes[20 + nameLength],
                         _bytes.ExtractUshort(21 + nameLength)
-                        )
+                        ),
+                        FontId = _bytes[23 + nameLength],
+                        Alignment = _bytes[24 + nameLength]
                     };
                     zone = tickerZone;
                     break;

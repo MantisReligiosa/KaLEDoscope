@@ -15,7 +15,7 @@ namespace CommandProcessing
         private readonly int _timeout;
         private Timer _timer;
 
-        public RequestingCommand(Device device, INetworkAgent networkAgent, ILogger logger,
+        protected RequestingCommand(Device device, INetworkAgent networkAgent, ILogger logger,
             int port = 500,
             int timeout = 100)
             : base(device, networkAgent, logger)

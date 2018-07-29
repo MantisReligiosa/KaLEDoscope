@@ -30,6 +30,7 @@ namespace PixelBoardDevice.Requests
             {
                 bytes.Add((byte)textZone.FontId);
                 bytes.Add((byte)(textZone.Alignment ?? 0));
+                bytes.Add((byte)(textZone.AnimationId ?? 0));
                 bytes.Add((byte)textZone.Text.Length);
                 bytes.AddRange(textZone.Text.ToBytes());
             }
@@ -69,6 +70,8 @@ namespace PixelBoardDevice.Requests
                 {
                     bytes.AddRange(new byte[] { 0x00, 0x00 });
                 }
+                bytes.Add((byte)(clockZone.ClockType == 1 ? clockZone.FontId ?? 0 : 0x00));
+                bytes.Add((byte)(clockZone.ClockType == 1 ? clockZone.Alignment ?? 0 : 0x00));
             }
             else if (zone is TickerZone tickerZone)
             {
@@ -77,6 +80,8 @@ namespace PixelBoardDevice.Requests
                 bytes.Add((byte)tickerZone.TickerCountDownStartValue.Minutes);
                 bytes.Add((byte)tickerZone.TickerCountDownStartValue.Seconds);
                 bytes.AddRange(((ushort)tickerZone.TickerCountDownStartValue.Milliseconds).ToBytes());
+                bytes.Add((byte)(tickerZone.FontId ?? 0));
+                bytes.Add((byte)(tickerZone.Alignment ?? 0));
             }
             return bytes.ToArray();
         }

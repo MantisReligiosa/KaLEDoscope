@@ -95,7 +95,21 @@ namespace KaLEDoscope
 
         private void OnShowOptions(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            var configModel = new ConfigViewModel
+            {
+                AutosavePeriod = _viewModel.AutosavePeriod / 1000,
+                AutosaveFilename = _viewModel.AutosaveFileName
+            };
+            var configWindow = new ConfigWindow
+            {
+                DataContext = configModel,
+                Owner = this
+            };
+            if (configWindow.ShowDialog() == true)
+            {
+                _viewModel.AutosavePeriod = configModel.AutosavePeriod * 1000;
+                _viewModel.AutosaveFileName = configModel.AutosaveFilename;
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using BaseDevice;
 using BaseDeviceSerialization;
 using CommandProcessing;
+using Configuration;
 using DeviceBuilding;
 using Extensions;
 using GongSolutions.Wpf.DragDrop;
@@ -22,6 +23,7 @@ using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using UiCommands;
 using Input = System.Windows.Input;
@@ -41,14 +43,14 @@ namespace KaLEDoscope
         private readonly ObservableCollection<LogItem> _logItems = new ObservableCollection<LogItem>();
         private readonly INetworkAgent _networkScanAgent;
         private readonly INetworkAgent _networkExchangeAgent;
-        private readonly Timer _timer;
+        private readonly Timer _autosaveTimer;
 
         private const string _defaultStructureFileName = "Структура";
         private const string _defaultStructureFileExtension = ".struct";
-        private const string _temporaryStructureFileName = "temp";
+        private const string _defaultAutosaveFileName = "temp";
         private const string _defaultStructureFilter = "Structure file (.struct)|*.struct|All files (*.*)|*.*";
         private const string _appName = "KaLEDoscope";
-        private const int _timerPeriod = 60000;
+        private const int _defaultAutosavePeriod = 60000;
 
 
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
@@ -97,6 +99,25 @@ namespace KaLEDoscope
                 _haveUnsavedData = value;
                 OnPropertyChanged(nameof(HaveUnsavedData));
                 OnPropertyChanged(nameof(Title));
+            }
+        }
+
+        public string AutosaveFileName { get; set; } = _defaultAutosaveFileName;
+
+        private int _autosavePeriod;
+        public int AutosavePeriod
+        {
+            get
+            {
+                return _autosavePeriod;
+            }
+            set
+            {
+                _autosavePeriod = value;
+                if (!_autosaveTimer.IsNull() && _autosaveTimer.Interval != value)
+                {
+                    _autosaveTimer.Interval = value;
+                }
             }
         }
 
@@ -152,13 +173,33 @@ namespace KaLEDoscope
             }
             LoadStructure(String.Empty);
             StructureNodes.CollectionChanged += (s, e) => HaveUnsavedData = true;
-            _timer = new Timer(_timerPeriod);
-            _timer.Elapsed += (s, e) =>
+            var config = Config.GetConfig();
+            var configAutosavePeriod = config.GetParameter("Autosave", "Period");
+            if (configAutosavePeriod.IsNull() || !int.TryParse(configAutosavePeriod, out var result))
+            {
+                AutosavePeriod = _defaultAutosavePeriod;
+            }
+            else
+            {
+                AutosavePeriod = result;
+            }
+            var configAutosaveFileName = config.GetParameter("Autosave", "Filename");
+            if (configAutosaveFileName.IsNull())
+            {
+                AutosaveFileName = _defaultAutosaveFileName;
+            }
+            else
+            {
+                AutosaveFileName = configAutosaveFileName;
+            }
+
+            _autosaveTimer = new Timer(AutosavePeriod);
+            _autosaveTimer.Elapsed += (s, e) =>
             {
                 if (HaveUnsavedData)
                     SaveExistStructure();
             };
-            _timer.Start();
+            _autosaveTimer.Start();
         }
 
         public void CheckActivation()
@@ -188,20 +229,53 @@ namespace KaLEDoscope
             {
                 foreach (var device in devices)
                 {
-#warning Добавить апдейт, если устройства были заведены руками
-                    StructureNodes.Add(new DeviceNode
+                    var existsDeviceNode = FindDeviceNodeFor(device);
+                    if (!existsDeviceNode.IsNull())
                     {
-                        Device = device,
-                        Name = device.Name,
-                        AllowDownload = true,
-                        AllowLoad = true,
-                        AllowSave = true,
-                        AllowUpload = true
-                    });
+                        existsDeviceNode.Device = device;
+                        existsDeviceNode.Name = device.Name;
+                        existsDeviceNode.AllowDownload = true;
+                        existsDeviceNode.AllowLoad = true;
+                        existsDeviceNode.AllowSave = true;
+                        existsDeviceNode.AllowUpload = true;
+                    }
+                    else
+                    {
+                        StructureNodes.Add(new DeviceNode
+                        {
+                            Device = device,
+                            Name = device.Name,
+                            AllowDownload = true,
+                            AllowLoad = true,
+                            AllowSave = true,
+                            AllowUpload = true
+                        });
+                    }
                 }
                 HaveUnsavedData = devices.Any();
             });
             IsScanEnabled = true;
+        }
+
+        private DeviceNode FindDeviceNodeFor(Device device)
+        {
+            DeviceNode deviceNode;
+            foreach (var aggregationNode in StructureNodes.OfType<AggregationNode>())
+            {
+                deviceNode = aggregationNode.Nodes.OfType<DeviceNode>().FirstOrDefault(n => n.Device.Id == device.Id);
+                if (!deviceNode.IsNull())
+                    return deviceNode;
+            }
+            foreach (var folderNode in StructureNodes.OfType<FolderNode>())
+            {
+                deviceNode = folderNode.Nodes.OfType<DeviceNode>().FirstOrDefault(n => n.Device.Id == device.Id);
+                if (!deviceNode.IsNull())
+                    return deviceNode;
+            }
+            deviceNode = StructureNodes.OfType<DeviceNode>().FirstOrDefault(n => n.Device.Id == device.Id);
+            if (!deviceNode.IsNull())
+                return deviceNode;
+            return null;
         }
 
         private DelegateCommand _options;
@@ -273,6 +347,10 @@ namespace KaLEDoscope
                     {
                         if (HaveUnsavedData)
                             SaveExistStructure();
+                        var config = Config.GetConfig();
+                        config.SetParameter("Autosave", "Period", AutosavePeriod.ToString());
+                        config.SetParameter("Autosave", "Filename", AutosaveFileName);
+                        config.Save();
                         QuitApplication?.Invoke(this, EventArgs.Empty);
                     });
                 }
@@ -539,7 +617,7 @@ namespace KaLEDoscope
         {
             if (String.IsNullOrEmpty(filename))
             {
-                filename = String.Concat(_temporaryStructureFileName, _defaultStructureFileExtension);
+                filename = String.Concat(_defaultAutosaveFileName, _defaultStructureFileExtension);
             }
             else
             {
@@ -603,6 +681,11 @@ namespace KaLEDoscope
                             .FirstOrDefault(n => n.Aggregation.Id == device.AggregationId);
                         deviceNode.Parent = aggregationNode;
                         aggregationNode.Nodes.Add(deviceNode);
+                        if (!device.AggregationOrder.HasValue)
+                        {
+                            var order = aggregationNode.Nodes.OfType<DeviceNode>().Max(d => d.Device.AggregationOrder ?? 0) + 1;
+                            device.AggregationOrder = order;
+                        }
                     }
                     else if (device.FolderId.HasValue)
                     {
@@ -662,7 +745,7 @@ namespace KaLEDoscope
             var serialized = JsonConvert.SerializeObject(serializableContainers);
             var datas = _compressor.Zip(serialized);
             var fileName = String.IsNullOrEmpty(StructureFileName) ?
-                String.Concat(_temporaryStructureFileName, _defaultStructureFileExtension) :
+                String.Concat(AutosaveFileName, _defaultStructureFileExtension) :
                 StructureFileName;
             System.IO.File.WriteAllBytes(fileName, datas);
             _logger.Info(this, $"Структура сохранена в {fileName}");
@@ -803,6 +886,7 @@ namespace KaLEDoscope
         private UserControl GetAggregationGrid(AggregationNode aggregationNode, DeviceNode selectedDeviceNode)
         {
             var pack = _deviceFactory.GetControlsPack(selectedDeviceNode.Device, _logger);
+            pack.DataChanged += (o, args) => HaveUnsavedData = true;
             _activeControlsPackInAggregation = pack;
             var previewControl = GetAggregationPreviewGrid(aggregationNode, selectedDeviceNode);
             return GetDeviceItemGrid(selectedDeviceNode, previewControl, pack.CustomizationControl, pack.MenuItems, pack.OnPreviewAreaMouseDown);
@@ -826,8 +910,18 @@ namespace KaLEDoscope
             {
                 Width = new GridLength(1, GridUnitType.Star)
             });
+            grid.RowDefinitions.Add(new RowDefinition
+            {
+                Height = new GridLength(1, GridUnitType.Star)
+            });
+            grid.RowDefinitions.Add(new RowDefinition
+            {
+                Height = GridLength.Auto
+            });
             var column = 1;
-            foreach (var node in aggregationNode.Nodes)
+            var nodeCount = aggregationNode.Nodes.Count();
+            var deviceIndex = 1;
+            foreach (var node in aggregationNode.Nodes.OrderBy(n => ((DeviceNode)n).Device.AggregationOrder))
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition
                 {
@@ -842,7 +936,13 @@ namespace KaLEDoscope
                 };
                 grid.Children.Add(splitter);
                 Grid.SetColumn(splitter, column++);
+                Grid.SetRow(splitter, 0);
+                Grid.SetRowSpan(splitter, 2);
 
+                grid.ColumnDefinitions.Add(new ColumnDefinition
+                {
+                    Width = new GridLength(1, GridUnitType.Star)
+                });
                 grid.ColumnDefinitions.Add(new ColumnDefinition
                 {
                     Width = new GridLength(1, GridUnitType.Star)
@@ -864,13 +964,50 @@ namespace KaLEDoscope
                         Content = devicePreview
                     };
                     grid.Children.Add(controlWrapper);
-                    Grid.SetColumn(controlWrapper, column++);
+                    Grid.SetColumn(controlWrapper, column);
+                    Grid.SetColumnSpan(controlWrapper, 2);
+                    Grid.SetRow(controlWrapper, 0);
                 }
                 else
                 {
                     grid.Children.Add(devicePreview);
-                    Grid.SetColumn(devicePreview, column++);
+                    Grid.SetColumn(devicePreview, column);
+                    Grid.SetColumnSpan(devicePreview, 2);
+                    Grid.SetRow(devicePreview, 0);
                 }
+                var toLeftButton = new Button
+                {
+                    Height = 27,
+                    Content = new Image
+                    {
+                        Source = new BitmapImage(new Uri(@"pack://application:,,,/"
+                        + Assembly.GetExecutingAssembly().GetName().Name
+                        + ";component/"
+                        + "Resources/previous.png", UriKind.Absolute))
+                    },
+                    IsEnabled = deviceIndex != 1
+                };
+                toLeftButton.Click += (o, e) => ChangeOrder(node, aggregationNode, -1);
+                grid.Children.Add(toLeftButton);
+                Grid.SetColumn(toLeftButton, column++);
+                Grid.SetRow(toLeftButton, 1);
+                var toRightButton = new Button
+                {
+                    Height = 27,
+                    Content = new Image
+                    {
+                        Source = new BitmapImage(new Uri(@"pack://application:,,,/"
+                        + Assembly.GetExecutingAssembly().GetName().Name
+                        + ";component/"
+                        + "Resources/next.png", UriKind.Absolute))
+                    },
+                    IsEnabled = deviceIndex != nodeCount
+                };
+                toRightButton.Click += (o, e) => ChangeOrder(node, aggregationNode, 1);
+                grid.Children.Add(toRightButton);
+                Grid.SetColumn(toRightButton, column++);
+                Grid.SetRow(toRightButton, 1);
+                deviceIndex++;
             }
             grid.ColumnDefinitions.Add(new ColumnDefinition
             {
@@ -890,6 +1027,20 @@ namespace KaLEDoscope
                 Width = new GridLength(1, GridUnitType.Star)
             });
             return control;
+        }
+
+        private void ChangeOrder(NodeItem node, AggregationNode aggregationNode, int increment)
+        {
+            var currentDevide = ((DeviceNode)node).Device;
+            var currentDeviceOrder = currentDevide.AggregationOrder.Value;
+            var targetDevice = aggregationNode.Nodes.Select(n => ((DeviceNode)n).Device).FirstOrDefault(d => d.AggregationOrder == currentDevide.AggregationOrder + increment);
+            currentDevide.AggregationOrder = targetDevice.AggregationOrder;
+            targetDevice.AggregationOrder = currentDeviceOrder;
+            HaveUnsavedData = true;
+            if (DeviceTabs.Any(t => t.DataContext == aggregationNode))
+            {
+                ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
+            }
         }
 
         private static string GetDeviceTabItemTitle(DeviceNode deviceNode)

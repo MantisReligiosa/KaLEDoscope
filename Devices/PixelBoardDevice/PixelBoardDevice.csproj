@@ -125,6 +125,7 @@
     <Compile Include="Responces\ProgramResponce.cs" />
     <Compile Include="Responces\ZoneResponce.cs" />
     <Compile Include="Serialization\SerializableBinaryImage.cs" />
+    <Compile Include="UI\POCO\AnimationType.cs" />
     <Compile Include="UI\POCO\TickerType.cs" />
     <Compile Include="UI\ProgramPreviewViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
