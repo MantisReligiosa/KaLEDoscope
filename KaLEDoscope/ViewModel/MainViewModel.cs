@@ -705,51 +705,69 @@ namespace KaLEDoscope
 
         private void SaveExistStructure()
         {
-            var serializableContainers = new List<SerializableContainer>();
-            foreach (var node in StructureNodes)
+            try
             {
-                var deviceNode = node as DeviceNode;
-                var folderNode = node as FolderNode;
-                var aggregationNode = node as AggregationNode;
-                if (!deviceNode.IsNull())
+                _logger.Debug(this, "Подготовка контейнеров");
+                var serializableContainers = new List<SerializableContainer>();
+                foreach (var node in StructureNodes)
                 {
-                    serializableContainers.Add(GetDeviceSerializableContainer(deviceNode));
-                }
-                else if (!folderNode.IsNull())
-                {
-                    serializableContainers.Add(
-                        new SerializableContainer
-                        {
-                            ContentType = ContentType.Folder,
-                            Content = (SerializableFolder)folderNode.Folder
-                        });
-                    foreach (var deviceSubNode in folderNode.Nodes)
+                    var deviceNode = node as DeviceNode;
+                    var folderNode = node as FolderNode;
+                    var aggregationNode = node as AggregationNode;
+                    if (!deviceNode.IsNull())
                     {
-                        serializableContainers.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
+                        _logger.Debug(this, $"Устройство [{deviceNode.Device.Name}]");
+                        serializableContainers.Add(GetDeviceSerializableContainer(deviceNode));
+                    }
+                    else if (!folderNode.IsNull())
+                    {
+                        _logger.Debug(this, $"Папка [{folderNode.Folder.Name}]");
+                        serializableContainers.Add(
+                            new SerializableContainer
+                            {
+                                ContentType = ContentType.Folder,
+                                Content = (SerializableFolder)folderNode.Folder
+                            });
+                        foreach (var deviceSubNode in folderNode.Nodes)
+                        {
+                            var deviceNodeInFolder = deviceSubNode as DeviceNode;
+                            _logger.Debug(this, $"Устройство [{folderNode.Folder.Name}]/[{deviceNodeInFolder.Device.Name}]");
+                            serializableContainers.Add(GetDeviceSerializableContainer(deviceNodeInFolder));
+                        }
+                    }
+                    else if (!aggregationNode.IsNull())
+                    {
+                        _logger.Debug(this, $"Агрегация [{aggregationNode.Aggregation.Name}]");
+                        serializableContainers.Add(
+                            new SerializableContainer
+                            {
+                                ContentType = ContentType.Aggregator,
+                                Content = (SerializableAggregation)aggregationNode.Aggregation
+                            });
+                        foreach (var deviceSubNode in aggregationNode.Nodes)
+                        {
+                            var deviceInAgregation = deviceSubNode as DeviceNode;
+                            _logger.Debug(this, $"Устройство [{aggregationNode.Aggregation.Name}]/[{deviceInAgregation.Device.Name}]");
+                            serializableContainers.Add(GetDeviceSerializableContainer(deviceInAgregation));
+                        }
                     }
                 }
-                else if (!aggregationNode.IsNull())
-                {
-                    serializableContainers.Add(
-                        new SerializableContainer
-                        {
-                            ContentType = ContentType.Aggregator,
-                            Content = (SerializableAggregation)aggregationNode.Aggregation
-                        });
-                    foreach (var deviceSubNode in aggregationNode.Nodes)
-                    {
-                        serializableContainers.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
-                    }
-                }
+                _logger.Debug(this, "Сериализация");
+                var serialized = JsonConvert.SerializeObject(serializableContainers);
+                _logger.Debug(this, "Упаковка");
+                var datas = _compressor.Zip(serialized);
+                var fileName = String.IsNullOrEmpty(StructureFileName) ?
+                    String.Concat(AutosaveFileName, _defaultStructureFileExtension) :
+                    StructureFileName;
+                _logger.Debug(this, "Запись");
+                System.IO.File.WriteAllBytes(fileName, datas);
+                _logger.Info(this, $"Структура сохранена в {fileName}");
+                HaveUnsavedData = false;
             }
-            var serialized = JsonConvert.SerializeObject(serializableContainers);
-            var datas = _compressor.Zip(serialized);
-            var fileName = String.IsNullOrEmpty(StructureFileName) ?
-                String.Concat(AutosaveFileName, _defaultStructureFileExtension) :
-                StructureFileName;
-            System.IO.File.WriteAllBytes(fileName, datas);
-            _logger.Info(this, $"Структура сохранена в {fileName}");
-            HaveUnsavedData = false;
+            catch (Exception ex)
+            {
+                _logger.Error(this, $"Ошибка записи! {ex.Message}", ex);
+            }
         }
 
         private SerializableContainer GetDeviceSerializableContainer(DeviceNode node)
