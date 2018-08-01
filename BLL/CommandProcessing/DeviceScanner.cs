@@ -42,17 +42,15 @@ namespace CommandProcessing
 
         private void DirectConnectScanCommand_OnScanCompleted(List<Device> devices)
         {
-            if (!devices.Any())
-            {
-                return;
-            }
-            _logger.Info(this, "Начинаю распознавание");
+            if (devices.Any())
+                _logger.Info(this, "Начинаю распознавание");
             OnScanCompleted?.Invoke(devices.Select(d =>
             {
                 return _deviceFactory.Customize(d);
             }
             ).ToList());
-            _logger.Info(this, "Распознавание закончено");
+            if (devices.Any())
+                _logger.Info(this, "Распознавание закончено");
         }
     }
 }
