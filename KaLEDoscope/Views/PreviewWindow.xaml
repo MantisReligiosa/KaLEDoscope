@@ -19,13 +19,13 @@
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Width="30" Height="30" Command="{Binding PlayPause}">
+            <Button Grid.Column="0" Width="30" Height="30" Command="{Binding PlayPause}" ToolTip="Пуск/Пауза">
                 <Image Source="{Binding PlayPauseIconSource}"/>
             </Button>
-            <Button Grid.Column="1" Margin="2,0,0,0" Width="30" Height="30" Command="{Binding Stop}">
+            <Button Grid.Column="1" Margin="2,0,0,0" Width="30" Height="30" Command="{Binding Stop}" ToolTip="Стоп">
                 <Image Source="/KaLEDoscope;component/Resources/stop.png"/>
             </Button>
-            <ToggleButton Grid.Column="2" Width="30" Height="30" Margin="1,0,0,0" IsChecked="{Binding RepeatEnabled}">
+            <ToggleButton Grid.Column="2" Width="30" Height="30" Margin="1,0,0,0" IsChecked="{Binding RepeatEnabled}" ToolTip="Непрерывно">
                 <Image Source="/KaLEDoscope;component/Resources/repeat.png"/>
             </ToggleButton>
             <Slider Grid.Column="3" TickPlacement="BottomRight" Margin="5,0,0,0" Maximum="{Binding Duration}" Value="{Binding Position}"/>
