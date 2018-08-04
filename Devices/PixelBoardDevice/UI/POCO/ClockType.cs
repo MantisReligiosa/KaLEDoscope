@@ -1,8 +1,4 @@
-﻿using PixelBoardDevice.DomainObjects;
-using System;
-using System.Drawing;
-
-namespace PixelBoardDevice.UI.POCO
+﻿namespace PixelBoardDevice.UI.POCO
 {
     public class ClockType
     {

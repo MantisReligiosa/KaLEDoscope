@@ -83,6 +83,10 @@
       <Project>{1BAF3556-8262-4102-BDA9-F0EA0DEDDA44}</Project>
       <Name>Extensions</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\Configuration\Configuration.csproj">
+      <Project>{370CA0A3-CDE9-47F8-9E5C-5996C99C4B1C}</Project>
+      <Name>Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeviceBuilding\DeviceBuilding.csproj">
       <Project>{2D60FBB1-2869-4354-939B-7F72D9B314B3}</Project>
       <Name>DeviceBuilding</Name>

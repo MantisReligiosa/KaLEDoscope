@@ -1,6 +1,5 @@
 ﻿using CommandProcessing;
 using Extensions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,17 +15,17 @@ namespace SevenSegmentBoardDevice.Requests
             {
                 return new byte[0];
             }
-            var result = new byte[1 + frames.Count(f => f.IsEnabled) * 3];
-            result[0] = (byte)frames.Count(f => f.IsEnabled);
-            var counter = 0;
+            var result = new List<byte>
+            {
+                (byte)frames.Count(f => f.IsEnabled)
+            };
             foreach (var frame in frames.Where(f => f.IsEnabled))
             {
-                result[1 + counter * 3] = (byte)frame.Id;
+                result.Add((byte)frame.Id);
                 var durationBytes = ((ushort)(frame.DisplayPeriod)).ToBytes();
-                Array.Copy(durationBytes, 0, result, 2 + counter * 3, 2);
-                counter++;
+                result.AddRange(durationBytes);
             }
-            return result;
+            return result.ToArray();
         }
     }
 }

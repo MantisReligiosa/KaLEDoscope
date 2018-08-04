@@ -47,11 +47,8 @@ namespace KaLEDoscope
 
         private const string _defaultStructureFileName = "Структура";
         private const string _defaultStructureFileExtension = ".struct";
-        private const string _defaultAutosaveFileName = "temp";
         private const string _defaultStructureFilter = "Structure file (.struct)|*.struct|All files (*.*)|*.*";
         private const string _appName = "KaLEDoscope";
-        private const int _defaultAutosavePeriod = 60000;
-
 
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
@@ -82,8 +79,7 @@ namespace KaLEDoscope
             get
             {
                 return (String.IsNullOrEmpty(StructureFileName) ? string.Empty : $"{StructureFileName} - ") +
-                    $"{_appName}" +
-                    $"{(HaveUnsavedData ? "*" : String.Empty)}";
+                    $"{_appName}" + $"{(HaveUnsavedData ? "*" : String.Empty)}";
             }
         }
 
@@ -102,7 +98,7 @@ namespace KaLEDoscope
             }
         }
 
-        public string AutosaveFileName { get; set; } = _defaultAutosaveFileName;
+        public string AutosaveFileName { get; set; }
 
         private int _autosavePeriod;
         public int AutosavePeriod
@@ -173,25 +169,8 @@ namespace KaLEDoscope
             }
             LoadStructure(String.Empty);
             StructureNodes.CollectionChanged += (s, e) => HaveUnsavedData = true;
-            var config = Config.GetConfig();
-            var configAutosavePeriod = config.GetParameter("Autosave", "Period");
-            if (configAutosavePeriod.IsNull() || !int.TryParse(configAutosavePeriod, out var result))
-            {
-                AutosavePeriod = _defaultAutosavePeriod;
-            }
-            else
-            {
-                AutosavePeriod = result;
-            }
-            var configAutosaveFileName = config.GetParameter("Autosave", "Filename");
-            if (configAutosaveFileName.IsNull())
-            {
-                AutosaveFileName = _defaultAutosaveFileName;
-            }
-            else
-            {
-                AutosaveFileName = configAutosaveFileName;
-            }
+            AutosavePeriod = Config.GetConfig().AutosavePeriod;
+            AutosaveFileName = Config.GetConfig().AutosaveFilename;
 
             _autosaveTimer = new Timer(AutosavePeriod);
             _autosaveTimer.Elapsed += (s, e) =>
@@ -347,10 +326,9 @@ namespace KaLEDoscope
                     {
                         if (HaveUnsavedData)
                             SaveExistStructure();
-                        var config = Config.GetConfig();
-                        config.SetParameter("Autosave", "Period", AutosavePeriod.ToString());
-                        config.SetParameter("Autosave", "Filename", AutosaveFileName);
-                        config.Save();
+                        Config.GetConfig().AutosavePeriod = AutosavePeriod;
+                        Config.GetConfig().AutosaveFilename = AutosaveFileName;
+                        Config.GetConfig().Save();
                         QuitApplication?.Invoke(this, EventArgs.Empty);
                     });
                 }
@@ -617,7 +595,7 @@ namespace KaLEDoscope
         {
             if (String.IsNullOrEmpty(filename))
             {
-                filename = String.Concat(_defaultAutosaveFileName, _defaultStructureFileExtension);
+                filename = String.Concat(AutosaveFileName, _defaultStructureFileExtension);
             }
             else
             {

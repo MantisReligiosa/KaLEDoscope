@@ -1,5 +1,6 @@
 ﻿using Activation;
 using Compression;
+using Configuration;
 using KaLEDoscope.ViewModel;
 using KaLEDoscope.Views;
 using Logger;
@@ -98,7 +99,11 @@ namespace KaLEDoscope
             var configModel = new ConfigViewModel
             {
                 AutosavePeriod = _viewModel.AutosavePeriod / 1000,
-                AutosaveFilename = _viewModel.AutosaveFileName
+                AutosaveFilename = _viewModel.AutosaveFileName,
+                ScanPort = Config.GetConfig().ScanPort,
+                ScanPeriod = Config.GetConfig().ScanPeriod,
+                RequestPort = Config.GetConfig().RequestPort,
+                ResponceTimeout = Config.GetConfig().ResponceTimeout
             };
             var configWindow = new ConfigWindow
             {
@@ -109,6 +114,10 @@ namespace KaLEDoscope
             {
                 _viewModel.AutosavePeriod = configModel.AutosavePeriod * 1000;
                 _viewModel.AutosaveFileName = configModel.AutosaveFilename;
+                Config.GetConfig().ScanPort = configModel.ScanPort;
+                Config.GetConfig().ScanPeriod = configModel.ScanPeriod;
+                Config.GetConfig().RequestPort = configModel.RequestPort;
+                Config.GetConfig().ResponceTimeout = configModel.ResponceTimeout;
             }
         }
     }

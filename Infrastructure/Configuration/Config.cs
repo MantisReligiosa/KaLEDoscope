@@ -1,4 +1,5 @@
-﻿using IniParser;
+﻿using Extensions;
+using IniParser;
 using IniParser.Model;
 using System.IO;
 
@@ -11,12 +12,61 @@ namespace Configuration
         private readonly FileIniDataParser _parser;
         private readonly IniData _data;
 
-        public string GetParameter(string section, string key)
+        public int ScanPort
         {
-            return _data[section][key];
+            get => GetParameter("Network", "ScanPort", 30000);
+            set => SetParameter("Network", "ScanPort", value.ToString());
+        }
+        public int ScanPeriod
+        {
+            get => GetParameter("Network", "ScanPeriod", 10000);
+            set => SetParameter("Network", "ScanPeriod", value.ToString());
+        }
+        public int AutosavePeriod
+        {
+            get => GetParameter("Autosave", "Period", 60000);
+            set => SetParameter("Autosave", "Period", value.ToString());
+        }
+        public string AutosaveFilename
+        {
+            get => GetParameter("Autosave", "Filename", "temp");
+            set => SetParameter("Autosave", "Filename", value);
+        }
+        public int RequestPort
+        {
+            get => GetParameter("Network", "RequestPort", 500);
+            set => SetParameter("Network", "RequestPort", value.ToString());
+        }
+        public int ResponceTimeout
+        {
+            get => GetParameter("Network", "ResponceTimeout", 100);
+            set => SetParameter("Network", "ResponceTimeout", value.ToString());
         }
 
-        public void SetParameter(string section, string key, string value)
+        private int GetParameter(string section, string key, int defaultValue)
+        {
+            var value = _data[section][key];
+            if (value.IsNull() || !int.TryParse(value, out var result))
+            {
+                return defaultValue;
+            }
+            else
+            {
+                return result;
+            }
+        }
+
+        private string GetParameter(string section, string key, string defaultValue)
+        {
+            var value = _data[section][key];
+            if (value.IsNull())
+            {
+                return defaultValue;
+            }
+            return value;
+        }
+
+        private void SetParameter(string section, string key, string value)
         {
             _data[section][key] = value;
         }

@@ -1,5 +1,4 @@
-﻿using BaseDevice;
-using BaseDeviceSerialization;
+﻿using BaseDeviceSerialization;
 using PixelBoardDevice.DomainObjects;
 using System.Collections.Generic;
 using System.Linq;

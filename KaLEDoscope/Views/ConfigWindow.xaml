@@ -38,13 +38,32 @@
                     <Label Grid.Column="0" Grid.Row="0" Content="Имя файла по умолчанию"/>
                     <TextBox Grid.Column="1" Grid.Row="0" Height="23" TextWrapping="Wrap" Text="{Binding AutosaveFilename}" Width="120"/>
                     <Label Grid.Column="0" Grid.Row="1" Content="Интервал автосохранения, секунд"/>
-                    <xctk:IntegerUpDown Grid.Row="1" 
-                                    Grid.Column="1"
-                                    Value="{Binding AutosavePeriod}"
-                                    Minimum="1"/>
-
+                    <xctk:IntegerUpDown Grid.Row="1" Grid.Column="1" Value="{Binding AutosavePeriod}" Minimum="1"/>
                 </Grid>
-                <!--<Grid Background="#FFE5E5E5"/>-->
+            </TabItem>
+            <TabItem Header="Сеть">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Label Content="Порт сканирования" Grid.Row="0" Grid.Column="0"/>
+                    <xctk:IntegerUpDown Grid.Row="0" Grid.Column="1" Value="{Binding ScanPort}" Minimum="1" Width="120"/>
+                    <Label Content="Период сканирования, мс" Grid.Row="1" Grid.Column="0"/>
+                    <xctk:IntegerUpDown Grid.Row="1" Grid.Column="1" Value="{Binding ScanPeriod}" Minimum="1" Width="120"/>
+                    <Label Content="Порт конфигурирования" Grid.Row="2" Grid.Column="0"/>
+                    <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Value="{Binding RequestPort}" Minimum="1" Width="120"/>
+                    <Label Content="Тайм-аут команды" Grid.Row="3" Grid.Column="0"/>
+                    <xctk:IntegerUpDown Grid.Row="3" Grid.Column="1" Value="{Binding ResponceTimeout}" Minimum="1" Width="120"/>
+                </Grid>
             </TabItem>
         </TabControl>
     </Grid>

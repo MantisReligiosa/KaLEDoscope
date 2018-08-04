@@ -20,7 +20,7 @@ namespace PixelBoardDevice.Responces
                 Id = _bytes[5],
                 Height = height,
                 Base64String = Convert.ToBase64String(bitmap)
-        };
+            };
+        }
     }
-}
 }

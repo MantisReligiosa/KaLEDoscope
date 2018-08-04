@@ -175,6 +175,10 @@
       <Project>{6755A76A-64DB-4068-8269-F3F98F2D109D}</Project>
       <Name>BitmapProcessing</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Infrastructure\Configuration\Configuration.csproj">
+      <Project>{370CA0A3-CDE9-47F8-9E5C-5996C99C4B1C}</Project>
+      <Name>Configuration</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Infrastructure\Resources\Resources.csproj">
       <Project>{d00400bb-008f-4d07-90f8-5cefb1ffc585}</Project>
       <Name>Resources</Name>

@@ -1,6 +1,7 @@
 ﻿using BaseDevice;
 using CommandProcessing.Requests;
 using CommandProcessing.Responces;
+using Configuration;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace CommandProcessing.Commands
     {
         private readonly int _port;
         private readonly int _timeout;
+        private readonly Config _config;
         private readonly List<Device> _devices;
 
         public event Action<List<Device>> OnScanCompleted;
@@ -19,14 +21,13 @@ namespace CommandProcessing.Commands
 
         public ScanCommand(
             INetworkAgent networkAgent,
-            ILogger logger,
-            int port = 30000,
-            int timeout = 10000)
+            ILogger logger)
             : base(null, networkAgent, logger)
         {
             _devices = new List<Device>();
-            _port = port;
-            _timeout = timeout;
+            _config = Config.GetConfig();
+            _port = _config.ScanPort;
+            _timeout = _config.ScanPeriod;
         }
 
         public override void Execute()

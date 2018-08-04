@@ -22,8 +22,6 @@ namespace PixelBoardDevice
         public string Model => "pixelBoard";
         public string DisplayName => "Электронное табло";
 
-        private ProgramPreviewViewModel _previewViewModel;
-
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var _model = new PixelDeviceViewModel(device, logger);
@@ -31,7 +29,7 @@ namespace PixelBoardDevice
             {
                 Duration = _model.Programs.Sum(p => p.Period) * 1000
             };
-            previewController.NeedRedrawPosition += (o, position) => 
+            previewController.NeedRedrawPosition += (o, position) =>
             {
                 var programs = _model.Programs.ToList();
                 Program actualProgram = null;
@@ -62,7 +60,7 @@ namespace PixelBoardDevice
                 PreviewController = previewController
             };
             var designViewModel = new ProgramPreviewViewModel(_model);
-            _previewViewModel = new ProgramPreviewViewModel(_model, true);
+            var _previewViewModel = new ProgramPreviewViewModel(_model, true);
             _model.PropertyChanged += (o, args) =>
             {
                 previewController.Duration = _model.Programs.Sum(p => p.Period) * 1000;

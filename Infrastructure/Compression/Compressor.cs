@@ -28,10 +28,8 @@ namespace Compression
             {
                 using (var gs = new GZipStream(mso, CompressionMode.Compress))
                 {
-                    //msi.CopyTo(gs);
                     CopyTo(msi, gs);
                 }
-
                 return mso.ToArray();
             }
         }
@@ -43,10 +41,8 @@ namespace Compression
             {
                 using (var gs = new GZipStream(msi, CompressionMode.Decompress))
                 {
-                    //gs.CopyTo(mso);
                     CopyTo(gs, mso);
                 }
-
                 return Encoding.UTF8.GetString(mso.ToArray());
             }
         }

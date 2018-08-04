@@ -7,8 +7,8 @@ namespace PixelBoardDevice.Commands
 {
     public class DownloadProgramsCommands : DownloadStorageItemsCommand<ProgramResponce, Program>
     {
-        public DownloadProgramsCommands(Device device, INetworkAgent networkAgent, ILogger logger,
-            int port = 500, int timeout = 100) : base(device, networkAgent, logger, port, timeout)
+        public DownloadProgramsCommands(Device device, INetworkAgent networkAgent, ILogger logger)
+            : base(device, networkAgent, logger)
         {
         }
 
