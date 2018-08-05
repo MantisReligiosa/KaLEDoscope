@@ -9,8 +9,8 @@ namespace PixelBoardDevice.Commands
 {
     public class UploadZonesCommand : UploadStorageItemsCommand<UploadZoneRequest, Zone>
     {
-        public UploadZonesCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger)
+        public UploadZonesCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
         }
 

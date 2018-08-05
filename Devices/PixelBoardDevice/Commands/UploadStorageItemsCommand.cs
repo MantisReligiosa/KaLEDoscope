@@ -2,7 +2,6 @@
 using CommandProcessing;
 using CommandProcessing.Exceptions;
 using CommandProcessing.Responces;
-using Configuration;
 using PixelBoardDevice.Requests;
 using ServiceInterfaces;
 using System;
@@ -20,11 +19,11 @@ namespace PixelBoardDevice.Commands
         private readonly int _timeout;
         private Timer _timer;
 
-        protected UploadStorageItemsCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger)
+        protected UploadStorageItemsCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
-            _port = Config.GetConfig().RequestPort;
-            _timeout = Config.GetConfig().ResponceTimeout;
+            _port = config.RequestPort;
+            _timeout = config.ResponceTimeout;
         }
 
         public abstract byte StorageId { get; }

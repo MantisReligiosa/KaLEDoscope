@@ -48,12 +48,12 @@ namespace DeviceBuilding
             return device;
         }
 
-        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands(string model)
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> GetDownloadCommands(string model)
         {
             return _builders.FirstOrDefault(b => b.Model.Equals(model)).GetDownloadCommands();
         }
 
-        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands(string model)
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> GetUploadCommands(string model)
         {
             return _builders.FirstOrDefault(b => b.Model.Equals(model)).GetUploadCommands();
         }

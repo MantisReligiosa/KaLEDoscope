@@ -61,7 +61,7 @@
                     <xctk:IntegerUpDown Grid.Row="1" Grid.Column="1" Value="{Binding ScanPeriod}" Minimum="1" Width="120"/>
                     <Label Content="Порт конфигурирования" Grid.Row="2" Grid.Column="0"/>
                     <xctk:IntegerUpDown Grid.Row="2" Grid.Column="1" Value="{Binding RequestPort}" Minimum="1" Width="120"/>
-                    <Label Content="Тайм-аут команды" Grid.Row="3" Grid.Column="0"/>
+                    <Label Content="Тайм-аут команды, мс" Grid.Row="3" Grid.Column="0"/>
                     <xctk:IntegerUpDown Grid.Row="3" Grid.Column="1" Value="{Binding ResponceTimeout}" Minimum="1" Width="120"/>
                 </Grid>
             </TabItem>

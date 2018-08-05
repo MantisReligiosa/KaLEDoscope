@@ -8,8 +8,8 @@ namespace SevenSegmentBoardDevice.Commands
 {
     public class UploadAlarmsCommand : RequestingCommand<UploadFramesRequest, AcceptanceResponce, object>
     {
-        public UploadAlarmsCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger) { }
+        public UploadAlarmsCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Отправка списка будильников";
 

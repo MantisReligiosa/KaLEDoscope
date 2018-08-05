@@ -1,11 +1,12 @@
 ﻿using Extensions;
 using IniParser;
 using IniParser.Model;
+using ServiceInterfaces;
 using System.IO;
 
 namespace Configuration
 {
-    public class Config
+    public class Config : IConfig
     {
         private static Config _config;
         private const string _filePath = "Configuration.ini";
@@ -45,7 +46,7 @@ namespace Configuration
 
         private int GetParameter(string section, string key, int defaultValue)
         {
-            var value = _data[section][key];
+            var value = GetConfig()._data[section][key];
             if (value.IsNull() || !int.TryParse(value, out var result))
             {
                 return defaultValue;
@@ -58,7 +59,7 @@ namespace Configuration
 
         private string GetParameter(string section, string key, string defaultValue)
         {
-            var value = _data[section][key];
+            var value = GetConfig()._data[section][key];
             if (value.IsNull())
             {
                 return defaultValue;
@@ -68,7 +69,7 @@ namespace Configuration
 
         private void SetParameter(string section, string key, string value)
         {
-            _data[section][key] = value;
+            GetConfig()._data[section][key] = value;
         }
 
         private Config()

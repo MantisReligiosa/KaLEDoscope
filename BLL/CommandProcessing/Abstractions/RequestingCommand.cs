@@ -1,6 +1,5 @@
 ﻿using BaseDevice;
 using CommandProcessing.Exceptions;
-using Configuration;
 using ServiceInterfaces;
 using System;
 using System.Timers;
@@ -16,11 +15,11 @@ namespace CommandProcessing
         private readonly int _timeout;
         private Timer _timer;
 
-        protected RequestingCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger)
+        protected RequestingCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
-            _port = Config.GetConfig().RequestPort;
-            _timeout = Config.GetConfig().ResponceTimeout;
+            _port = config.RequestPort;
+            _timeout = config.ResponceTimeout;
         }
 
         public abstract object GetRequestData();

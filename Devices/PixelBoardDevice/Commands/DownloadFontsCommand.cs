@@ -7,8 +7,8 @@ namespace PixelBoardDevice.Commands
 {
     public class DownloadFontsCommand : DownloadStorageItemsCommand<FontResponce, BinaryFont>
     {
-        public DownloadFontsCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger)
+        public DownloadFontsCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
         }
 

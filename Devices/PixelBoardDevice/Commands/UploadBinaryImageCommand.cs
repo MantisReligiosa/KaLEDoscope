@@ -8,8 +8,8 @@ namespace PixelBoardDevice.Commands
 {
     public class UploadBinaryImageCommand : UploadStorageItemsCommand<UploadBinaryImageRequest, BinaryImage>
     {
-        public UploadBinaryImageCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger)
+        public UploadBinaryImageCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
         }
 

@@ -8,8 +8,8 @@ namespace SevenSegmentBoardDevice.Commands
 {
     public class UploadBoardTypeCommand : RequestingCommand<UploadBoardTypeRequest, AcceptanceResponce, object>
     {
-        public UploadBoardTypeCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger) { }
+        public UploadBoardTypeCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Отправка параметров табло";
 

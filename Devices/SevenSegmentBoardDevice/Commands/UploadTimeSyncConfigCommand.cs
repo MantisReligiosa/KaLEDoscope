@@ -8,8 +8,8 @@ namespace SevenSegmentBoardDevice.Commands
 {
     public class UploadTimeSyncConfigCommand : RequestingCommand<UploadUploadTimeSyncConfigRequest, AcceptanceResponce, object>
     {
-        public UploadTimeSyncConfigCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-                : base(device, networkAgent, logger) { }
+        public UploadTimeSyncConfigCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+                : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Отправка параметров синхронизации времени";
 

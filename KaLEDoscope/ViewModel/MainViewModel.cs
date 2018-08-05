@@ -32,8 +32,9 @@ namespace KaLEDoscope
 {
     public class MainViewModel : Notified, IDropTarget
     {
-        private ILogger _logger { get; set; }
-        private ICompressor _compressor { get; set; }
+        private readonly ILogger _logger;
+        private readonly IConfig _config;
+        private readonly ICompressor _compressor;
         private readonly IActivationManager _activationManager;
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
@@ -119,12 +120,14 @@ namespace KaLEDoscope
 
         public MainViewModel(
             ILogger logger,
+            IConfig config,
             ICompressor compressor,
             INetworkAgent networkScanAgent,
             INetworkAgent networkExchangeAgent,
             IActivationManager activationManager)
         {
             _logger = logger;
+            _config = config;
             _compressor = compressor;
             _networkScanAgent = networkScanAgent;
             _networkExchangeAgent = networkExchangeAgent;
@@ -196,7 +199,7 @@ namespace KaLEDoscope
 
         private void MakeNodes()
         {
-            var directConnectDeviceScanner = new DeviceScanner(_logger, _networkScanAgent, _deviceFactory);
+            var directConnectDeviceScanner = new DeviceScanner(_deviceFactory, _networkScanAgent, _config, _logger);
             directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
             directConnectDeviceScanner.StartSearch();
             IsScanEnabled = false;
@@ -1051,7 +1054,7 @@ namespace KaLEDoscope
 
         private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems, Action OnMouseUp)
         {
-            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _logger);
+            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _logger, _config);
             model.NodeRenamed += ((sender, node) =>
             {
                 var tab = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);

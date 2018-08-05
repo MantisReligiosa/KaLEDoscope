@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="ExceptionEventArgs.cs" />
     <Compile Include="IActivationManager.cs" />
+    <Compile Include="IConfig.cs" />
     <Compile Include="IDeviceCommand.cs" />
     <Compile Include="ICompressor.cs" />
     <Compile Include="IDeviceViewModel.cs" />

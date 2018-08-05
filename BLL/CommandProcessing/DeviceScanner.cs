@@ -10,18 +10,18 @@ namespace CommandProcessing
 {
     public class DeviceScanner
     {
+        private readonly IConfig _config;
         private readonly ILogger _logger;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
         private readonly INetworkAgent _networkAgent;
         public event Action<List<Device>> OnScanCompleted;
 
-        public DeviceScanner(
-            ILogger logger,
-            INetworkAgent networkAgent,
-            DeviceFactory deviceFactory)
+        public DeviceScanner(DeviceFactory deviceFactory, INetworkAgent networkAgent,
+            IConfig config, ILogger logger)
         {
             _logger = logger;
+            _config = config;
             _deviceFactory = deviceFactory;
             _invoker = new Invoker(_logger);
             _networkAgent = networkAgent;
@@ -29,7 +29,7 @@ namespace CommandProcessing
 
         public void StartSearch()
         {
-            var directConnectScanCommand = new ScanCommand(_networkAgent, _logger);
+            var directConnectScanCommand = new ScanCommand(_networkAgent, _logger, _config);
             directConnectScanCommand.OnScanCompleted += DirectConnectScanCommand_OnScanCompleted;
             directConnectScanCommand.Error += DirectConnectScanCommand_Error;
             _invoker.Invoke(directConnectScanCommand);

@@ -1,7 +1,6 @@
 ﻿using BaseDevice;
 using CommandProcessing;
 using CommandProcessing.Exceptions;
-using Configuration;
 using PixelBoardDevice.DTO;
 using PixelBoardDevice.Requests;
 using PixelBoardDevice.Responces;
@@ -20,11 +19,11 @@ namespace PixelBoardDevice.Commands
         private readonly int _port;
         private readonly int _timeout;
 
-        protected DownloadStorageItemsCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger)
+        protected DownloadStorageItemsCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
-            _port = Config.GetConfig().RequestPort;
-            _timeout = Config.GetConfig().ResponceTimeout;
+            _port = config.RequestPort;
+            _timeout = config.ResponceTimeout;
         }
 
         public abstract byte StorageId { get; }

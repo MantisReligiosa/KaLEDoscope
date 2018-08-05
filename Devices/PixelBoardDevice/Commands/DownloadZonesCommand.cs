@@ -9,8 +9,8 @@ namespace PixelBoardDevice.Commands
 {
     public class DownloadZonesCommand : DownloadStorageItemsCommand<ZoneResponce, Zone>
     {
-        public DownloadZonesCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger)
+        public DownloadZonesCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
         }
 

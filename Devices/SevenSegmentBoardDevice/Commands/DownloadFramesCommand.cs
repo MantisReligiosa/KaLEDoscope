@@ -11,8 +11,8 @@ namespace SevenSegmentBoardDevice.Commands
 {
     public class DownloadFramesCommand : RequestingCommand<ConfigurationRequest, FramesResponce, List<ActiveFrameDTO>>
     {
-        public DownloadFramesCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger) { }
+        public DownloadFramesCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Запрос списка фреймов";
 

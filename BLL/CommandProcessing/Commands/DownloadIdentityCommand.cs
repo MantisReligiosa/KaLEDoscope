@@ -8,8 +8,8 @@ namespace CommandProcessing.Commands
 {
     public class DownloadIdentityCommand : RequestingCommand<ConfigurationRequest, IdentityResponce, Identity>
     {
-        public DownloadIdentityCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger) { }
+        public DownloadIdentityCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Запрос идентификатора";
 

@@ -23,11 +23,12 @@ namespace KaLEDoscope
         {
             InitializeComponent();
             var logger = new SeviceLog();
+            var config = Config.GetConfig();
             var compressor = new Compressor();
             var networkScanAgent = new UdpAgent();
             var networkExcangeAgent = new TcpAgent();
             _activationManager = new ActivationManager(compressor);
-            _viewModel = new MainViewModel(logger, compressor, networkScanAgent, networkExcangeAgent,
+            _viewModel = new MainViewModel(logger, config, compressor, networkScanAgent, networkExcangeAgent,
                 _activationManager);
             _viewModel.ActivationRequired += new EventHandler(OnActivationRequired);
             _viewModel.TrialExpired += new EventHandler(OnTrialExpired);

@@ -7,8 +7,8 @@ namespace CommandProcessing.Commands
 {
     public class UploadIdentityCommand : RequestingCommand<UploadIdentityRequest, AcceptanceResponce, object>
     {
-        public UploadIdentityCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger) { }
+        public UploadIdentityCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Отправка идентификатора";
 

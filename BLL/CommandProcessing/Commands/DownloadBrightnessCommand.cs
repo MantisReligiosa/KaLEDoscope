@@ -7,8 +7,8 @@ namespace CommandProcessing.Commands
 {
     public class DownloadBrightnessCommand : RequestingCommand<ConfigurationRequest, BrightnessResponce, Brightness>
     {
-        public DownloadBrightnessCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger) { }
+        public DownloadBrightnessCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Запрос параметров яркости";
 
