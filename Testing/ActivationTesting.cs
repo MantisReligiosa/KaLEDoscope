@@ -54,7 +54,7 @@ namespace Testing
                 RequestCode = "0123-4567-89AB-CDEF-0000-0000-0000-0000",
                 ExpirationDate = new DateTime(2025, 1, 1)
             });
-            Assert.Equal("CBCB-DFCB-CBCC-CBCB-EFD0-04CB-EFCF-EBCB", activationKey);
+            Assert.Equal("1AA7-570E-6DA5-E7CB-8727-3337-E457-3244", activationKey);
         }
 
         [Fact]
