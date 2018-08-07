@@ -1,6 +1,6 @@
-﻿using Abstractions;
-using BaseDevice;
+﻿using BaseDevice;
 using CommandProcessing;
+using Common;
 using DeviceBuilding;
 using Extensions;
 using KaLEDoscope.Views;

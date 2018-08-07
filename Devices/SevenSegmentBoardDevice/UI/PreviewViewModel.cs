@@ -1,4 +1,4 @@
-﻿using Abstractions;
+﻿using Common;
 using System.Windows;
 
 namespace SevenSegmentBoardDevice.UI

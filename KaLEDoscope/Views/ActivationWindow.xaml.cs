@@ -25,8 +25,6 @@ namespace KaLEDoscope.Views
         {
             InitializeComponent();
             _activationViewModel = viewModel;
-            _activationViewModel.DuplicatedTrialKeyFound += DuplicatedTrialKeyFound;
-            _activationViewModel.FullyActivationSucceeded += FullyActivationSucceeded;
             _activationViewModel.TrialActivationSucceeded += TrialActivationSucceeded;
             _activationViewModel.CopyToClipboard += CopyToClipboard;
             _activationViewModel.PasteFromClipboard += PasteFromClipboard;
@@ -57,24 +55,6 @@ namespace KaLEDoscope.Views
                 MessageBoxImage.Information);
             DialogResult = true;
             Close();
-        }
-
-        private void FullyActivationSucceeded(object sender, EventArgs e)
-        {
-            MessageBox.Show("Активация выполнена успешна!",
-                "Успешно", 
-                MessageBoxButton.OK, 
-                MessageBoxImage.Information);
-            DialogResult = true;
-            Close();
-        }
-
-        private void DuplicatedTrialKeyFound(object sender, EventArgs e)
-        {
-            MessageBox.Show("Этот ключ уже был использован",
-                "Ошибка",
-                MessageBoxButton.OK,
-                MessageBoxImage.Error);
         }
     }
 }

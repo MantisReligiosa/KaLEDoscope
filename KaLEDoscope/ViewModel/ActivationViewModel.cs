@@ -1,5 +1,5 @@
-﻿using Abstractions;
-using Activation;
+﻿using Activation;
+using Common;
 using Extensions;
 using System;
 using UiCommands;
@@ -10,8 +10,6 @@ namespace KaLEDoscope.ViewModel
     public class ActivationViewModel : Notified
     {
         private readonly ActivationManager _activationManager;
-        public event EventHandler FullyActivationSucceeded;
-        public event EventHandler DuplicatedTrialKeyFound;
         public event EventHandler CopyToClipboard;
         public event EventHandler PasteFromClipboard;
         public event EventHandler<TrialExpirationEventArgs> TrialActivationSucceeded;
@@ -52,26 +50,13 @@ namespace KaLEDoscope.ViewModel
                     _activate = new DelegateCommand((o) =>
                     {
                         var activationKey = ActivationKey;
-                        if (_activationManager.IsFullyActivationKeyValid(activationKey))
+                        if (_activationManager.TryActivate(activationKey, out LicenseInfo licenseInfo))
                         {
-                            _activationManager.SetFullAccess();
-                            FullyActivationSucceeded?.Invoke(this, EventArgs.Empty);
-                        }
-                        else if (_activationManager.IsTrialActivationKeyValid(activationKey))
-                        {
-                            if (!_activationManager.IsTrialKeyOriginal(activationKey))
+                            _activationManager.ApplyLicense(licenseInfo);
+                            TrialActivationSucceeded?.Invoke(this, new TrialExpirationEventArgs
                             {
-                                DuplicatedTrialKeyFound.Invoke(this, EventArgs.Empty);
-                            }
-                            else
-                            {
-                                var expirationDate = DateTime.Now.Date.AddMonths(1);
-                                _activationManager.AddTrial(activationKey, expirationDate);
-                                TrialActivationSucceeded?.Invoke(this, new TrialExpirationEventArgs
-                                {
-                                    ExpirationDate = expirationDate
-                                });
-                            }
+                                ExpirationDate = _activationManager.ActualLicenseInfo.ExpirationDate
+                            });
                         }
                     });
                 }

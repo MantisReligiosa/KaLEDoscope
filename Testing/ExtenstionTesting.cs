@@ -14,6 +14,14 @@ namespace Testing
         }
 
         [Fact]
+        public void UintToByteTesting()
+        {
+            uint value = 0xabcdef12;
+            var bytes = value.ToBytes();
+            Assert.Equal(new byte[] { 0xab, 0xcd, 0xef, 0x12 }, bytes);
+        }
+
+        [Fact]
         public void StringToByteTesting()
         {
             var bytes = "test".ToBytes();
@@ -34,6 +42,14 @@ namespace Testing
             var bytes = new byte[] { 0xab, 0xcd };
             var value = bytes.ExtractUshort(0);
             Assert.Equal(0xabcd, value);
+        }
+
+        [Fact]
+        public void ExtractUintTesting()
+        {
+            var bytes = new byte[] { 0xab, 0xcd, 0xef, 0x12 };
+            var value = bytes.ExtractUint(0);
+            Assert.Equal(0xabcdef12, value);
         }
 
         [Fact]

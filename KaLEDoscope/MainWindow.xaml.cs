@@ -27,7 +27,9 @@ namespace KaLEDoscope
             var compressor = new Compressor();
             var networkScanAgent = new UdpAgent();
             var networkExcangeAgent = new TcpAgent();
-            _activationManager = new ActivationManager(compressor);
+            var activationFile = new ActivationFile();
+            var hardwareInfoProvider = new HardwareInfoProvider();
+            _activationManager = new ActivationManager(compressor, activationFile, hardwareInfoProvider);
             _viewModel = new MainViewModel(logger, config, compressor, networkScanAgent, networkExcangeAgent,
                 _activationManager);
             _viewModel.ActivationRequired += new EventHandler(OnActivationRequired);
@@ -59,7 +61,7 @@ namespace KaLEDoscope
 
         private void OnTrialExpired(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Пробный период истек.\r\n" +
+            if (MessageBox.Show("Срок активации истек.\r\n" +
                 "Необходимо активировать приложение\r\n" +
                 "Перейти к активации?", "Требуется активация", MessageBoxButton.YesNo, MessageBoxImage.Warning)
                 == MessageBoxResult.No)

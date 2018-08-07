@@ -1,7 +1,7 @@
-﻿using Abstractions;
-using BaseDevice;
+﻿using BaseDevice;
 using BaseDeviceSerialization;
 using CommandProcessing;
+using Common;
 using Configuration;
 using DeviceBuilding;
 using Extensions;
@@ -186,12 +186,11 @@ namespace KaLEDoscope
 
         public void CheckActivation()
         {
-            if (!_activationManager.IsActivationInfoExists)
+            if (String.IsNullOrEmpty(_activationManager.ActualLicenseInfo.RequestCode))
             {
                 ActivationRequired?.Invoke(this, EventArgs.Empty);
             }
-            else if (!_activationManager.IsFullAccess
-                && _activationManager.TrialExpirationDate < DateTime.Now)
+            else if (_activationManager.ActualLicenseInfo.ExpirationDate < DateTime.Now)
             {
                 TrialExpired?.Invoke(this, EventArgs.Empty);
             }

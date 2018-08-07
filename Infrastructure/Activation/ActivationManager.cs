@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
+﻿using Common;
+using Extensions;
+using Force.Crc32;
+using Newtonsoft.Json;
 using ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Management;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -12,61 +13,46 @@ namespace Activation
 {
     public class ActivationManager : IActivationManager
     {
-        private readonly string _activationFile = "Activation.key";
         private readonly ICompressor _compressor;
-        private readonly ActivationInfo _activationInfo;
+        private readonly IActivationFile _activationFile;
+        private readonly IHardwareInfoProvider _hardwareInfoProvider;
+        public LicenseInfo ActualLicenseInfo { get; set; }
+        private readonly byte[] _key;
+        private readonly byte[] _iv;
 
-        public ActivationManager(ICompressor compressor)
+        public ActivationManager(ICompressor compressor, IActivationFile activationFile, IHardwareInfoProvider hardwareInfoProvider)
         {
             _compressor = compressor;
-            IsActivationInfoExists = File.Exists(_activationFile);
-            if (!IsActivationInfoExists)
+            _activationFile = activationFile;
+            _hardwareInfoProvider = hardwareInfoProvider;
+            _key = Encoding.ASCII.GetBytes("1f5gF$7gn5ugRj5uHfk&lg548G5m*ff6");
+            _iv = Encoding.ASCII.GetBytes("fTG%85jGfi@4j*Ei");
+            if (_activationFile.IsNull() || !_activationFile.Exists())
             {
-                IsActivationInfoExists = false;
-                _activationInfo = new ActivationInfo
+                ActualLicenseInfo = new LicenseInfo
                 {
-                    Trials = new List<TrialInfo>(),
-                    IsFullAccess = false
+                    ExpirationDate = DateTime.Now,
+                    RequestCode = string.Empty
                 };
                 return;
             }
-            var bytes = File.ReadAllBytes(_activationFile);
+            var bytes = _activationFile.Read();
             var text = _compressor.Unzip(bytes);
-            _activationInfo = JsonConvert.DeserializeObject<ActivationInfo>(text);
+            ActualLicenseInfo = JsonConvert.DeserializeObject<LicenseInfo>(text);
         }
 
-        public bool IsActivationInfoExists { get; private set; }
-
-        public bool IsFullAccess => _activationInfo?.IsFullAccess ?? false;
-
-        public DateTime TrialExpirationDate => _activationInfo.Trials?.Max(t => t.ExpirationDate) ?? new DateTime();
-
-        public bool IsTrialKeyOriginal(string activationKey) => !_activationInfo?.Trials?.Any(t => t.ActivationKey.Equals(activationKey)) ?? true;
-
-        public void AddTrial(string activationKey, DateTime trialExpirationDate)
+        public void ApplyLicense(LicenseInfo licenseInfo)
         {
-            _activationInfo.Trials.Add(new TrialInfo
-            {
-                ActivationKey = activationKey,
-                ExpirationDate = trialExpirationDate
-            });
+            ActualLicenseInfo = licenseInfo;
             Submit();
         }
 
         private void Submit()
         {
-            var serialized = JsonConvert.SerializeObject(_activationInfo);
+            var serialized = JsonConvert.SerializeObject(ActualLicenseInfo);
             var datas = _compressor.Zip(serialized);
-            File.WriteAllBytes(_activationFile, datas);
+            _activationFile.Write(datas);
         }
-
-        public void SetFullAccess()
-        {
-            _activationInfo.IsFullAccess = true;
-            Submit();
-        }
-
-        private const string _salt = "$2a$10$SdjajHU2LSmnQSbelTsQdO";
 
         public string GetRequestCode()
         {
@@ -85,24 +71,14 @@ namespace Activation
 
         private string GetUniqueHardwareId()
         {
-            var processorID = GetHardwareParameter("Win32_Processor", "ProcessorId");
-            var motherboardSerial = GetHardwareParameter("Win32_BaseBoard", "SerialNumber");
-            var memorySerial = GetHardwareParameter("Win32_PhysicalMemory", "SerialNumber");
-            var driveSerial = GetHardwareParameter("Win32_DiskDrive", "SerialNumber");
-
+            var processorId = _hardwareInfoProvider.ProcessorId;
+            var motherboardSerial = _hardwareInfoProvider.MotherboardSerial;
+            var memorySerial = _hardwareInfoProvider.MemorySerial;
+            var driveSerial = _hardwareInfoProvider.DriveSerial;
             var hardwareParameters = string.Concat(
-                processorID, motherboardSerial, memorySerial, driveSerial);
+                processorId, motherboardSerial, memorySerial, driveSerial);
 
             return hardwareParameters;
-        }
-
-        private static string GetHardwareParameter(string hardwareArea, string parameterName)
-        {
-            using (var searcher = new ManagementObjectSearcher($"SELECT * FROM {hardwareArea}"))
-                return searcher.Get()
-                    .Cast<ManagementObject>()
-                    .First()[parameterName]
-                    ?.ToString() ?? string.Empty;
         }
 
         private string GetHexString(byte[] bytes)
@@ -121,46 +97,137 @@ namespace Activation
             return result;
         }
 
-        public string GetFullyActivationKey(string requestCode)
+        public string GetActivationKey(LicenseInfo licenseInfo)
         {
-            var hash = BCrypt.Net.BCrypt.HashPassword(requestCode, _salt);
-            return GetMD5Code(hash);
+            var requestBytes = GetBytesFromHexString(licenseInfo.RequestCode);
+            var year = (byte)(licenseInfo.ExpirationDate.Year % 100);
+            var month = (byte)licenseInfo.ExpirationDate.Month;
+            var day = (byte)licenseInfo.ExpirationDate.Day;
+            var crc1 = Crc32Algorithm.Compute(requestBytes, 0, 8);
+            var crc2 = Crc32Algorithm.Compute(requestBytes, 8, 8);
+            var message = new List<byte>()
+            {
+                year,month, day
+            };
+            message.AddRange(crc1.ToBytes());
+            message.AddRange(crc2.ToBytes());
+
+            byte[] encMessage;
+            using (var rijndael = new RijndaelManaged
+            {
+                Key = _key,
+                IV = _iv
+            })
+            {
+                encMessage = EncryptBytes(rijndael, message.ToArray());
+            }
+            return GetHexString(encMessage);
         }
 
-        public string GetTrialActivationKey(string requestCode)
+        private byte[] EncryptBytes(
+            SymmetricAlgorithm alg,
+            byte[] message)
         {
-            var hash = BCrypt.Net.BCrypt.HashPassword(GetTrialRequestCode(requestCode), _salt);
-            var key = GetMD5Code(hash);
-            return key;
+            if ((message == null) || (message.Length == 0))
+            {
+                return message;
+            }
+
+            if (alg == null)
+            {
+                throw new ArgumentNullException("alg");
+            }
+
+            using (var stream = new MemoryStream())
+            using (var encryptor = alg.CreateEncryptor())
+            using (var encrypt = new CryptoStream(stream, encryptor, CryptoStreamMode.Write))
+            {
+                encrypt.Write(message, 0, message.Length);
+                encrypt.FlushFinalBlock();
+                return stream.ToArray();
+            }
         }
 
-        private string GetTrialRequestCode(string r) => r + "Trial";
-
-        public bool IsFullyActivationKeyValid(string activationKey)
+        private byte[] DecryptBytes(
+            SymmetricAlgorithm alg,
+            byte[] message)
         {
-            bool result;
+            if ((message == null) || (message.Length == 0))
+            {
+                return message;
+            }
+
+            if (alg == null)
+            {
+                throw new ArgumentNullException("alg");
+            }
+
+            using (var stream = new MemoryStream())
+            using (var decryptor = alg.CreateDecryptor())
+            using (var encrypt = new CryptoStream(stream, decryptor, CryptoStreamMode.Write))
+            {
+                encrypt.Write(message, 0, message.Length);
+                encrypt.FlushFinalBlock();
+                return stream.ToArray();
+            }
+        }
+
+        private byte[] GetBytesFromHexString(string requestBytes)
+        {
+            var bytes = new List<byte>();
+            requestBytes = requestBytes.ToUpper();
+            requestBytes = requestBytes.Replace("-", "");
+            byte b = 0;
+            var isFirst = true;
+            foreach (var c in requestBytes)
+            {
+                byte b1;
+                if (Char.IsDigit(c))
+                    b1 = (byte)(c - '0');
+                else
+                    b1 = (byte)(c - 'A' + 10);
+                if (isFirst)
+                {
+                    b = (byte)(b1 << 4);
+                }
+                else
+                {
+                    b += b1;
+                    bytes.Add(b);
+                    b = 0;
+                }
+                isFirst = !isFirst;
+            }
+            return bytes.ToArray();
+        }
+
+
+        public bool TryActivate(string activationKey, out LicenseInfo licenseInfo)
+        {
+            licenseInfo = null;
             var requestCode = GetRequestCode();
-            var correctActivationKey = GetFullyActivationKey(requestCode);
-            result = correctActivationKey.Equals(activationKey);
-            return result;
-        }
-
-        public bool IsTrialActivationKeyValid(string activationKey)
-        {
-            bool result;
-            try
+            var encActivationBytes = GetBytesFromHexString(activationKey);
+            var requestBytes = GetBytesFromHexString(requestCode);
+            var crc1_expected = Crc32Algorithm.Compute(requestBytes, 0, 8);
+            var crc2_expected = Crc32Algorithm.Compute(requestBytes, 8, 8);
+            byte[] activationBytes;
+            using (var rijndael = new RijndaelManaged())
             {
-                var requestCode = GetRequestCode();
-                var correctActivationKey = GetTrialActivationKey(requestCode);
-                result = correctActivationKey.Equals(activationKey);
-                return result;
+                rijndael.Key = _key;
+                rijndael.IV = _iv;
+                activationBytes = DecryptBytes(rijndael, encActivationBytes);
             }
-            catch (Exception ex)
+            var crc1_actual = activationBytes.ExtractUint(3);
+            var crc2_actual = activationBytes.ExtractUint(7);
+            if ((crc1_actual != crc1_expected) || (crc2_actual != crc2_expected))
+                return false;
+            licenseInfo = new LicenseInfo
             {
-                result = false;
-            }
-            return result;
+                ExpirationDate = new DateTime(2000 + activationBytes[0],
+                    activationBytes[1], activationBytes[2]),
+                RequestCode = requestCode
+            };
+            return true;
         }
-
     }
 }

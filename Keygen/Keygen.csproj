@@ -96,6 +96,10 @@
     <None Include="Resources\if_edit-copy_118918.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Domain\Abstractions\Common.csproj">
+      <Project>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure\Activation\Activation.csproj">
       <Project>{F1AC927D-0F23-448D-B122-49A725A9E55B}</Project>
       <Name>Activation</Name>
