@@ -10,18 +10,18 @@ namespace CommandProcessing
 {
     public class DeviceScanner
     {
+        private readonly IConfig _config;
         private readonly ILogger _logger;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
         private readonly INetworkAgent _networkAgent;
         public event Action<List<Device>> OnScanCompleted;
 
-        public DeviceScanner(
-            ILogger logger,
-            INetworkAgent networkAgent,
-            DeviceFactory deviceFactory)
+        public DeviceScanner(DeviceFactory deviceFactory, INetworkAgent networkAgent,
+            IConfig config, ILogger logger)
         {
             _logger = logger;
+            _config = config;
             _deviceFactory = deviceFactory;
             _invoker = new Invoker(_logger);
             _networkAgent = networkAgent;
@@ -29,7 +29,7 @@ namespace CommandProcessing
 
         public void StartSearch()
         {
-            var directConnectScanCommand = new ScanCommand(_networkAgent, _logger);
+            var directConnectScanCommand = new ScanCommand(_networkAgent, _logger, _config);
             directConnectScanCommand.OnScanCompleted += DirectConnectScanCommand_OnScanCompleted;
             directConnectScanCommand.Error += DirectConnectScanCommand_Error;
             _invoker.Invoke(directConnectScanCommand);
@@ -42,17 +42,15 @@ namespace CommandProcessing
 
         private void DirectConnectScanCommand_OnScanCompleted(List<Device> devices)
         {
-            if (!devices.Any())
-            {
-                return;
-            }
-            _logger.Info(this, "Начинаю распознавание");
+            if (devices.Any())
+                _logger.Info(this, "Начинаю распознавание");
             OnScanCompleted?.Invoke(devices.Select(d =>
             {
                 return _deviceFactory.Customize(d);
             }
             ).ToList());
-            _logger.Info(this, "Распознавание закончено");
+            if (devices.Any())
+                _logger.Info(this, "Распознавание закончено");
         }
     }
 }

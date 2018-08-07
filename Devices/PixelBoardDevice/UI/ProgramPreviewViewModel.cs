@@ -1,4 +1,4 @@
-﻿using Abstractions;
+﻿using Common;
 using Extensions;
 using PixelBoardDevice.DomainObjects;
 using PixelBoardDevice.DomainObjects.Zones;
@@ -11,7 +11,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 using UiCommands;
 
 namespace PixelBoardDevice.UI

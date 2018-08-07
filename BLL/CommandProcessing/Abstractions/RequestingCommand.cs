@@ -15,13 +15,11 @@ namespace CommandProcessing
         private readonly int _timeout;
         private Timer _timer;
 
-        protected RequestingCommand(Device device, INetworkAgent networkAgent, ILogger logger,
-            int port = 500,
-            int timeout = 100)
-            : base(device, networkAgent, logger)
+        protected RequestingCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
-            _port = port;
-            _timeout = timeout;
+            _port = config.RequestPort;
+            _timeout = config.ResponceTimeout;
         }
 
         public abstract object GetRequestData();

@@ -14,30 +14,32 @@ namespace CommandProcessing
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
         private readonly ILogger _logger;
+        private readonly IConfig _config;
 
-        private readonly List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> _downloadingCommandContainer
-            = new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
+        private readonly List<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> _downloadingCommandContainer
+            = new List<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>>
             {
-                (d, n, l) => new DownloadIdentityCommand(d, n, l),
-                (d, n, l) => new DownloadNetworkCommand(d, n, l),
-                (d, n, l) => new DownloadWorkScheduleCommand(d, n, l),
-                (d, n, l) => new DownloadBrightnessCommand(d, n, l)
+                (d, n, l, c) => new DownloadIdentityCommand(d, n, l, c),
+                (d, n, l, c) => new DownloadNetworkCommand(d, n, l, c),
+                (d, n, l, c) => new DownloadWorkScheduleCommand(d, n, l, c),
+                (d, n, l, c) => new DownloadBrightnessCommand(d, n, l, c)
             };
 
-        private readonly List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> _uploadingCommandContainer
-            = new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
+        private readonly List<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> _uploadingCommandContainer
+            = new List<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>>
             {
-                (d, n, l) => new UploadIdentityCommand(d, n, l),
-                (d, n, l) => new UploadNetworkCommand(d, n, l),
-                (d, n, l) => new UploadWorkScheduleCommand(d, n, l),
-                (d, n, l) => new UploadBrightnessCommand(d, n, l)
+                (d, n, l, c) => new UploadIdentityCommand(d, n, l, c),
+                (d, n, l, c) => new UploadNetworkCommand(d, n, l, c),
+                (d, n, l, c) => new UploadWorkScheduleCommand(d, n, l, c),
+                (d, n, l, c) => new UploadBrightnessCommand(d, n, l, c)
             };
 
-        public ConfigurationService(INetworkAgent networkAgent, DeviceFactory deviceFactory, ILogger logger)
+        public ConfigurationService(INetworkAgent networkAgent, DeviceFactory deviceFactory, ILogger logger, IConfig config)
         {
             _networkAgent = networkAgent;
             _deviceFactory = deviceFactory;
             _logger = logger;
+            _config = config;
             _invoker = new Invoker(_logger);
         }
 
@@ -45,7 +47,7 @@ namespace CommandProcessing
         {
             _downloadingCommandContainer.AddRange(_deviceFactory.GetDownloadCommands(device.Model));
             _logger.Info(this, "Начало получения конфигурации от устройства");
-            var command = _downloadingCommandContainer.First().Invoke(device, _networkAgent, _logger);
+            var command = _downloadingCommandContainer.First().Invoke(device, _networkAgent, _logger, _config);
             ProcessDownloadCommand(command);
         }
 
@@ -53,7 +55,7 @@ namespace CommandProcessing
         {
             _uploadingCommandContainer.AddRange(_deviceFactory.GetUploadCommands(device.Model));
             _logger.Info(this, "Начало отправки конфигурации устройству");
-            var command = _uploadingCommandContainer.First().Invoke(device, _networkAgent, _logger);
+            var command = _uploadingCommandContainer.First().Invoke(device, _networkAgent, _logger, _config);
             ProcessUploadCommand(command);
         }
 
@@ -77,7 +79,7 @@ namespace CommandProcessing
             _counter++;
             if (_downloadingCommandContainer.Count > _counter)
             {
-                var command = _downloadingCommandContainer.ElementAt(_counter).Invoke(e.Device, _networkAgent, _logger);
+                var command = _downloadingCommandContainer.ElementAt(_counter).Invoke(e.Device, _networkAgent, _logger, _config);
                 ProcessDownloadCommand(command);
             }
             else
@@ -91,7 +93,7 @@ namespace CommandProcessing
             _counter++;
             if (_uploadingCommandContainer.Count > _counter)
             {
-                var command = _uploadingCommandContainer.ElementAt(_counter).Invoke(e.Device, _networkAgent, _logger);
+                var command = _uploadingCommandContainer.ElementAt(_counter).Invoke(e.Device, _networkAgent, _logger, _config);
                 ProcessUploadCommand(command);
             }
             else

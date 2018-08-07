@@ -1,4 +1,5 @@
 ﻿using Activation;
+using Common;
 using System;
 using System.Windows.Forms;
 
@@ -28,14 +29,28 @@ namespace Keygen
 
         private void GenerateActivationCodeHahdler(object sender, EventArgs e)
         {
-            var licenseManager = new ActivationManager(null);
-            serialNumberInputControl2.SerialNumber = licenseManager.GetFullyActivationKey(serialNumberInputControl1.SerialNumber);
+            var licenseManager = new ActivationManager(null, null, null);
+            var requestCode = serialNumberInputControl1.SerialNumber;
+            var data = DateTime.Now;
+            if (radioButton1.Checked)
+                data = data.AddDays((int)numericUpDown1.Value);
+            if (radioButton2.Checked)
+                data = data.AddMonths((int)numericUpDown2.Value);
+            if (radioButton3.Checked)
+                data = data.AddYears((int)numericUpDown3.Value);
+            var licenseInfo = new LicenseInfo
+            {
+                ExpirationDate = data,
+                RequestCode = requestCode
+            };
+            serialNumberInputControl2.SerialNumber = licenseManager.GetActivationKey(licenseInfo);
         }
 
-        private void GenerateTrialCodeHandler(object sender, EventArgs e)
+        private void CheckedChanged(object sender, EventArgs e)
         {
-            var licenseManager = new ActivationManager(null);
-            serialNumberInputControl2.SerialNumber = licenseManager.GetTrialActivationKey(serialNumberInputControl1.SerialNumber);
+            numericUpDown1.Enabled = radioButton1.Checked;
+            numericUpDown2.Enabled = radioButton2.Checked;
+            numericUpDown3.Enabled = radioButton3.Checked;
         }
     }
 }

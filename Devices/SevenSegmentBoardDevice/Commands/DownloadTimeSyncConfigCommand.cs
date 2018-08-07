@@ -8,8 +8,8 @@ namespace SevenSegmentBoardDevice.Commands
 {
     public class DownloadTimeSyncConfigCommand : RequestingCommand<ConfigurationRequest, TimeSyncParametersResponce, TimeSyncParameters>
     {
-        public DownloadTimeSyncConfigCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger) { }
+        public DownloadTimeSyncConfigCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Запрос параметров синхронизации времени";
 

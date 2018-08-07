@@ -1,6 +1,6 @@
-﻿using Abstractions;
-using BaseDevice;
+﻿using BaseDevice;
 using CommandProcessing;
+using Common;
 using DeviceBuilding;
 using Extensions;
 using KaLEDoscope.Views;
@@ -16,6 +16,7 @@ namespace KaLEDoscope.ViewModel
     {
         public DeviceNode DeviceNode { get; private set; }
         private readonly ILogger _logger;
+        private readonly IConfig _config;
         private readonly DeviceFactory _deviceFactory;
         private readonly Invoker _invoker;
         private readonly ICompressor _compressor;
@@ -35,10 +36,12 @@ namespace KaLEDoscope.ViewModel
             Invoker invoker,
             ICompressor compressor,
             INetworkAgent networkAgent,
-            ILogger logger)
+            ILogger logger,
+            IConfig config)
         {
             DeviceNode = deviceNode;
             _logger = logger;
+            _config = config;
             _networkAgent = networkAgent;
             _deviceFactory = deviceFactory;
             _invoker = invoker;
@@ -97,7 +100,7 @@ namespace KaLEDoscope.ViewModel
                     {
                         d.AllowUpload = true;
                         BeforeGettingSettings?.Invoke(this, d);
-                        var configurationService = new ConfigurationService(_networkAgent, _deviceFactory, _logger);
+                        var configurationService = new ConfigurationService(_networkAgent, _deviceFactory, _logger, _config);
                         configurationService.DownloadSettings(d.Device);
                         AfterGetingSettings?.Invoke(this, d.Device);
                     });
@@ -115,7 +118,7 @@ namespace KaLEDoscope.ViewModel
                 {
                     _uploadSettings = new DelegateCommand<DeviceNode>((d) =>
                     {
-                        var configurationService = new ConfigurationService(_networkAgent, _deviceFactory, _logger);
+                        var configurationService = new ConfigurationService(_networkAgent, _deviceFactory, _logger, _config);
                         configurationService.UploadSettings(d.Device);
                     });
                 }

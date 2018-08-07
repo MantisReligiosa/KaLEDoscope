@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceBuilding", "BLL\Devic
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{CB066D1E-7C67-40AC-9F9F-19D75635B074}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abstractions", "Domain\Abstractions\Abstractions.csproj", "{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Domain\Abstractions\Common.csproj", "{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpExcange", "Infrastructure\TcpExcange\TcpExcange.csproj", "{82374D01-1F4E-4792-A413-B02E462C96C2}"
 EndProject

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Abstractions
+namespace Common
 {
     public abstract class Notified : INotifyPropertyChanged
     {

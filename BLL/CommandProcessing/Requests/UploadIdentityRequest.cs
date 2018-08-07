@@ -1,6 +1,6 @@
 ﻿using CommandProcessing.DTO;
 using Extensions;
-using System;
+using System.Collections.Generic;
 
 namespace CommandProcessing.Requests
 {
@@ -12,11 +12,11 @@ namespace CommandProcessing.Requests
         {
             var identity = o as Identity;
             var nameLength = (byte)identity.Name.Length;
-            var bytes = new byte[nameLength + 3];
-            Array.Copy(((ushort)(identity.Id)).ToBytes(), 0, bytes, 0, 2);
-            bytes[2] = nameLength;
-            Array.Copy(identity.Name.ToBytes(), 0, bytes, 3, nameLength);
-            return bytes;
+            var bytes = new List<byte>();
+            bytes.AddRange(((ushort)(identity.Id)).ToBytes());
+            bytes.Add(nameLength);
+            bytes.AddRange(identity.Name.ToBytes());
+            return bytes.ToArray();
         }
     }
 }

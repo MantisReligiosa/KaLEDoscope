@@ -28,7 +28,7 @@ namespace BitmapProcessing
                 {
                     style = FontStyle.Bold;
                 }
-                var font = new System.Drawing.Font(source, (float)newFontSize, style, GraphicsUnit.Pixel);
+                var font = new System.Drawing.Font(source, newFontSize, style, GraphicsUnit.Pixel);
                 var image = DrawTextImage(c.ToString(), font, Color.White, Color.Black, Size.Empty) as Bitmap;
                 var trimmedToHeightImage = image.Clone(new Rectangle(0, image.Height - newFontSize, image.Width,
                     newFontSize), image.PixelFormat);

@@ -8,9 +8,8 @@ namespace PixelBoardDevice.Commands
 {
     public class UploadFontsCommand : UploadStorageItemsCommand<UploadFontRequest, BinaryFont>
     {
-        public UploadFontsCommand(Device device, INetworkAgent networkAgent, ILogger logger,
-            int port = 500, int timeout = 100)
-            : base(device, networkAgent, logger, port, timeout)
+        public UploadFontsCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
         }
 

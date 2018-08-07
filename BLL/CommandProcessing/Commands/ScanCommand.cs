@@ -17,16 +17,12 @@ namespace CommandProcessing.Commands
         public event Action<List<Device>> OnScanCompleted;
         public override string Name => "Поиск устройств";
 
-        public ScanCommand(
-            INetworkAgent networkAgent,
-            ILogger logger,
-            int port = 30000,
-            int timeout = 10000)
-            : base(null, networkAgent, logger)
+        public ScanCommand(INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(null, networkAgent, logger, config)
         {
             _devices = new List<Device>();
-            _port = port;
-            _timeout = timeout;
+            _port = config.ScanPort;
+            _timeout = config.ScanPeriod;
         }
 
         public override void Execute()

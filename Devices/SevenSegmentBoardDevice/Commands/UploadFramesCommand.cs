@@ -8,8 +8,8 @@ namespace SevenSegmentBoardDevice.Commands
 {
     public class UploadFramesCommand : RequestingCommand<UploadFramesRequest, AcceptanceResponce, object>
     {
-        public UploadFramesCommand(Device device, INetworkAgent networkAgent, ILogger logger)
-            : base(device, networkAgent, logger) { }
+        public UploadFramesCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config) { }
 
         public override string Name => "Отправка списка фреймов";
 

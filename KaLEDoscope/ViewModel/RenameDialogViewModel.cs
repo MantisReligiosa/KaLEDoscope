@@ -1,4 +1,4 @@
-﻿using Abstractions;
+﻿using Common;
 
 namespace KaLEDoscope.ViewModel
 {

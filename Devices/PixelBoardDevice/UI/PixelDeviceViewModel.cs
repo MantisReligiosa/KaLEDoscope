@@ -1,6 +1,6 @@
-﻿using Abstractions;
-using BaseDevice;
+﻿using BaseDevice;
 using BitmapProcessing;
+using Common;
 using Extensions;
 using Microsoft.Win32;
 using PixelBoardDevice.DomainObjects;

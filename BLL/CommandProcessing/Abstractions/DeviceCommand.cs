@@ -10,11 +10,13 @@ namespace CommandProcessing
         protected TDevice _device;
         protected INetworkAgent _networkAgent;
         protected ILogger _logger;
+        protected IConfig _config;
         protected string _commandName;
-        protected DeviceCommand(TDevice device, INetworkAgent networkAgent, ILogger logger)
+        protected DeviceCommand(TDevice device, INetworkAgent networkAgent, ILogger logger, IConfig config)
         {
             _device = device;
             _logger = logger;
+            _config = config;
             _networkAgent = networkAgent;
             _networkAgent.Logger = _logger;
         }

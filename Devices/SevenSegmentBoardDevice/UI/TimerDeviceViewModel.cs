@@ -1,5 +1,5 @@
-﻿using Abstractions;
-using BaseDevice;
+﻿using BaseDevice;
+using Common;
 using Extensions;
 using ServiceInterfaces;
 using System;

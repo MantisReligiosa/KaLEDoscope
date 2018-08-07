@@ -7,8 +7,8 @@
     <ProjectGuid>{11FBA52A-1C5B-4248-A35C-3B7C95D9480C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Abstractions</RootNamespace>
-    <AssemblyName>Abstractions</AssemblyName>
+    <RootNamespace>Common</RootNamespace>
+    <AssemblyName>Common</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LicenseInfo.cs" />
     <Compile Include="Notified.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

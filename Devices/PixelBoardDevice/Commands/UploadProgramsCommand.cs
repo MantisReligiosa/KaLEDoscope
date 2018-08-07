@@ -8,9 +8,8 @@ namespace PixelBoardDevice.Commands
 {
     public class UploadProgramsCommand : UploadStorageItemsCommand<UploadProgramRequest, Program>
     {
-        public UploadProgramsCommand(Device device, INetworkAgent networkAgent, ILogger logger,
-            int port = 500, int timeout = 100)
-            : base(device, networkAgent, logger, port, timeout)
+        public UploadProgramsCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
         }
 

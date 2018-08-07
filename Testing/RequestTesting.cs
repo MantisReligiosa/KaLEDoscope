@@ -1,6 +1,8 @@
 ﻿using BaseDevice;
+using CommandProcessing;
 using CommandProcessing.DTO;
 using CommandProcessing.Requests;
+using NSubstitute;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -12,22 +14,22 @@ namespace Testing
         [Fact]
         public void Request_GetBytes()
         {
-            var mock = new MockRequest
-            {
-                DeviceID = 0x1234
-            };
-            var bytes = mock.GetBytes();
+            var request = Substitute.For<Request>();
+            request.RequestID.Returns((byte)0x01);
+            request.DeviceID = (ushort)0x1234;
+            request.MakeData(Arg.Any<object>()).Returns(new byte[] { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff });
+            var bytes = request.GetBytes();
             Assert.Equal(new byte[] { 0x12, 0x34, 0x01, 0x00, 0x06, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff }, bytes);
         }
 
         [Fact]
         public void Request_ToString()
         {
-            var mock = new MockRequest
-            {
-                DeviceID = 0x1234
-            };
-            var requestString = mock.ToString();
+            var request = Substitute.For<Request>();
+            request.RequestID.Returns((byte)0x01);
+            request.DeviceID = (ushort)0x1234;
+            request.MakeData(Arg.Any<object>()).Returns(new byte[] { 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff });
+            var requestString = request.ToString();
             Assert.Equal("[12][34][01][00][06][AA][BB][CC][DD][EE][FF]", requestString);
         }
 

@@ -1,7 +1,7 @@
-﻿using Abstractions;
-using BaseDevice;
+﻿using BaseDevice;
 using BaseDeviceSerialization;
 using CommandProcessing;
+using Common;
 using Configuration;
 using DeviceBuilding;
 using Extensions;
@@ -32,8 +32,9 @@ namespace KaLEDoscope
 {
     public class MainViewModel : Notified, IDropTarget
     {
-        private ILogger _logger { get; set; }
-        private ICompressor _compressor { get; set; }
+        private readonly ILogger _logger;
+        private readonly IConfig _config;
+        private readonly ICompressor _compressor;
         private readonly IActivationManager _activationManager;
         private readonly Dispatcher _dispatcher;
         private readonly DeviceFactory _deviceFactory;
@@ -47,11 +48,8 @@ namespace KaLEDoscope
 
         private const string _defaultStructureFileName = "Структура";
         private const string _defaultStructureFileExtension = ".struct";
-        private const string _defaultAutosaveFileName = "temp";
         private const string _defaultStructureFilter = "Structure file (.struct)|*.struct|All files (*.*)|*.*";
         private const string _appName = "KaLEDoscope";
-        private const int _defaultAutosavePeriod = 60000;
-
 
         public ObservableCollection<NodeItem> StructureNodes { get; set; } = new ObservableCollection<NodeItem>();
         public ObservableCollection<TabItem> DeviceTabs { get; set; } = new ObservableCollection<TabItem>();
@@ -82,8 +80,7 @@ namespace KaLEDoscope
             get
             {
                 return (String.IsNullOrEmpty(StructureFileName) ? string.Empty : $"{StructureFileName} - ") +
-                    $"{_appName}" +
-                    $"{(HaveUnsavedData ? "*" : String.Empty)}";
+                    $"{_appName}" + $"{(HaveUnsavedData ? "*" : String.Empty)}";
             }
         }
 
@@ -102,7 +99,7 @@ namespace KaLEDoscope
             }
         }
 
-        public string AutosaveFileName { get; set; } = _defaultAutosaveFileName;
+        public string AutosaveFileName { get; set; }
 
         private int _autosavePeriod;
         public int AutosavePeriod
@@ -123,12 +120,14 @@ namespace KaLEDoscope
 
         public MainViewModel(
             ILogger logger,
+            IConfig config,
             ICompressor compressor,
             INetworkAgent networkScanAgent,
             INetworkAgent networkExchangeAgent,
             IActivationManager activationManager)
         {
             _logger = logger;
+            _config = config;
             _compressor = compressor;
             _networkScanAgent = networkScanAgent;
             _networkExchangeAgent = networkExchangeAgent;
@@ -173,25 +172,8 @@ namespace KaLEDoscope
             }
             LoadStructure(String.Empty);
             StructureNodes.CollectionChanged += (s, e) => HaveUnsavedData = true;
-            var config = Config.GetConfig();
-            var configAutosavePeriod = config.GetParameter("Autosave", "Period");
-            if (configAutosavePeriod.IsNull() || !int.TryParse(configAutosavePeriod, out var result))
-            {
-                AutosavePeriod = _defaultAutosavePeriod;
-            }
-            else
-            {
-                AutosavePeriod = result;
-            }
-            var configAutosaveFileName = config.GetParameter("Autosave", "Filename");
-            if (configAutosaveFileName.IsNull())
-            {
-                AutosaveFileName = _defaultAutosaveFileName;
-            }
-            else
-            {
-                AutosaveFileName = configAutosaveFileName;
-            }
+            AutosavePeriod = Config.GetConfig().AutosavePeriod;
+            AutosaveFileName = Config.GetConfig().AutosaveFilename;
 
             _autosaveTimer = new Timer(AutosavePeriod);
             _autosaveTimer.Elapsed += (s, e) =>
@@ -204,12 +186,11 @@ namespace KaLEDoscope
 
         public void CheckActivation()
         {
-            if (!_activationManager.IsActivationInfoExists)
+            if (String.IsNullOrEmpty(_activationManager.ActualLicenseInfo.RequestCode))
             {
                 ActivationRequired?.Invoke(this, EventArgs.Empty);
             }
-            else if (!_activationManager.IsFullAccess
-                && _activationManager.TrialExpirationDate < DateTime.Now)
+            else if (_activationManager.ActualLicenseInfo.ExpirationDate < DateTime.Now)
             {
                 TrialExpired?.Invoke(this, EventArgs.Empty);
             }
@@ -217,7 +198,7 @@ namespace KaLEDoscope
 
         private void MakeNodes()
         {
-            var directConnectDeviceScanner = new DeviceScanner(_logger, _networkScanAgent, _deviceFactory);
+            var directConnectDeviceScanner = new DeviceScanner(_deviceFactory, _networkScanAgent, _config, _logger);
             directConnectDeviceScanner.OnScanCompleted += DirectConnectDeviceScanner_OnScanCompleted;
             directConnectDeviceScanner.StartSearch();
             IsScanEnabled = false;
@@ -347,10 +328,9 @@ namespace KaLEDoscope
                     {
                         if (HaveUnsavedData)
                             SaveExistStructure();
-                        var config = Config.GetConfig();
-                        config.SetParameter("Autosave", "Period", AutosavePeriod.ToString());
-                        config.SetParameter("Autosave", "Filename", AutosaveFileName);
-                        config.Save();
+                        Config.GetConfig().AutosavePeriod = AutosavePeriod;
+                        Config.GetConfig().AutosaveFilename = AutosaveFileName;
+                        Config.GetConfig().Save();
                         QuitApplication?.Invoke(this, EventArgs.Empty);
                     });
                 }
@@ -617,7 +597,7 @@ namespace KaLEDoscope
         {
             if (String.IsNullOrEmpty(filename))
             {
-                filename = String.Concat(_defaultAutosaveFileName, _defaultStructureFileExtension);
+                filename = String.Concat(AutosaveFileName, _defaultStructureFileExtension);
             }
             else
             {
@@ -705,51 +685,69 @@ namespace KaLEDoscope
 
         private void SaveExistStructure()
         {
-            var serializableContainers = new List<SerializableContainer>();
-            foreach (var node in StructureNodes)
+            try
             {
-                var deviceNode = node as DeviceNode;
-                var folderNode = node as FolderNode;
-                var aggregationNode = node as AggregationNode;
-                if (!deviceNode.IsNull())
+                _logger.Debug(this, "Подготовка контейнеров");
+                var serializableContainers = new List<SerializableContainer>();
+                foreach (var node in StructureNodes)
                 {
-                    serializableContainers.Add(GetDeviceSerializableContainer(deviceNode));
-                }
-                else if (!folderNode.IsNull())
-                {
-                    serializableContainers.Add(
-                        new SerializableContainer
-                        {
-                            ContentType = ContentType.Folder,
-                            Content = (SerializableFolder)folderNode.Folder
-                        });
-                    foreach (var deviceSubNode in folderNode.Nodes)
+                    var deviceNode = node as DeviceNode;
+                    var folderNode = node as FolderNode;
+                    var aggregationNode = node as AggregationNode;
+                    if (!deviceNode.IsNull())
                     {
-                        serializableContainers.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
+                        _logger.Debug(this, $"Устройство [{deviceNode.Device.Name}]");
+                        serializableContainers.Add(GetDeviceSerializableContainer(deviceNode));
+                    }
+                    else if (!folderNode.IsNull())
+                    {
+                        _logger.Debug(this, $"Папка [{folderNode.Folder.Name}]");
+                        serializableContainers.Add(
+                            new SerializableContainer
+                            {
+                                ContentType = ContentType.Folder,
+                                Content = (SerializableFolder)folderNode.Folder
+                            });
+                        foreach (var deviceSubNode in folderNode.Nodes)
+                        {
+                            var deviceNodeInFolder = deviceSubNode as DeviceNode;
+                            _logger.Debug(this, $"Устройство [{folderNode.Folder.Name}]/[{deviceNodeInFolder.Device.Name}]");
+                            serializableContainers.Add(GetDeviceSerializableContainer(deviceNodeInFolder));
+                        }
+                    }
+                    else if (!aggregationNode.IsNull())
+                    {
+                        _logger.Debug(this, $"Агрегация [{aggregationNode.Aggregation.Name}]");
+                        serializableContainers.Add(
+                            new SerializableContainer
+                            {
+                                ContentType = ContentType.Aggregator,
+                                Content = (SerializableAggregation)aggregationNode.Aggregation
+                            });
+                        foreach (var deviceSubNode in aggregationNode.Nodes)
+                        {
+                            var deviceInAgregation = deviceSubNode as DeviceNode;
+                            _logger.Debug(this, $"Устройство [{aggregationNode.Aggregation.Name}]/[{deviceInAgregation.Device.Name}]");
+                            serializableContainers.Add(GetDeviceSerializableContainer(deviceInAgregation));
+                        }
                     }
                 }
-                else if (!aggregationNode.IsNull())
-                {
-                    serializableContainers.Add(
-                        new SerializableContainer
-                        {
-                            ContentType = ContentType.Aggregator,
-                            Content = (SerializableAggregation)aggregationNode.Aggregation
-                        });
-                    foreach (var deviceSubNode in aggregationNode.Nodes)
-                    {
-                        serializableContainers.Add(GetDeviceSerializableContainer((DeviceNode)deviceSubNode));
-                    }
-                }
+                _logger.Debug(this, "Сериализация");
+                var serialized = JsonConvert.SerializeObject(serializableContainers);
+                _logger.Debug(this, "Упаковка");
+                var datas = _compressor.Zip(serialized);
+                var fileName = String.IsNullOrEmpty(StructureFileName) ?
+                    String.Concat(AutosaveFileName, _defaultStructureFileExtension) :
+                    StructureFileName;
+                _logger.Debug(this, "Запись");
+                System.IO.File.WriteAllBytes(fileName, datas);
+                _logger.Info(this, $"Структура сохранена в {fileName}");
+                HaveUnsavedData = false;
             }
-            var serialized = JsonConvert.SerializeObject(serializableContainers);
-            var datas = _compressor.Zip(serialized);
-            var fileName = String.IsNullOrEmpty(StructureFileName) ?
-                String.Concat(AutosaveFileName, _defaultStructureFileExtension) :
-                StructureFileName;
-            System.IO.File.WriteAllBytes(fileName, datas);
-            _logger.Info(this, $"Структура сохранена в {fileName}");
-            HaveUnsavedData = false;
+            catch (Exception ex)
+            {
+                _logger.Error(this, $"Ошибка записи! {ex.Message}", ex);
+            }
         }
 
         private SerializableContainer GetDeviceSerializableContainer(DeviceNode node)
@@ -1055,7 +1053,7 @@ namespace KaLEDoscope
 
         private UserControl GetDeviceItemGrid(DeviceNode deviceNode, UserControl previewControl, UserControl customizationControl, IEnumerable<object> toolbarItems, Action OnMouseUp)
         {
-            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _logger);
+            var model = new CustomizationViewModel(deviceNode, _deviceFactory, _invoker, _compressor, _networkExchangeAgent, _logger, _config);
             model.NodeRenamed += ((sender, node) =>
             {
                 var tab = DeviceTabs.FirstOrDefault(t => (t.DataContext is Device) && (Device)t.DataContext == node.Device);

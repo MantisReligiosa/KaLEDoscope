@@ -15,7 +15,7 @@ namespace DeviceBuilding
         Device DeserializeDevice(string text);
         object GetSerializable(Device device);
         Device FromSerializable(object serializableDevice);
-        IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands();
-        IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands();
+        IEnumerable<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> GetDownloadCommands();
+        IEnumerable<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> GetUploadCommands();
     }
 }

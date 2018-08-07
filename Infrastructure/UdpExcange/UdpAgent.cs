@@ -7,7 +7,6 @@ namespace UdpExcange
 {
     public class UdpAgent : INetworkAgent
     {
-#warning Почему public?
         public ILogger Logger { get; set; }
         private UdpClient _udpClient;
         private bool _isClosed = false;

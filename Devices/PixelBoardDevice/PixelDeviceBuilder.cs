@@ -22,8 +22,6 @@ namespace PixelBoardDevice
         public string Model => "pixelBoard";
         public string DisplayName => "Электронное табло";
 
-        private ProgramPreviewViewModel _previewViewModel;
-
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var _model = new PixelDeviceViewModel(device, logger);
@@ -31,7 +29,7 @@ namespace PixelBoardDevice
             {
                 Duration = _model.Programs.Sum(p => p.Period) * 1000
             };
-            previewController.NeedRedrawPosition += (o, position) => 
+            previewController.NeedRedrawPosition += (o, position) =>
             {
                 var programs = _model.Programs.ToList();
                 Program actualProgram = null;
@@ -62,7 +60,7 @@ namespace PixelBoardDevice
                 PreviewController = previewController
             };
             var designViewModel = new ProgramPreviewViewModel(_model);
-            _previewViewModel = new ProgramPreviewViewModel(_model, true);
+            var _previewViewModel = new ProgramPreviewViewModel(_model, true);
             _model.PropertyChanged += (o, args) =>
             {
                 previewController.Duration = _model.Programs.Sum(p => p.Period) * 1000;
@@ -191,23 +189,23 @@ namespace PixelBoardDevice
             return null;
         }
 
-        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetDownloadCommands()
-            => new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> GetDownloadCommands()
+            => new List<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>>
             {
-                (d, n, l) => new DownloadBoardConfigCommand(d, n, l),
-                (d, n, l) => new DownloadFontsCommand(d, n, l),
-                (d, n, l) => new DownloadProgramsCommands(d, n, l),
-                (d, n, l) => new DownloadZonesCommand(d, n, l),
-                (d, n, l) => new DownloadBinaryImageCommand(d, n, l)
+                (d, n, l, c) => new DownloadBoardConfigCommand(d, n, l, c),
+                (d, n, l, c) => new DownloadFontsCommand(d, n, l, c),
+                (d, n, l, c) => new DownloadProgramsCommands(d, n, l, c),
+                (d, n, l, c) => new DownloadZonesCommand(d, n, l, c),
+                (d, n, l, c) => new DownloadBinaryImageCommand(d, n, l, c)
             };
 
-        public IEnumerable<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>> GetUploadCommands()
-            => new List<Func<Device, INetworkAgent, ILogger, IDeviceCommand<Device>>>
+        public IEnumerable<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> GetUploadCommands()
+            => new List<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>>
             {
-                (d, n, l) => new UploadFontsCommand(d, n, l),
-                (d, n, l) => new UploadProgramsCommand(d, n, l),
-                (d, n, l) => new UploadZonesCommand(d, n, l),
-                (d, n, l) => new UploadBinaryImageCommand(d, n, l)
+                (d, n, l, c) => new UploadFontsCommand(d, n, l, c),
+                (d, n, l, c) => new UploadProgramsCommand(d, n, l, c),
+                (d, n, l, c) => new UploadZonesCommand(d, n, l, c),
+                (d, n, l, c) => new UploadBinaryImageCommand(d, n, l, c)
             };
     }
 }

@@ -24,6 +24,5 @@ namespace CommandProcessing.Responces
                 Name = _bytes.ExtractString(modelNameLenght + 16, deviceLenght)
             };
         }
-
     }
 }

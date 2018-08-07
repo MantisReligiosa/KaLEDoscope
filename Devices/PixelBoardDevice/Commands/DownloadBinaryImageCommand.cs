@@ -7,9 +7,8 @@ namespace PixelBoardDevice.Commands
 {
     public class DownloadBinaryImageCommand : DownloadStorageItemsCommand<BinaryImageResponce, BinaryImage>
     {
-        public DownloadBinaryImageCommand(Device device, INetworkAgent networkAgent, ILogger logger,
-            int port = 500, int timeout = 100)
-            : base(device, networkAgent, logger, port, timeout)
+        public DownloadBinaryImageCommand(Device device, INetworkAgent networkAgent, ILogger logger, IConfig config)
+            : base(device, networkAgent, logger, config)
         {
         }
 
