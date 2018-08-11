@@ -21,7 +21,7 @@ using Input = System.Windows.Input;
 
 namespace PixelBoardDevice.UI
 {
-    public class PixelDeviceViewModel : Notified, IDeviceViewModel
+    public class PixelDeviceViewModel : Notified
     {
         public event EventHandler ModelChanged;
         public readonly PixelBoard Device;
@@ -277,6 +277,26 @@ namespace PixelBoardDevice.UI
             }
         }
 
+        public int TextEditWidth { get; set; }
+
+        public int RectX { get; set; }
+
+        public Rect ZoneRect
+        {
+            get
+            {
+                if (SelectedZone.IsNull())
+                    return new Rect(0, 0, 0, 0);
+                RectX = 0;
+                if (AlignmentCenter)
+                    RectX = (TextEditWidth - SelectedZone.Width) / 2;
+                if (AlignmentRight)
+                    RectX = TextEditWidth - SelectedZone.Width;
+                OnPropertyChanged(nameof(RectX));
+                return new Rect(new System.Windows.Size(SelectedZone.Width, SelectedZone.Height));
+            }
+        }
+
         private int _zoneLeft;
         public int ZoneLeft
         {
@@ -422,6 +442,8 @@ namespace PixelBoardDevice.UI
                     deviceZone.Height = value;
                 }
                 OnPropertyChanged(nameof(ZoneHeight));
+                OnPropertyChanged(nameof(ZoneRect));
+                ReformatText();
             }
         }
 
@@ -438,6 +460,8 @@ namespace PixelBoardDevice.UI
                     deviceZone.Width = value;
                 }
                 OnPropertyChanged(nameof(ZoneWidth));
+                OnPropertyChanged(nameof(ZoneRect));
+                ReformatText();
             }
         }
 
@@ -619,6 +643,7 @@ namespace PixelBoardDevice.UI
                 OnPropertyChanged(nameof(AlignmentLeft));
                 OnPropertyChanged(nameof(AlignmentCenter));
                 OnPropertyChanged(nameof(AlignmentRight));
+                OnPropertyChanged(nameof(ZoneRect));
             }
         }
 
@@ -836,6 +861,8 @@ namespace PixelBoardDevice.UI
                         IsItalic = binaryFont.Italic;
                         IsBold = binaryFont.Bold;
                     }
+                    var alignment = fontableZone.Alignment ?? 0;
+                    TextAlignment = (TextAlignment)alignment;
                 }
                 if (_selectedZone is TextZone textZone)
                 {
@@ -879,12 +906,16 @@ namespace PixelBoardDevice.UI
             AllowTicker(currentZoneType?.AllowTicker ?? false);
         }
 
+        private string _prevText;
         private string _text;
         public string Text
         {
             get => _text;
             set
             {
+                if (_text?.Equals(value) ?? false)
+                    return;
+                _prevText = _text;
                 _text = value;
                 var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id);
                 if (zone is TextZone textZone)
@@ -892,6 +923,7 @@ namespace PixelBoardDevice.UI
                     textZone.Text = value;
                     UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, SelectedFontSize, IsItalic, IsBold);
                 }
+                ReformatText();
                 OnPropertyChanged(nameof(Text));
             }
         }
@@ -1279,11 +1311,88 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        Device IDeviceViewModel.BaseDevice => throw new NotImplementedException();
-
         public Program PreviewedProgram { get; set; }
 
         public readonly double PreviewScaleMinRate;
         public readonly double PreviewScaleMaxRate;
+
+        private void ReformatText()
+        {
+            if (String.IsNullOrEmpty(Text))
+                return;
+            var formattingComplete = false;
+            var text = Text;
+            var neededHeight = 0;
+            while (!formattingComplete)
+            {
+                formattingComplete = true;
+                neededHeight = 0;
+                var insertingPosition = 0;
+                var style = System.Drawing.FontStyle.Regular;
+                if (IsBold)
+                {
+                    if (IsItalic)
+                        style = System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic;
+                    else
+                        style = System.Drawing.FontStyle.Bold;
+                }
+                else if (IsItalic)
+                    style = System.Drawing.FontStyle.Italic;
+                var font = new System.Drawing.Font(SelectedFont.Source, SelectedFontSize, style, GraphicsUnit.Pixel);
+                foreach (var line in text.Split(new[] { "\r\n" }, StringSplitOptions.None))
+                {
+                    using (Image img = new Bitmap(1, 1))
+                    {
+                        using (Graphics drawing = Graphics.FromImage(img))
+                        {
+                            var textSize = drawing.MeasureString(line, font);
+                            if (String.IsNullOrEmpty(line))
+                            {
+                                textSize = drawing.MeasureString(" ", font);
+                            }
+                            neededHeight += Convert.ToInt32(textSize.Height);
+                            if (neededHeight > DeviceHeight - ZoneTop)
+                            {
+                                //Некуда больше расширяться!
+                                Text = _prevText;
+                                return;
+                            }
+                            if (textSize.Width > ZoneWidth)
+                            {
+                                if (neededHeight + Convert.ToInt32(textSize.Height) >
+                                    DeviceHeight - ZoneTop)
+                                {
+                                    //Некуда больше расширяться!
+                                    Text = _prevText;
+                                    return;
+                                }
+                                if (ZoneHeight < neededHeight + Convert.ToInt32(textSize.Height))
+                                    ZoneHeight = neededHeight + Convert.ToInt32(textSize.Height);
+                                // Определяем где нужно разделить строку
+                                var charAmount = 0;
+                                float substLenght = 0;
+                                while (substLenght < ZoneWidth)
+                                {
+                                    charAmount++;
+                                    substLenght = drawing.MeasureString(line.Substring(0, charAmount), font).Width;
+                                }
+                                insertingPosition += charAmount;
+                                text = text.Insert(insertingPosition - 1, "\r\n");
+                                formattingComplete = false;
+                            }
+                            else
+                            {
+                                insertingPosition += line.Length + 2;
+                            }
+                        }
+                    }
+                }
+            }
+            Text = text;
+            if (neededHeight > ZoneHeight)
+            {
+                ZoneHeight = neededHeight;
+            }
+        }
     }
 }

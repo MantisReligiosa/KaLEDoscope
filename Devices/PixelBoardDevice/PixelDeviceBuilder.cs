@@ -48,14 +48,19 @@ namespace PixelBoardDevice
                     _model.PreviewedProgram = actualProgram;
                 }
             };
+            var customizationControl = new PixelControl
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                DataContext = _model
+            };
+            customizationControl.TextEditControl.Loaded += (o, e) => 
+            {
+                _model.TextEditWidth = (int)customizationControl.TextEditControl.ActualWidth;
+            };
             var pack = new ControlsPack
             {
-                CustomizationControl = new PixelControl
-                {
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    VerticalAlignment = VerticalAlignment.Stretch,
-                    DataContext = _model
-                },
+                CustomizationControl = customizationControl,
                 Device = device,
                 PreviewController = previewController
             };

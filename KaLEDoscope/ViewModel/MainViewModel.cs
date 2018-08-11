@@ -170,10 +170,11 @@ namespace KaLEDoscope
                     CommandParameter = deviceItem.Model
                 });
             }
+            AutosaveFileName = _config.AutosaveFilename;
             LoadStructure(String.Empty);
             StructureNodes.CollectionChanged += (s, e) => HaveUnsavedData = true;
-            AutosavePeriod = Config.GetConfig().AutosavePeriod;
-            AutosaveFileName = Config.GetConfig().AutosaveFilename;
+            AutosavePeriod = _config.AutosavePeriod;
+            AutosaveFileName = _config.AutosaveFilename;
 
             _autosaveTimer = new Timer(AutosavePeriod);
             _autosaveTimer.Elapsed += (s, e) =>

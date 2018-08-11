@@ -209,16 +209,45 @@
                             <ToggleButton Grid.Row="0" Grid.Column="6" IsChecked="{Binding AlignmentRight}" Width="22" IsEnabled="{Binding AnimationType.NoAnimationType}">
                                 <Image Source="/PixelBoardDevice;component/Resources/if_align-right_2561324.png" />
                             </ToggleButton>
-                            <TextBox Grid.Row="1" Grid.ColumnSpan="10" AcceptsReturn="True" 
+                            <TextBox Name="TextEditControl" Grid.Row="1" Grid.ColumnSpan="10" AcceptsReturn="True" 
                                      Height="100"
                                      TextWrapping="WrapWithOverflow"
                                      FontFamily="{Binding SelectedFont}"
                                      FontSize="{Binding SelectedFontSize}"
                                      FontStyle="{Binding FontStyle}"
                                      FontWeight="{Binding FontWeight}"
-                                     Text="{Binding Text}"
+                                     Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
                                      Visibility="{Binding TextEditingVisibility}" Margin="0,0,0,1" TextAlignment="{Binding TextAlignment}">
+                                <TextBox.Background>
+                                    <DrawingBrush Stretch="None" AlignmentX="Left" AlignmentY="Top">
+                                        <DrawingBrush.Transform>
+                                            <TransformGroup>
+                                                <ScaleTransform/>
+                                                <SkewTransform/>
+                                                <RotateTransform/>
+                                                <TranslateTransform X="{Binding RectX}"/>
+                                            </TransformGroup>
+                                        </DrawingBrush.Transform>
+                                        <DrawingBrush.Drawing>
+                                            <GeometryDrawing>
+                                                <GeometryDrawing.Pen>
+                                                    <Pen Brush="Red"/>
+                                                </GeometryDrawing.Pen>
+                                                <GeometryDrawing.Geometry>
+                                                    <GeometryGroup>
+                                                        <RectangleGeometry Rect="{Binding ZoneRect}">
+                                                        </RectangleGeometry>
+                                                    </GeometryGroup>
+                                                </GeometryDrawing.Geometry>
+                                            </GeometryDrawing>
+                                        </DrawingBrush.Drawing>
+                                    </DrawingBrush>
+                                </TextBox.Background>
+                                <!--<DrawingBrush >
+                                        
+                                </TextBox.BorderBrush>-->
                             </TextBox>
+
                         </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="3" Header="Анимация" Visibility="{Binding AnimationVisibility}" Style="{StaticResource GroupBoxStyle}">
