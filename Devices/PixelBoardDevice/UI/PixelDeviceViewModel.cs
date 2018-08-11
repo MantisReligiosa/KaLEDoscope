@@ -1318,10 +1318,12 @@ namespace PixelBoardDevice.UI
 
         private void ReformatText()
         {
-            if (String.IsNullOrEmpty(Text))
+            var textZone = SelectedZone as TextZone;
+            var zoneFont = Device.Fonts.FirstOrDefault(f => f.Id == textZone.FontId);
+            if (String.IsNullOrEmpty(textZone.Text))
                 return;
             var formattingComplete = false;
-            var text = Text;
+            var text = textZone.Text;
             var neededHeight = 0;
             while (!formattingComplete)
             {
@@ -1329,16 +1331,16 @@ namespace PixelBoardDevice.UI
                 neededHeight = 0;
                 var insertingPosition = 0;
                 var style = System.Drawing.FontStyle.Regular;
-                if (IsBold)
+                if (zoneFont.Bold)
                 {
-                    if (IsItalic)
+                    if (zoneFont.Italic)
                         style = System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic;
                     else
                         style = System.Drawing.FontStyle.Bold;
                 }
-                else if (IsItalic)
+                else if (zoneFont.Italic)
                     style = System.Drawing.FontStyle.Italic;
-                var font = new System.Drawing.Font(SelectedFont.Source, SelectedFontSize, style, GraphicsUnit.Pixel);
+                var font = new System.Drawing.Font(zoneFont.Source, zoneFont.Height, style, GraphicsUnit.Pixel);
                 foreach (var line in text.Split(new[] { "\r\n" }, StringSplitOptions.None))
                 {
                     using (Image img = new Bitmap(1, 1))
@@ -1351,27 +1353,27 @@ namespace PixelBoardDevice.UI
                                 textSize = drawing.MeasureString(" ", font);
                             }
                             neededHeight += Convert.ToInt32(textSize.Height);
-                            if (neededHeight > DeviceHeight - ZoneTop)
+                            if (neededHeight > DeviceHeight - textZone.Y)
                             {
                                 //Некуда больше расширяться!
                                 Text = _prevText;
                                 return;
                             }
-                            if (textSize.Width > ZoneWidth)
+                            if (textSize.Width > textZone.Width)
                             {
                                 if (neededHeight + Convert.ToInt32(textSize.Height) >
-                                    DeviceHeight - ZoneTop)
+                                    DeviceHeight - textZone.Y)
                                 {
                                     //Некуда больше расширяться!
                                     Text = _prevText;
                                     return;
                                 }
-                                if (ZoneHeight < neededHeight + Convert.ToInt32(textSize.Height))
-                                    ZoneHeight = neededHeight + Convert.ToInt32(textSize.Height);
+                                if (textZone.Height < neededHeight + Convert.ToInt32(textSize.Height))
+                                    textZone.Height = neededHeight + Convert.ToInt32(textSize.Height);
                                 // Определяем где нужно разделить строку
                                 var charAmount = 0;
                                 float substLenght = 0;
-                                while (substLenght < ZoneWidth)
+                                while (substLenght < textZone.Width)
                                 {
                                     charAmount++;
                                     substLenght = drawing.MeasureString(line.Substring(0, charAmount), font).Width;
@@ -1388,11 +1390,15 @@ namespace PixelBoardDevice.UI
                     }
                 }
             }
-            Text = text;
             if (neededHeight > ZoneHeight)
             {
-                ZoneHeight = neededHeight;
+                textZone.Height = neededHeight;
+                OnPropertyChanged(nameof(ZoneHeight));
             }
+            textZone.Text = text;
+            _text = text;
+            OnPropertyChanged(nameof(Text));
+            OnPropertyChanged(nameof(ZoneRect));
         }
     }
 }
