@@ -1329,7 +1329,7 @@ namespace PixelBoardDevice.UI
             if (String.IsNullOrEmpty(textZone.Text))
                 return;
             var formattingComplete = false;
-            var text = textZone.Text;
+            var text = textZone.Text.Replace(Constants.LineSplitString, "");
             var neededHeight = 0;
             while (!formattingComplete)
             {
@@ -1347,7 +1347,7 @@ namespace PixelBoardDevice.UI
                 else if (zoneFont.Italic)
                     style = System.Drawing.FontStyle.Italic;
                 var font = new System.Drawing.Font(zoneFont.Source, zoneFont.Height, style, GraphicsUnit.Pixel);
-                foreach (var line in text.Split(new[] { "\r\n" }, StringSplitOptions.None))
+                foreach (var line in text.Split(new[] { "\r\n", Constants.LineSplitString }, StringSplitOptions.None))
                 {
                     using (Image img = new Bitmap(1, 1))
                     {
@@ -1418,7 +1418,7 @@ namespace PixelBoardDevice.UI
                                 insertingPosition += charAmount;
                                 if (!string.IsNullOrEmpty(text))
                                 {
-                                    text = text.Insert(insertingPosition - 1, "\r\n");
+                                    text = text.Insert(insertingPosition - 1, Constants.LineSplitString);
                                     formattingComplete = false;
                                 }
                             }
@@ -1438,7 +1438,7 @@ namespace PixelBoardDevice.UI
                 ZoneHeight = textZone.Height;
             }
             textZone.Text = text;
-            _text = text;
+            _text = text.Replace(Constants.LineSplitString, "\r\n");
             OnPropertyChanged(nameof(Text));
             OnPropertyChanged(nameof(ZoneRect));
         }

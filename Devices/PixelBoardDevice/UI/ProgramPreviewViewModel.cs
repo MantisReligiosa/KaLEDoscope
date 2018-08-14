@@ -485,7 +485,7 @@ namespace PixelBoardDevice.UI
             var drawingFont = new System.Drawing.Font(
                 font.Source, font.Height, style, System.Drawing.GraphicsUnit.Pixel);
             var bitmap = BitmapProcessing.BitmapProcessor.DrawTextImage(
-                text,
+                text.Replace(Constants.LineSplitString, "\r\n"),
                 drawingFont,
                 System.Drawing.Color.Red,
                 System.Drawing.Color.Transparent,

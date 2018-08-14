@@ -92,6 +92,7 @@
     <Compile Include="DomainObjects\BinaryFont.cs" />
     <Compile Include="DomainObjects\BinaryImage.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
+    <Compile Include="DomainObjects\Constants.cs" />
     <Compile Include="DomainObjects\IFontableZone.cs" />
     <Compile Include="DomainObjects\Program.cs" />
     <Compile Include="DomainObjects\Zone.cs" />
