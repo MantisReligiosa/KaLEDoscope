@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extensions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -131,17 +132,10 @@ namespace NetworkConsole
             }
         }
 
-        public ObservableCollection<Exchange> Exchanges { get; set; } = new ObservableCollection<Exchange>();
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ViewModel()
         {
-            Exchanges.Add(new Exchange
-            {
-                Request = "@@@",
-                Responce = "XXX"
-            });
             logMessage("Запуск");
             ProviderItem = ProviderItems.First();
             StartListen();
@@ -165,15 +159,8 @@ namespace NetworkConsole
 
         private void OnBytesRecieved(object sender, BytesRecievedEventArgs e)
         {
-            var receiveString = Encoding.UTF8.GetString(e.Bytes);
+            var receiveString = e.Bytes.ToStringExtend();
             logMessage($"Получено: {receiveString} от {e.SenderAddress} по {_providerName}");
-            var exchange = Exchanges.FirstOrDefault(ex => ex.Request.Equals(receiveString));
-            if (exchange != null)
-            {
-                Thread.Sleep(500);
-                logMessage("АВТООТВЕТ");
-                Send(false, e.SenderAddress, _port, exchange.Responce);
-            }
         }
 
         private void Close()
@@ -206,23 +193,6 @@ namespace NetworkConsole
             }
         }
 
-        private DelegateCommand _addExchange;
-        public Input.ICommand AddExchange
-        {
-            get
-            {
-                if (_addExchange == null)
-                {
-                    _addExchange = new DelegateCommand((o) =>
-                    {
-                        Exchanges.Add(new Exchange());
-                    });
-                }
-                return _addExchange;
-            }
-        }
-
-
         private DelegateCommand _sendMessage;
         public Input.ICommand SendMessage
         {
@@ -241,6 +211,12 @@ namespace NetworkConsole
 
         private void Send(bool isBroadcast, string address, int port, string msg)
         {
+            if (String.IsNullOrEmpty(msg))
+                return;
+            if (msg.Length%2==1)
+            {
+                msg = "0" + msg;
+            }
             Close();
             string message = "Отправка ";
             IPEndPoint ipEndpoint;
@@ -254,10 +230,12 @@ namespace NetworkConsole
                 ipEndpoint = new IPEndPoint(IPAddress.Parse(_address), port);
                 message += $"сообщения на адрес {address}:{port} по {_providerItem.Name}";
             }
-            message += $": {msg}";
+            var bytes = msg.GetBytesFromHexString();
+            message += $": {bytes.ToStringExtend()}";
             logMessage(message);
             _provider.Connect(ipEndpoint);
-            var bytes = Encoding.UTF8.GetBytes(msg);
+
+
             _provider.Send(bytes, bytes.Length);
             Close();
             StartListen();

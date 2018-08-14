@@ -99,7 +99,7 @@ namespace Activation
 
         public string GetActivationKey(LicenseInfo licenseInfo)
         {
-            var requestBytes = GetBytesFromHexString(licenseInfo.RequestCode);
+            var requestBytes = licenseInfo.RequestCode.GetBytesFromHexString();
             var year = (byte)(licenseInfo.ExpirationDate.Year % 100);
             var month = (byte)licenseInfo.ExpirationDate.Month;
             var day = (byte)licenseInfo.ExpirationDate.Day;
@@ -172,42 +172,12 @@ namespace Activation
             }
         }
 
-        private byte[] GetBytesFromHexString(string requestBytes)
-        {
-            var bytes = new List<byte>();
-            requestBytes = requestBytes.ToUpper();
-            requestBytes = requestBytes.Replace("-", "");
-            byte b = 0;
-            var isFirst = true;
-            foreach (var c in requestBytes)
-            {
-                byte b1;
-                if (Char.IsDigit(c))
-                    b1 = (byte)(c - '0');
-                else
-                    b1 = (byte)(c - 'A' + 10);
-                if (isFirst)
-                {
-                    b = (byte)(b1 << 4);
-                }
-                else
-                {
-                    b += b1;
-                    bytes.Add(b);
-                    b = 0;
-                }
-                isFirst = !isFirst;
-            }
-            return bytes.ToArray();
-        }
-
-
         public bool TryActivate(string activationKey, out LicenseInfo licenseInfo)
         {
             licenseInfo = null;
             var requestCode = GetRequestCode();
-            var encActivationBytes = GetBytesFromHexString(activationKey);
-            var requestBytes = GetBytesFromHexString(requestCode);
+            var encActivationBytes = activationKey.GetBytesFromHexString();
+            var requestBytes = requestCode.GetBytesFromHexString();
             var crc1_expected = Crc32Algorithm.Compute(requestBytes, 0, 8);
             var crc2_expected = Crc32Algorithm.Compute(requestBytes, 8, 8);
             byte[] activationBytes;
