@@ -423,25 +423,25 @@ namespace PixelBoardDevice.UI
                 Height = diameter * scale,
                 Width = diameter * scale
             };
-            Canvas.SetTop(circle, (y + 2) * scale);
-            Canvas.SetLeft(circle, (x + 2) * scale);
+            Canvas.SetTop(circle, (y + (height - diameter) / 2) * scale);
+            Canvas.SetLeft(circle, (x + (width - diameter) / 2) * scale);
 
             var verticalLine = new Line
             {
                 Stroke = Brushes.Red,
-                X1 = (x + 2 + diameter / 2) * scale,
-                Y1 = (y + 2 + diameter / 2) * scale,
-                X2 = (x + 2 + diameter / 2) * scale,
-                Y2 = (y + 3) * scale,
+                X1 = (x + (width - diameter) / 2 + diameter / 2) * scale,
+                Y1 = (y + (height - diameter) / 2) * scale,
+                X2 = (x + (width - diameter) / 2 + diameter / 2) * scale,
+                Y2 = (y + (height - diameter) / 2 + diameter / 2) * scale,
             };
 
             var horizontalLine = new Line
             {
                 Stroke = Brushes.Red,
-                X1 = (x + 2 + diameter / 2) * scale,
-                Y1 = (y + 2 + diameter / 2) * scale,
-                X2 = (x + 3) * scale,
-                Y2 = (y + 2 + diameter / 2) * scale,
+                X1 = (x + (width - diameter) / 2 + diameter / 2) * scale,
+                Y1 = (y + (height - diameter) / 2 + diameter / 2) * scale,
+                X2 = (x + (width - diameter) / 2) * scale,
+                Y2 = (y + (height - diameter) / 2 + diameter / 2) * scale,
             };
 
             canvas.Children.Add(circle);
