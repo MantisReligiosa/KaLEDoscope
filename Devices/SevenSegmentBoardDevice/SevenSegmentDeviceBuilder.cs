@@ -95,7 +95,7 @@ namespace SevenSegmentBoardDevice
 
         private void RedrawDesignPreview()
         {
-            _designViewModel.IsDigit = (_model.DisplayType.Id != 0);
+            _designViewModel.IsDigit = (_model.DisplayType?.Id  != 0);
             switch (_model.DisplayFormat.Capacity)
             {
                 case 3:

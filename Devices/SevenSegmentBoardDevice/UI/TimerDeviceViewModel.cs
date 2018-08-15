@@ -258,9 +258,9 @@ namespace SevenSegmentBoardDevice.UI
         {
             _device = (SevenSegmentBoard)device;
             DisplayTypes = new ObservableCollection<DisplayType>(Refs.DisplayTypes);
-            DisplayType = Refs.DisplayTypes.FirstOrDefault(d => d == _device.BoardType.DisplayType);
+            DisplayType = Refs.DisplayTypes.FirstOrDefault(d => d == _device.BoardType.DisplayType) ?? Refs.DisplayTypes.FirstOrDefault();
             FontTypes = new ObservableCollection<FontType>(Refs.FontTypes);
-            FontType = Refs.FontTypes.FirstOrDefault(f => f == _device.BoardType?.FontType);
+            FontType = Refs.FontTypes.FirstOrDefault(f => f == _device.BoardType?.FontType) ?? (DisplayType.IsFontEnabled ? Refs.FontTypes.FirstOrDefault() : null);
             DisplayFrames = new ObservableCollection<DisplayFrame>();
             DisplayFrames.CollectionChanged += DisplayFrames_CollectionChanged;
             Refs.DisplayFrames.ForEach(f =>
@@ -279,19 +279,18 @@ namespace SevenSegmentBoardDevice.UI
                 displayFrame.PropertyChanged += ((s, e) => { OnPropertyChanged(nameof(DisplayFrames)); });
             });
             DisplayFormats = new ObservableCollection<DisplayFormat>(Refs.DisplayFormats);
-            DisplayFormat = Refs.DisplayFormats.FirstOrDefault(d => d == _device.BoardType.DisplayFormat);
+            DisplayFormat = Refs.DisplayFormats.FirstOrDefault(d => d == _device.BoardType.DisplayFormat) ?? Refs.DisplayFormats.FirstOrDefault();
             CountdownTypes = new ObservableCollection<CountdownType>(Refs.CountdownTypes);
-            CountdownType = Refs.CountdownTypes.FirstOrDefault(c => c.Id == _device.StopWatchParameters.CountdownTypeId);
+            CountdownType = Refs.CountdownTypes.FirstOrDefault(c => c.Id == _device.StopWatchParameters.CountdownTypeId) ?? Refs.CountdownTypes.FirstOrDefault();
             CountdownStartValue = _device.StopWatchParameters.CountdownStartValue;
             SyncSources = new ObservableCollection<SyncSource>(Refs.SyncSources);
-            SyncSource = Refs.SyncSources.FirstOrDefault(s => s.Id == _device.TimeSyncParameters.SourceId);
+            SyncSource = Refs.SyncSources.FirstOrDefault(s => s.Id == _device.TimeSyncParameters.SourceId) ?? Refs.SyncSources.FirstOrDefault();
             TimeZones = new ObservableCollection<TimeZoneInfo>(_timeZones);
-            TimeZone = _timeZones.FirstOrDefault(t => t.Id.Equals(_device.TimeSyncParameters.ZoneId));
+            TimeZone = _timeZones.FirstOrDefault(t => t.Id.Equals(_device.TimeSyncParameters.ZoneId)) ?? _timeZones.FirstOrDefault();
             TimeSyncPeriodValue = _device.TimeSyncParameters.SyncPeriod;
             TimeSyncServerIp = _device.TimeSyncParameters.ServerAddress;
             TimeSyncServerPort = _device.TimeSyncParameters.ServerPort;
             AlarmSchedule = new ObservableCollection<Alarm>(_device.AlarmSchedule);
-
         }
 
         private void DisplayFrames_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
