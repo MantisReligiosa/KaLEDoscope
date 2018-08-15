@@ -46,10 +46,16 @@ namespace PixelBoardDevice.UI
                 AllowTextEditing = true,
                 AllowClock = false,
                 ZoneCondition = (z) => z is TextZone,
-                Customize = () => new TextZone
+                Customize = () =>
                 {
-                    IsValid = true,
-                },
+                    return new TextZone
+                    {
+                        IsValid = true,
+                        Alignment = 0,
+                        AnimationId = 0,
+                        Height = 8
+                    };
+                }
             },
             new ZoneType
             {
@@ -64,6 +70,8 @@ namespace PixelBoardDevice.UI
                 ZoneCondition = (z) => z is SensorZone,
                 Customize = () => new SensorZone{
                     IsValid = true,
+                    Alignment = 0,
+                    Height = 8
                 }
             },
             new ZoneType
@@ -79,6 +87,8 @@ namespace PixelBoardDevice.UI
                 ZoneCondition = (z) => z is TagZone,
                 Customize = () => new TagZone{
                     IsValid = true,
+                    Alignment = 0,
+                    Height = 8
                 }
             },
             new ZoneType
@@ -106,6 +116,7 @@ namespace PixelBoardDevice.UI
                 ZoneCondition = (z) => z is ClockZone,
                 Customize = () => new ClockZone{
                     IsValid = true,
+                    ClockType = 2
                 },
 
             },
@@ -443,7 +454,7 @@ namespace PixelBoardDevice.UI
                 }
                 OnPropertyChanged(nameof(ZoneHeight));
                 OnPropertyChanged(nameof(ZoneRect));
-                ReformatText();
+                ReformatText(true);
             }
         }
 
@@ -461,7 +472,7 @@ namespace PixelBoardDevice.UI
                 }
                 OnPropertyChanged(nameof(ZoneWidth));
                 OnPropertyChanged(nameof(ZoneRect));
-                ReformatText();
+                ReformatText(true);
             }
         }
 
@@ -476,6 +487,7 @@ namespace PixelBoardDevice.UI
                 {
                     UpdateZoneFont(SelectedProgram, SelectedZone, value, SelectedFontSize, IsItalic, IsBold);
                 }
+                ReformatText(true);
                 OnPropertyChanged(nameof(SelectedFont));
             }
         }
@@ -605,6 +617,7 @@ namespace PixelBoardDevice.UI
                 {
                     UpdateZoneFont(SelectedProgram, SelectedZone, SelectedFont, value, IsItalic, IsBold);
                 }
+                ReformatText(true);
                 OnPropertyChanged(nameof(SelectedFontSize));
             }
         }
@@ -1227,7 +1240,9 @@ namespace PixelBoardDevice.UI
                             X = 0,
                             Y = 0,
                             Height = 10,
-                            Width = 10
+                            Width = 10,
+                            Alignment = 0,
+                            AnimationId = 0
                         };
                         SelectedProgram.Zones.Add(zone);
                         Zones.Add(zone);
@@ -1316,14 +1331,18 @@ namespace PixelBoardDevice.UI
         public readonly double PreviewScaleMinRate;
         public readonly double PreviewScaleMaxRate;
 
-        private void ReformatText()
+        private void ReformatText(bool trimText = false)
         {
             var textZone = SelectedZone as TextZone;
-            var zoneFont = Device.Fonts.FirstOrDefault(f => f.Id == textZone.FontId);
+            if (textZone.IsNull())
+                return;
+            var zoneFont = Device.Fonts.FirstOrDefault(f => f.Id == (textZone?.FontId ?? 0));
+            if (zoneFont.IsNull())
+                return;
             if (String.IsNullOrEmpty(textZone.Text))
                 return;
             var formattingComplete = false;
-            var text = textZone.Text;
+            var text = textZone.Text.Replace(Constants.LineSplitString, "");
             var neededHeight = 0;
             while (!formattingComplete)
             {
@@ -1341,7 +1360,7 @@ namespace PixelBoardDevice.UI
                 else if (zoneFont.Italic)
                     style = System.Drawing.FontStyle.Italic;
                 var font = new System.Drawing.Font(zoneFont.Source, zoneFont.Height, style, GraphicsUnit.Pixel);
-                foreach (var line in text.Split(new[] { "\r\n" }, StringSplitOptions.None))
+                foreach (var line in text.Split(new[] { "\r\n", Constants.LineSplitString }, StringSplitOptions.None))
                 {
                     using (Image img = new Bitmap(1, 1))
                     {
@@ -1355,9 +1374,25 @@ namespace PixelBoardDevice.UI
                             neededHeight += Convert.ToInt32(textSize.Height);
                             if (neededHeight > DeviceHeight - textZone.Y)
                             {
-                                //Некуда больше расширяться!
-                                Text = _prevText;
-                                return;
+                                if (trimText)
+                                {
+                                    var lastReturn = text.LastIndexOf("\r\n");
+                                    if (lastReturn < 0)
+                                    {
+                                        text = String.Empty;
+                                    }
+                                    else
+                                    {
+                                        text = text.Substring(0, lastReturn);
+                                    }
+                                    //OnPropertyChanged(nameof(Text));
+                                }
+                                else
+                                {
+                                    text = _prevText;
+                                    //OnPropertyChanged(nameof(Text));
+                                }
+                                //return;
                             }
                             if (textSize.Width > textZone.Width)
                             {
@@ -1365,8 +1400,23 @@ namespace PixelBoardDevice.UI
                                     DeviceHeight - textZone.Y)
                                 {
                                     //Некуда больше расширяться!
-                                    Text = _prevText;
-                                    return;
+                                    if (trimText)
+                                    {
+                                        var lastReturn = text.LastIndexOf("\r\n");
+                                        if (lastReturn > 0)
+                                        {
+                                            text = text.Substring(0, lastReturn);
+                                            formattingComplete = false;
+                                            break;
+                                        }
+                                        //OnPropertyChanged(nameof(Text));
+                                    }
+                                    else
+                                    {
+                                        text = _prevText;
+                                        //OnPropertyChanged(nameof(Text));
+                                    }
+                                    //return;
                                 }
                                 if (textZone.Height < neededHeight + Convert.ToInt32(textSize.Height))
                                     textZone.Height = neededHeight + Convert.ToInt32(textSize.Height);
@@ -1379,8 +1429,11 @@ namespace PixelBoardDevice.UI
                                     substLenght = drawing.MeasureString(line.Substring(0, charAmount), font).Width;
                                 }
                                 insertingPosition += charAmount;
-                                text = text.Insert(insertingPosition - 1, "\r\n");
-                                formattingComplete = false;
+                                if (!string.IsNullOrEmpty(text))
+                                {
+                                    text = text.Insert(insertingPosition - 1, Constants.LineSplitString);
+                                    formattingComplete = false;
+                                }
                             }
                             else
                             {
@@ -1390,13 +1443,15 @@ namespace PixelBoardDevice.UI
                     }
                 }
             }
-            if (neededHeight > ZoneHeight)
+            if (neededHeight > ZoneHeight && !String.IsNullOrEmpty(text))
             {
+                var maxHeight = DeviceHeight - textZone.Y;
+                neededHeight = (maxHeight > neededHeight) ? neededHeight : maxHeight;
                 textZone.Height = neededHeight;
-                OnPropertyChanged(nameof(ZoneHeight));
+                ZoneHeight = textZone.Height;
             }
             textZone.Text = text;
-            _text = text;
+            _text = text.Replace(Constants.LineSplitString, "\r\n");
             OnPropertyChanged(nameof(Text));
             OnPropertyChanged(nameof(ZoneRect));
         }

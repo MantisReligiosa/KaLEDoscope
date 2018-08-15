@@ -5,11 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NetworkConsole"
         mc:Ignorable="d"
-        Title="NetworkConsole" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight">
+        Title="NetworkConsole" SizeToContent="WidthAndHeight" Width="480" Height="215" MinWidth="480" MinHeight="214" MaxWidth="480">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="105"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"></ColumnDefinition>
@@ -31,7 +31,7 @@
                 <ComboBox Grid.Column="0" Grid.ColumnSpan="2" ItemsSource="{Binding ProviderItems}" DisplayMemberPath="Name" SelectedItem="{Binding ProviderItem}"/>
                 <Label Grid.Column="0" Grid.Row="1" Content="Порт:"/>
                 <TextBox Grid.Column="1" Grid.Row="1" Width="80" Text="{Binding Port}"/>
-                <Button Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Сменить" Command="{Binding ChangePort}"/>
+                <Button Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Content="Слушать" Command="{Binding ChangePort}"/>
             </Grid>
         </GroupBox>
         <GroupBox  Grid.Column="1" Grid.Row="0" Header="Отправить запрос">
@@ -55,37 +55,8 @@
                 <Button Grid.Row="3" Grid.ColumnSpan="2" Content="Отправить" Width="100" Command="{Binding SendMessage}"/>
             </Grid>
         </GroupBox>
-        <GroupBox  Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Header="Лог">
-            <TextBox Height="60" Text="{Binding Log}" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
-        </GroupBox>
-        <GroupBox Grid.Column="2" Grid.RowSpan="2" Header="Эмуляция запрос/ответ">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <ListView ItemsSource="{Binding Exchanges}" Grid.Row="0">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Header="Запрос">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Request}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                            <GridViewColumn Header="Ответ">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBox Text="{Binding Responce}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-                <Button Grid.Row="1" Content="Добавить" Command="{Binding AddExchange}"/>
-            </Grid>
+        <GroupBox  Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Header="Лог" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <TextBox Text="{Binding Log}" IsReadOnly="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Width="455"/>
         </GroupBox>
     </Grid>
 </Window>
