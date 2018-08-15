@@ -46,10 +46,16 @@ namespace PixelBoardDevice.UI
                 AllowTextEditing = true,
                 AllowClock = false,
                 ZoneCondition = (z) => z is TextZone,
-                Customize = () => new TextZone
+                Customize = () =>
                 {
-                    IsValid = true,
-                },
+                    return new TextZone
+                    {
+                        IsValid = true,
+                        Alignment = 0,
+                        AnimationId = 0,
+                        Height = 8
+                    };
+                }
             },
             new ZoneType
             {
@@ -64,6 +70,8 @@ namespace PixelBoardDevice.UI
                 ZoneCondition = (z) => z is SensorZone,
                 Customize = () => new SensorZone{
                     IsValid = true,
+                    Alignment = 0,
+                    Height = 8
                 }
             },
             new ZoneType
@@ -79,6 +87,8 @@ namespace PixelBoardDevice.UI
                 ZoneCondition = (z) => z is TagZone,
                 Customize = () => new TagZone{
                     IsValid = true,
+                    Alignment = 0,
+                    Height = 8
                 }
             },
             new ZoneType
@@ -106,6 +116,7 @@ namespace PixelBoardDevice.UI
                 ZoneCondition = (z) => z is ClockZone,
                 Customize = () => new ClockZone{
                     IsValid = true,
+                    ClockType = 2
                 },
 
             },
@@ -1229,7 +1240,9 @@ namespace PixelBoardDevice.UI
                             X = 0,
                             Y = 0,
                             Height = 10,
-                            Width = 10
+                            Width = 10,
+                            Alignment = 0,
+                            AnimationId = 0
                         };
                         SelectedProgram.Zones.Add(zone);
                         Zones.Add(zone);
