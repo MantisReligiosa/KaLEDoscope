@@ -56,10 +56,6 @@ namespace CommandProcessing.Commands
             {
                 RaiseError(ex);
             }
-            finally
-            {
-                _networkAgent.Close();
-            }
         }
 
         private void OnDeviceAnswered(ScanResponce responce)

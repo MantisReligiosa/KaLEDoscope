@@ -59,6 +59,7 @@ namespace UdpExcange
                     var responce = new TResponce();
                     responce.SetByteSequence(recievedBytes);
                     Logger.Debug(this, $"Ответ по UDP, порт {port}: {responce.ToString()}");
+                    responceHandler?.Invoke(responce);
                 }
                 catch (Exception ex)
                 {
