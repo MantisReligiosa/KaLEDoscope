@@ -13,7 +13,6 @@ namespace CommandProcessing.Requests
             var identity = o as Identity;
             var nameLength = (byte)identity.Name.Length;
             var bytes = new List<byte>();
-            bytes.AddRange(((ushort)(identity.Id)).ToBytes());
             bytes.Add(nameLength);
             bytes.AddRange(identity.Name.ToBytes());
             return bytes.ToArray();
