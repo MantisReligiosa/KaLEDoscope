@@ -125,7 +125,7 @@ namespace DeviceBuilding
         public ControlsPack GetControlsPack(Device device, ILogger logger)
         {
             var deviceBuilder = _builders.FirstOrDefault(b => b.Model.Equals(device.Model));
-            return deviceBuilder.GetControlsPack(device, logger);
+            return deviceBuilder?.GetControlsPack(device, logger) ?? null;
         }
     }
 }

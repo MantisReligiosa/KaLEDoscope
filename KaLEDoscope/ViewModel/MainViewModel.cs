@@ -837,6 +837,11 @@ namespace KaLEDoscope
             }
             IEnumerable<object> menuItems = null;
             var pack = _deviceFactory.GetControlsPack(deviceNode.Device, _logger);
+            if (pack.IsNull())
+            {
+                return;
+            }
+
             pack.DataChanged += (o, args) => HaveUnsavedData = true;
             menuItems = pack.MenuItems;
 
