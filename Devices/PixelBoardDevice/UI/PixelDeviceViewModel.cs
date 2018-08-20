@@ -750,6 +750,10 @@ namespace PixelBoardDevice.UI
             {
                 _animationType = value;
                 var zone = GetDeviceZone(SelectedProgram.Id, SelectedZone.Id) as TextZone;
+                if (zone.IsNull())
+                {
+                    return;
+                }
                 zone.AnimationId = value.Id;
                 OnPropertyChanged(nameof(AnimationType));
             }
