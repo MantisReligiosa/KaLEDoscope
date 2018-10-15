@@ -151,7 +151,7 @@
                         </ContextMenu>
                     </Button.ContextMenu>
                 </Button>
-                <Button Command="{Binding EditNode}">
+                <Button Command="{Binding EditNode}" IsEnabled="{Binding AllowRename}">
                     <Image Source="Resources\edit_small.png" ToolTip="Редактировать элемент"/>
                 </Button>
                 <Button Command="{Binding RemoveNode}">
@@ -172,11 +172,6 @@
             <i:Interaction.Behaviors>
                 <self:TreeViewBehaviour SelectedItem="{Binding SelectedNode, Mode=TwoWay}"/>
             </i:Interaction.Behaviors>
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseDoubleClick">
-                    <i:InvokeCommandAction Command="{Binding Path=ShowDevicePlugin}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type self:FolderNode}" ItemsSource="{Binding Path=Nodes}">
                     <StackPanel Orientation="Horizontal">
