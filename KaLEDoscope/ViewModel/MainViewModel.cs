@@ -61,6 +61,7 @@ namespace KaLEDoscope
         public event EventHandler QuitApplication;
         public event EventHandler ActivationRequired;
         public event EventHandler TrialExpired;
+        public event EventHandler NewStructure;
         public event EventHandler<ShowAboutEventArgs> ShowAbout;
         public event EventHandler<ShowPreviewEventArgs> ShowPreview;
 
@@ -1138,12 +1139,17 @@ namespace KaLEDoscope
                 {
                     _clearStructure = new DelegateCommand((o) =>
                       {
-                          StructureNodes.Clear();
-
+                          NewStructure?.Invoke(this, EventArgs.Empty);
                       });
                 }
                 return _clearStructure;
             }
+        }
+
+        public void ProceedClearStructure()
+        {
+            StructureNodes.Clear();
+            DeviceTabs.Clear();
         }
 
         private DelegateCommand _scanDevices;

@@ -35,11 +35,22 @@ namespace KaLEDoscope
             _viewModel.ActivationRequired += new EventHandler(OnActivationRequired);
             _viewModel.TrialExpired += new EventHandler(OnTrialExpired);
             _viewModel.ShowOptions += new EventHandler(OnShowOptions);
+            _viewModel.NewStructure += new EventHandler(OnNewStructure);
             _viewModel.QuitApplication += new EventHandler(OnQuitApplication);
             _viewModel.ShowAbout += new EventHandler<ShowAboutEventArgs>(OnShowAbout);
             _viewModel.ShowPreview += new EventHandler<ShowPreviewEventArgs>(OnShowPreview);
             DataContext = trvMenu.DataContext = _viewModel;
             _viewModel.CheckActivation();
+        }
+
+        private void OnNewStructure(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Создать новую структуру?\r\n" +
+                "Все несохранённые данные могут быть утеряны", "Требуется подверждение", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+                == MessageBoxResult.Yes)
+            {
+                _viewModel.ProceedClearStructure();
+            }
         }
 
         private void OnShowPreview(object sender, ShowPreviewEventArgs e)
