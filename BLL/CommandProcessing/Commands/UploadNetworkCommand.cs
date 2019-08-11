@@ -16,6 +16,7 @@ namespace CommandProcessing.Commands
 
         public override void ProcessRecievedData(object responceDTO)
         {
+            _device.Network.ApplyChangingIpAddress();
         }
     }
 }
