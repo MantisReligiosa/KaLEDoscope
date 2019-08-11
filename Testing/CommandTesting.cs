@@ -65,6 +65,13 @@ namespace Testing
                     cmd.OnIdentityRecieved(responce);
                 });
 
+            networkAgent.WhenForAnyArgs(n => n.Send(Arg.Any<string>(), Arg.Any<int>(), Arg.Any<IRequest>()))
+                .Do(x =>
+                {
+                    Assert.Equal(initialIp, x.Arg<string>());
+                    Assert.Equal(initialPort, x.Arg<int>());
+                });
+
             cmd.Execute();
 
             Assert.Equal(editedIp, device.Network.IpAddress);
