@@ -124,6 +124,7 @@
                                       Text="{Binding SyncIntervalStr}" 
                                       IsEditable="True" 
                                       IsSynchronizedWithCurrentItem="False" StaysOpenOnEdit="True">
+                    <ListBoxItem Content="5"/>
                     <ListBoxItem Content="15"/>
                     <ListBoxItem Content="30"/>
                     <ListBoxItem Content="45"/>

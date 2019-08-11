@@ -41,6 +41,7 @@ namespace KaLEDoscope
         private readonly Invoker _invoker;
         private DeviceNode _updatedNode;
         private TabItem _tabItem;
+        private NodeItem _selectedNode = null;
         private readonly ObservableCollection<LogItem> _logItems = new ObservableCollection<LogItem>();
         private readonly INetworkAgent _networkScanAgent;
         private readonly INetworkAgent _networkExchangeAgent;
@@ -60,13 +61,29 @@ namespace KaLEDoscope
         public event EventHandler QuitApplication;
         public event EventHandler ActivationRequired;
         public event EventHandler TrialExpired;
+        public event EventHandler NewStructure;
         public event EventHandler<ShowAboutEventArgs> ShowAbout;
         public event EventHandler<ShowPreviewEventArgs> ShowPreview;
 
         public TabItem SelectedTabItem { get; set; }
         public string StructureFileName { get; set; } = string.Empty;
         public bool IsScanEnabled { get; set; }
-        public NodeItem SelectedNode { get; set; }
+        public NodeItem SelectedNode
+        {
+            get
+            {
+                return _selectedNode;
+            }
+            set
+            {
+                if (_selectedNode == value)
+                    return;
+                _selectedNode = value;
+                ProcessDevicePlugin();
+                OnPropertyChanged(nameof(SelectedNode));
+                OnPropertyChanged(nameof(AllowRename));
+            }
+        }
         public bool AllowDebugLog { get; set; } = false;
         public int Debugs { get; set; }
         public bool AllowInfoLog { get; set; } = true;
@@ -75,6 +92,13 @@ namespace KaLEDoscope
         public int Warnings { get; set; }
         public bool AllowErrorLog { get; set; } = true;
         public int Errors { get; set; }
+        public bool AllowRename
+        {
+            get
+            {
+                return SelectedNode is AggregationNode || SelectedNode is FolderNode;
+            }
+        }
         public string Title
         {
             get
@@ -785,25 +809,30 @@ namespace KaLEDoscope
                 {
                     _showDevicePlugin = new DelegateCommand((o) =>
                     {
-                        var nodeItem = SelectedNode;
-                        if (nodeItem is AggregationNode aggregationNode)
-                        {
-                            ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
-                        }
-                        else if (nodeItem is DeviceNode deviceNode)
-                        {
-                            if (nodeItem.Parent is AggregationNode aggregation)
-                            {
-                                ProcessAggregator(aggregation, deviceNode);
-                            }
-                            else
-                            {
-                                ProcessDevice(deviceNode);
-                            }
-                        }
+                        ProcessDevicePlugin();
                     });
                 }
                 return _showDevicePlugin;
+            }
+        }
+
+        private void ProcessDevicePlugin()
+        {
+            var nodeItem = SelectedNode;
+            if (nodeItem is AggregationNode aggregationNode)
+            {
+                ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);
+            }
+            else if (nodeItem is DeviceNode deviceNode)
+            {
+                if (nodeItem.Parent is AggregationNode aggregation)
+                {
+                    ProcessAggregator(aggregation, deviceNode);
+                }
+                else
+                {
+                    ProcessDevice(deviceNode);
+                }
             }
         }
 
@@ -837,6 +866,11 @@ namespace KaLEDoscope
             }
             IEnumerable<object> menuItems = null;
             var pack = _deviceFactory.GetControlsPack(deviceNode.Device, _logger);
+            if (pack.IsNull())
+            {
+                return;
+            }
+
             pack.DataChanged += (o, args) => HaveUnsavedData = true;
             menuItems = pack.MenuItems;
 
@@ -1105,12 +1139,17 @@ namespace KaLEDoscope
                 {
                     _clearStructure = new DelegateCommand((o) =>
                       {
-                          StructureNodes.Clear();
-
+                          NewStructure?.Invoke(this, EventArgs.Empty);
                       });
                 }
                 return _clearStructure;
             }
+        }
+
+        public void ProceedClearStructure()
+        {
+            StructureNodes.Clear();
+            DeviceTabs.Clear();
         }
 
         private DelegateCommand _scanDevices;
@@ -1208,7 +1247,9 @@ namespace KaLEDoscope
             deviceNode.Parent = targetNode;
             if (targetNode is AggregationNode aggregationNode)
             {
+                var order = aggregationNode.Nodes.OfType<DeviceNode>().Where(d => d.Device.Id != deviceNode.Device.Id).Max(d => d.Device.AggregationOrder) ?? 0;
                 deviceNode.Device.AggregationId = aggregationNode.Aggregation.Id;
+                deviceNode.Device.AggregationOrder = order + 1;
                 if (DeviceTabs.Any(t => t.DataContext == aggregationNode))
                 {
                     ProcessAggregator(aggregationNode, aggregationNode.Nodes.FirstOrDefault() as DeviceNode);

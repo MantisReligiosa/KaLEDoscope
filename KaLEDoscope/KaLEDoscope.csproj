@@ -129,7 +129,6 @@
     <Compile Include="Models\FolderNode.cs" />
     <Compile Include="Models\LogItem.cs" />
     <Compile Include="Models\NodeItem.cs" />
-    <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

@@ -11,8 +11,8 @@ namespace Testing
         public void Responce_ToString()
         {
             var responce = new AcceptanceResponce();
-            responce.SetByteSequence(new byte[] { 0xab, 0xcd, 0xff, 0x00, 0x00 });
-            Assert.Equal("[AB][CD][FF][00][00]", responce.ToString());
+            responce.SetByteSequence(new byte[] { 0xab, 0xcd, 0xf0, 0x00, 0x00 });
+            Assert.Equal("[AB][CD][F0][00][00]", responce.ToString());
         }
 
         [Fact]
@@ -132,6 +132,17 @@ namespace Testing
             Assert.Equal("192.168.0.100", network.Gateway);
             Assert.Equal("192.168.0.101", network.DnsServer);
             Assert.Equal("192.168.0.102", network.AlternativeDnsServer);
+        }
+
+        [Fact]
+        public void AcceptanceResponce_FromByteSequence()
+        {
+            var acceptancekResponce = new AcceptanceResponce();
+            acceptancekResponce.SetByteSequence(new byte[]
+            {
+               0x00, 0xFF, 0xF0, 0x00, 0x00
+            });
+            var network = acceptancekResponce.Cast();
         }
     }
 }
