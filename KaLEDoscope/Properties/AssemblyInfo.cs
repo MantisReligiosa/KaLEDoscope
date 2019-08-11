@@ -39,6 +39,8 @@ using System.Windows;
                                               // app, or any theme specific resource dictionaries)
 )]
 [assembly: Guid("8e64d843-a92b-40c5-a0bf-88640ad33672")]
+[assembly: AssemblyVersion("1.0.11")]
+[assembly: AssemblyFileVersion("1.0.11")]
 
 /*
 // Version information for an assembly consists of the following four values:
