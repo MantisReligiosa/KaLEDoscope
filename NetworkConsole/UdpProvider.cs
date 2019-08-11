@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NetworkConsole
 {
@@ -32,30 +28,34 @@ namespace NetworkConsole
         public void StartListen(IPEndPoint endPoint)
         {
             _udpClient = new UdpClient(endPoint);
-            var s = new UdpState();
-            s.e = endPoint;
-            s.u = _udpClient;
-            _udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), s);
+            var state = new UdpState
+            {
+                Endpoint = endPoint,
+                Client = _udpClient
+            };
+            _udpClient.BeginReceive(new AsyncCallback(ReceiveCallback), state);
         }
 
         private void ReceiveCallback(IAsyncResult ar)
         {
             try
             {
-                UdpClient u = ((UdpState)(ar.AsyncState)).u;
-                IPEndPoint e = ((UdpState)(ar.AsyncState)).e;
+                var client = ((UdpState)(ar.AsyncState)).Client;
+                var endpoint = ((UdpState)(ar.AsyncState)).Endpoint;
 
-                var receiveBytes = u.EndReceive(ar, ref e);
+                var receiveBytes = client.EndReceive(ar, ref endpoint);
                 OnBytesRecieved?.Invoke(this, new BytesRecievedEventArgs
                 {
                     Bytes = receiveBytes,
-                    SenderAddress = e.Address.ToString()
+                    SenderAddress = endpoint.Address.ToString()
                 });
 
-                UdpState s = new UdpState();
-                s.e = e;
-                s.u = u;
-                u.BeginReceive(new AsyncCallback(ReceiveCallback), s);
+                UdpState state = new UdpState
+                {
+                    Endpoint = endpoint,
+                    Client = client
+                };
+                client.BeginReceive(new AsyncCallback(ReceiveCallback), state);
             }
             catch (ObjectDisposedException) { }
             catch (Exception ex)

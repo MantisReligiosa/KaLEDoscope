@@ -5,7 +5,7 @@ namespace NetworkConsole
 {
     internal class UdpState
     {
-        internal IPEndPoint e;
-        internal UdpClient u;
+        internal IPEndPoint Endpoint;
+        internal UdpClient Client;
     }
 }

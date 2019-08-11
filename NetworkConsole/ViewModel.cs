@@ -136,7 +136,7 @@ namespace NetworkConsole
 
         public ViewModel()
         {
-            logMessage("Запуск");
+            LogMessage("Запуск");
             ProviderItem = ProviderItems.First();
             StartListen();
         }
@@ -152,7 +152,7 @@ namespace NetworkConsole
             _providerName = _providerItem.Name;
             var endpoint = new IPEndPoint(IPAddress.Any, _port);
 
-            logMessage($"Начинаю слушать порт {_port} по {_providerName}");
+            LogMessage($"Начинаю слушать порт {_port} по {_providerName}");
             _provider.OnBytesRecieved += OnBytesRecieved;
             _provider.StartListen(endpoint);
         }
@@ -160,17 +160,17 @@ namespace NetworkConsole
         private void OnBytesRecieved(object sender, BytesRecievedEventArgs e)
         {
             var receiveString = e.Bytes.ToStringExtend();
-            logMessage($"Получено: {receiveString} от {e.SenderAddress} по {_providerName}");
+            LogMessage($"Получено: {receiveString} от {e.SenderAddress} по {_providerName}");
         }
 
         private void Close()
         {
-            logMessage($"Закрываю текущее подключение по {_providerName}");
+            LogMessage($"Закрываю текущее подключение по {_providerName}");
             _provider.OnBytesRecieved -= OnBytesRecieved;
             _provider.Close();
         }
 
-        private void logMessage(string Message)
+        private void LogMessage(string Message)
         {
             _log.AppendLine(Message);
             OnPropertyChanged(nameof(Log));
@@ -232,7 +232,7 @@ namespace NetworkConsole
             }
             var bytes = msg.GetBytesFromHexString();
             message += $": {bytes.ToStringExtend()}";
-            logMessage(message);
+            LogMessage(message);
             _provider.Connect(ipEndpoint);
 
 

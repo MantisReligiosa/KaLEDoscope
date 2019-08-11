@@ -26,7 +26,7 @@ namespace TcpExcange
         {
             _isClosed = false;
             tcpListener = new TcpListener(new IPEndPoint(IPAddress.Any, port));
-            var s = new TcpState
+            var state = new TcpState
             {
                 TcpListener = tcpListener
             };
@@ -46,13 +46,14 @@ namespace TcpExcange
                     Array.Copy(data, recievedBytes, recievedBytesAmount);
                     var responce = new TResponce();
                     responce.SetByteSequence(recievedBytes);
+                    Logger.Debug(this, $"Ответ по TCP: {responce.ToString()}");
                     responceHandler?.Invoke(responce);
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(this, "Ошибка при получении ответа", ex);
                 }
-            }), s);
+            }), state);
         }
 
         public void Send(string ipAddress, int port, IRequest request)

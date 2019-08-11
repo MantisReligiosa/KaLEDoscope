@@ -1,7 +1,6 @@
 ﻿using BaseDevice;
 using Extensions;
 using ServiceInterfaces;
-using System;
 
 namespace CommandProcessing
 {
@@ -17,7 +16,7 @@ namespace CommandProcessing
             where T : Device
         {
             _logger.Info(this, $"{command.Name}" +
-                ((!command.Device.IsNull()) ? $" устройства {command.Device.Name}" : String.Empty));
+                ((!command.Device.IsNull()) ? $" устройства {command.Device.Name}" : string.Empty));
             command.Execute();
         }
     }

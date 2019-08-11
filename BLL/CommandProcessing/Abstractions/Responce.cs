@@ -16,7 +16,7 @@ namespace CommandProcessing
         {
             _bytes = recievedBytes;
             var responceId = _bytes[2];
-            if (responceId != ResponceID && responceId < 0xf0)
+            if (responceId != ResponceID)
                 throw new InvalidByteSequenceException("Неверный ID ответа");
             if (recievedBytes.Length < 5)
                 throw new InvalidByteSequenceException("Неверная длина ответа");

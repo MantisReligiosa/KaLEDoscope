@@ -5,17 +5,17 @@ namespace CommandProcessing
 {
     public abstract class Request : IRequest
     {
-        private object _t;
+        private object _data;
         public abstract byte RequestID { get; }
         public ushort DeviceID { get; set; }
         public void SetRequestData(object data)
         {
-            _t = data;
+            _data = data;
         }
         public abstract byte[] MakeData(object o);
         public byte[] GetBytes()
         {
-            var datas = MakeData(_t);
+            var datas = MakeData(_data);
             var dataLength = (ushort)datas.Length;
             var requestLength = (ushort)(datas.Length + 5);
             var bytes = new byte[requestLength];
