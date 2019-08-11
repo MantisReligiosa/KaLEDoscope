@@ -2,34 +2,57 @@
 {
     public class Network
     {
-        private string _actualIpAddress = string.Empty;
-        private string _editedIpAddress = string.Empty;
-
         public string IpAddress
         {
-            get => _editedIpAddress.Equals(string.Empty) ? _actualIpAddress : _editedIpAddress;
+            get => EditedIpAddress.Equals(string.Empty) ? ActualIpAddress : EditedIpAddress;
             set
             {
-                if (_actualIpAddress.Equals(string.Empty))
+                if (ActualIpAddress.Equals(string.Empty))
                 {
-                    _actualIpAddress = value;
+                    ActualIpAddress = value;
                 }
                 else
                 {
-                    _editedIpAddress = value;
+                    EditedIpAddress = value;
                 }
             }
         }
-        public void ApplyChangingIpAddress()
+
+        public int Port
         {
-            _actualIpAddress = _editedIpAddress;
-            _editedIpAddress = string.Empty;
+            get => EditedPort.Equals(default(int)) ? ActualPort : EditedPort;
+            set
+            {
+                if (ActualPort.Equals(default(int)))
+                {
+                    ActualPort = value;
+                }
+                else
+                {
+                    EditedPort = value;
+                }
+            }
         }
 
+        public void ApplyChangingIpAddress()
+        {
+            ActualIpAddress = EditedIpAddress;
+            EditedIpAddress = string.Empty;
+        }
+
+        public void ApplyChangingPort()
+        {
+            ActualPort = EditedPort;
+            EditedPort = default(int);
+        }
+
+        public string EditedIpAddress { get; set; } = string.Empty;
+        public string ActualIpAddress { get; set; } = string.Empty;
+        public int EditedPort { get; set; } = default(int);
+        public int ActualPort { get; set; } = default(int);
         public byte SubnetMask { get; set; }
         public string Gateway { get; set; }
         public string DnsServer { get; set; }
         public string AlternativeDnsServer { get; set; }
-        public int Port { get; set; }
     }
 }
