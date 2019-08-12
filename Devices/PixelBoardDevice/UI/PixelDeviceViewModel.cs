@@ -225,7 +225,7 @@ namespace PixelBoardDevice.UI
         public ObservableCollection<TickerType> TickerTypes { get; set; }
         public ObservableCollection<AnimationType> AnimationTypes { get; set; }
 
-        public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = false)
+        public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = true)
         {
             PropertyChanged += (s, e) => ValidateAndInvokePreview();
             Device = (PixelBoard)d;
@@ -248,7 +248,7 @@ namespace PixelBoardDevice.UI
             PreviewScaleMaxRate = 5;
             DeviceHeight = Device.BoardSize.Height;
             DeviceWidth = Device.BoardSize.Width;
-            AllowChangeBoardSize = Device.IsStandaloneConfiguration;
+            //AllowChangeBoardSize = Device.IsStandaloneConfiguration;
             AllowAnimation(false);
             AllowBitmap(false);
             AllowExternalTag(false);
