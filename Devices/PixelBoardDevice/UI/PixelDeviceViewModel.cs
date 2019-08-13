@@ -25,7 +25,6 @@ namespace PixelBoardDevice.UI
     {
         public event EventHandler ModelChanged;
         public readonly PixelBoard Device;
-        private readonly ILogger _logger;
         private readonly string _alphabet =
     "0123456789" +
     "abcdefghijklmnopqrstuvwxyz" +
@@ -34,7 +33,7 @@ namespace PixelBoardDevice.UI
     "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЮЬЭЮЯ" +
     "`~!@#$%^&*()[]{}-_+=*:;\"',.<>/\\| ";
 
-        private readonly List<ZoneType> _zoneTypes = new List<ZoneType>
+        private static readonly List<ZoneType> _zoneTypes = new List<ZoneType>
         {
             new ZoneType
             {
@@ -210,7 +209,56 @@ namespace PixelBoardDevice.UI
             }
         };
 
-        private readonly List<int> _fontSizes = new List<int>
+        private static readonly List<POCO.BoardHardwareType> _boardHardwareTypes = new List<POCO.BoardHardwareType>
+        {
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.Hub12,
+                Name = "HUB12"
+            },
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.Hub08,
+                Name = "HUB08"
+            },
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.RsPanel16x16,
+                Name = "RS panel 16x16"
+            },
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.RsPanel8x16,
+                Name = "RS panel 8x16"
+            },
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.RsPanel8x8,
+                Name = "RS panel 8x8"
+            },
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.RsPanel8x4,
+                Name = "RS panel 8x4"
+            },
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.RsPanel12x12,
+                Name = "RS panel 12x12"
+            },
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.RsPanel9x28,
+                Name = "RS panel 9x28"
+            },
+            new POCO.BoardHardwareType
+            {
+                Id = (int)DomainObjects.BoardHardwareType.Rs7Segment,
+                Name = "RS 7 segment"
+            },
+        };
+
+        private static readonly List<int> _fontSizes = new List<int>
         {
             8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48, 72
         };
@@ -224,12 +272,13 @@ namespace PixelBoardDevice.UI
         public ObservableCollection<ClockType> ClockTypes { get; set; }
         public ObservableCollection<TickerType> TickerTypes { get; set; }
         public ObservableCollection<AnimationType> AnimationTypes { get; set; }
+        public ObservableCollection<POCO.BoardHardwareType> BoardHardwareTypes { get; set; }
 
         public PixelDeviceViewModel(Device d, ILogger l, bool allowChangeBoardSize = true)
         {
             PropertyChanged += (s, e) => ValidateAndInvokePreview();
             Device = (PixelBoard)d;
-            _logger = l;
+            Logger = l;
             ZoneTypes = new ObservableCollection<ZoneType>(_zoneTypes);
             Programs = new ObservableCollection<Program>(Device.Programs);
             Fonts = new ObservableCollection<Font.FontFamily>(new InstalledFontCollection().Families.Select(f => new Font.FontFamily(f.Name)));
@@ -241,6 +290,7 @@ namespace PixelBoardDevice.UI
             Zones.CollectionChanged += (s, e) => ValidateAndInvokePreview();
             SelectedProgram = Programs.FirstOrDefault();
             FontSizes = new ObservableCollection<int>(_fontSizes);
+            BoardHardwareTypes = new ObservableCollection<POCO.BoardHardwareType>(_boardHardwareTypes);
             TextAlignment = TextAlignment.Left;
             AllowChangeBoardSize = allowChangeBoardSize;
             PreviewScale = 1;
@@ -809,6 +859,18 @@ namespace PixelBoardDevice.UI
             }
         }
 
+        private POCO.BoardHardwareType _boardHardwareType;
+        public POCO.BoardHardwareType BoardHardwareType
+        {
+            get => _boardHardwareType;
+            set
+            {
+                _boardHardwareType = value;
+                Device.Hardware.Type = (DomainObjects.BoardHardwareType)(value.Id);
+                OnPropertyChanged(nameof(BoardHardwareType));
+            }
+        }
+
         private int _deviceWidth;
         public int DeviceWidth
         {
@@ -1292,7 +1354,7 @@ namespace PixelBoardDevice.UI
             }
         }
 
-        public ILogger Logger => _logger;
+        public ILogger Logger { get; }
 
         private double _previewScale;
         public double PreviewScale

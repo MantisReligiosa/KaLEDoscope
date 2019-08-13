@@ -24,6 +24,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <GroupBox Grid.Column="0" Header="Размеры табло" IsEnabled="{Binding AllowChangeBoardSize}" Style="{StaticResource GroupBoxStyle}">
@@ -43,7 +44,7 @@
                         <xctk:IntegerUpDown Grid.Column="1" Grid.Row="1" Value="{Binding DeviceHeight}" Minimum="0"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Grid.Column="1" Header="Доступ к MQTT" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox Grid.Column="2" Header="Доступ к MQTT" Style="{StaticResource GroupBoxStyle}" IsEnabled="False">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
@@ -60,7 +61,7 @@
                         <xctk:IntegerUpDown Grid.Column="1" Grid.Row="1" Minimum="0"/>
                     </Grid>
                 </GroupBox>
-                <GroupBox Grid.Column="2" Header="Доступ к OPC" Style="{StaticResource GroupBoxStyle}">
+                <GroupBox Grid.Column="3" Header="Доступ к OPC" Style="{StaticResource GroupBoxStyle}" IsEnabled="False">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
@@ -75,6 +76,20 @@
                         <TextBox Grid.Column="1" Grid.Row="0" />
                         <Label Grid.Column="0" Grid.Row="1">Порт</Label>
                         <xctk:IntegerUpDown Grid.Column="1" Grid.Row="1" Minimum="0"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="1" Header="Оборудование" Style="{StaticResource GroupBoxStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Label Grid.Column="0" Grid.Row="0">Тип панелей</Label>
+                        <ComboBox Grid.Column="1" Grid.Row="0" ItemsSource="{Binding BoardHardwareTypes}" SelectedItem="{Binding BoardHardwareType}" DisplayMemberPath="Name"></ComboBox>
                     </Grid>
                 </GroupBox>
             </Grid>

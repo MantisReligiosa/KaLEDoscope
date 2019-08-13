@@ -9,5 +9,6 @@ namespace PixelBoardDevice.DomainObjects
         public BoardSize BoardSize { get; set; }
         public List<Program> Programs { get; set; }
         public List<BinaryImage> BinaryImages { get; set; }
+        public BoardHardware Hardware { get; set; }
     }
 }

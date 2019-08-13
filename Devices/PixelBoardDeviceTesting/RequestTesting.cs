@@ -325,5 +325,40 @@ namespace PixelBoardDeviceTesting
                 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
             }, request.GetBytes());
         }
+
+        [Fact]
+        public void UploadBoardConfigRequest_ToByteSequence()
+        {
+            var request = new UploadBoardConfigRequest
+            {
+                DeviceID = 0x1111
+            };
+            request.SetRequestData(new BoardSize
+            {
+                Height = 64,
+                Width = 900
+            });
+            Assert.Equal(new byte[]
+            {
+                0x11, 0x11, 0x20, 0x00, 0x04, 0x03, 0x84, 0x00, 0x40
+            }, request.GetBytes());
+        }
+
+        [Fact]
+        public void UploadBoardHardwareConfigReques_ToByteSequence()
+        {
+            var request = new UploadBoardHardwareConfigRequest
+            {
+                DeviceID = 0x1111
+            };
+            request.SetRequestData(new BoardHardware
+            {
+                Type = BoardHardwareType.RsPanel16x16
+            });
+            Assert.Equal(new byte[]
+            {
+                0x11, 0x11, 0x27, 0x00, 0x01, 0x03
+            }, request.GetBytes());
+        }
     }
 }

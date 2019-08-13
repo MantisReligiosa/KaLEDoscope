@@ -1,4 +1,5 @@
-﻿using PixelBoardDevice.DomainObjects.Zones;
+﻿using PixelBoardDevice.DomainObjects;
+using PixelBoardDevice.DomainObjects.Zones;
 using PixelBoardDevice.Responces;
 using System;
 using Xunit;
@@ -18,6 +19,18 @@ namespace PixelBoardDeviceTesting
             var boardSize = responce.Cast();
             Assert.Equal(900, boardSize.Width);
             Assert.Equal(64, boardSize.Height);
+        }
+
+        [Fact]
+        public void BoardHardwareConfigResponce_FromByteSequence()
+        {
+            var responce = new BoardHardwareConfigResponce();
+            responce.SetByteSequence(new byte[]
+            {
+                0x11, 0x11, 0x27, 0x00, 0x01, 0x03
+            });
+            var boardHardware = responce.Cast();
+            Assert.Equal(BoardHardwareType.RsPanel16x16, boardHardware.Type);
         }
 
         [Fact]

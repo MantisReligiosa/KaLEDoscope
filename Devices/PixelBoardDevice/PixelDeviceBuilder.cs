@@ -54,7 +54,7 @@ namespace PixelBoardDevice
                 VerticalAlignment = VerticalAlignment.Stretch,
                 DataContext = _model
             };
-            customizationControl.TextEditControl.Loaded += (o, e) => 
+            customizationControl.TextEditControl.Loaded += (o, e) =>
             {
                 _model.TextEditWidth = (int)customizationControl.TextEditControl.ActualWidth;
             };
@@ -162,7 +162,8 @@ namespace PixelBoardDevice
                         Zones = new List<Zone>()
                     }
                 },
-                Name = String.IsNullOrEmpty(device.Name) ? DisplayName : device.Name
+                Name = string.IsNullOrEmpty(device.Name) ? DisplayName : device.Name,
+                Hardware = castedDevice?.Hardware ?? new BoardHardware()
             };
             return pixelBoard;
         }
@@ -198,6 +199,7 @@ namespace PixelBoardDevice
             => new List<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>>
             {
                 (d, n, l, c) => new DownloadBoardConfigCommand(d, n, l, c),
+                (d, n, l, c) => new DownloadBoardHardwareConfigCommand(d, n, l, c),
                 (d, n, l, c) => new DownloadFontsCommand(d, n, l, c),
                 (d, n, l, c) => new DownloadProgramsCommands(d, n, l, c),
                 (d, n, l, c) => new DownloadZonesCommand(d, n, l, c),
@@ -207,6 +209,8 @@ namespace PixelBoardDevice
         public IEnumerable<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>> GetUploadCommands()
             => new List<Func<Device, INetworkAgent, ILogger, IConfig, IDeviceCommand<Device>>>
             {
+                (d, n, l, c) => new UploadBoardConfigCommand(d, n, l, c),
+                (d, n, l, c) => new UploadBoardHardwareConfigCommand(d, n, l, c),
                 (d, n, l, c) => new UploadFontsCommand(d, n, l, c),
                 (d, n, l, c) => new UploadProgramsCommand(d, n, l, c),
                 (d, n, l, c) => new UploadZonesCommand(d, n, l, c),
