@@ -80,9 +80,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\DownloadBinaryImageCommand.cs" />
+    <Compile Include="Commands\DownloadBoardHardwareConfigCommand.cs" />
     <Compile Include="Commands\DownloadBoardConfigCommand.cs" />
     <Compile Include="Commands\DownloadFontsCommand.cs" />
     <Compile Include="Commands\DownloadProgramsCommands.cs" />
+    <Compile Include="Commands\UploadBoardConfigCommand.cs" />
+    <Compile Include="Commands\UploadBoardHardwareConfigCommand.cs" />
     <Compile Include="Commands\UploadFontsCommand.cs" />
     <Compile Include="Commands\UploadBinaryImageCommand.cs" />
     <Compile Include="Commands\UploadStorageItemsCommand.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="Commands\UploadZonesCommand.cs" />
     <Compile Include="DomainObjects\BinaryFont.cs" />
     <Compile Include="DomainObjects\BinaryImage.cs" />
+    <Compile Include="DomainObjects\BoardHardware.cs" />
     <Compile Include="DomainObjects\BoardSize.cs" />
     <Compile Include="DomainObjects\Constants.cs" />
     <Compile Include="DomainObjects\IFontableZone.cs" />
@@ -115,11 +119,14 @@
     <Compile Include="Requests\GetIdListRequest.cs" />
     <Compile Include="Requests\GetStorageItemRequest.cs" />
     <Compile Include="Requests\UploadBinaryImageRequest.cs" />
+    <Compile Include="Requests\UploadBoardConfigRequest.cs" />
+    <Compile Include="Requests\UploadBoardHardwareConfigRequest.cs" />
     <Compile Include="Requests\UploadFontRequest.cs" />
     <Compile Include="Commands\UploadProgramsCommand.cs" />
     <Compile Include="Requests\UploadProgramRequest.cs" />
     <Compile Include="Requests\UploadZoneRequest.cs" />
     <Compile Include="Responces\BinaryImageResponce.cs" />
+    <Compile Include="Responces\BoardHardwareConfigResponce.cs" />
     <Compile Include="Responces\BoardConfigResponce.cs" />
     <Compile Include="Responces\FontResponce.cs" />
     <Compile Include="Responces\IdListResponce.cs" />
@@ -127,6 +134,7 @@
     <Compile Include="Responces\ZoneResponce.cs" />
     <Compile Include="Serialization\SerializableBinaryImage.cs" />
     <Compile Include="UI\POCO\AnimationType.cs" />
+    <Compile Include="UI\POCO\BoardHardwareType.cs" />
     <Compile Include="UI\POCO\TickerType.cs" />
     <Compile Include="UI\ProgramPreviewViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

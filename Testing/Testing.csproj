@@ -68,6 +68,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivationTesting.cs" />
+    <Compile Include="CommandTesting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestTesting.cs" />
     <Compile Include="ResponceTesting.cs" />

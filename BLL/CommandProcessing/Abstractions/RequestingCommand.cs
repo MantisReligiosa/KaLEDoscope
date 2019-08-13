@@ -33,7 +33,7 @@ namespace CommandProcessing
             request.SetRequestData(GetRequestData());
             try
             {
-                _networkAgent.Send(_device.Network.IpAddress, _device.Network.Port, request);
+                _networkAgent.Send(_device.Network.ActualIpAddress, _device.Network.ActualPort, request);
             }
             catch (Exception ex)
             {
@@ -60,7 +60,7 @@ namespace CommandProcessing
             }
         }
 
-        private void OnIdentityRecieved(TResponce responce)
+        public void OnIdentityRecieved(TResponce responce)
         {
             if (responce.Resultativity == Resultativity.Busy)
             {
@@ -69,7 +69,7 @@ namespace CommandProcessing
                 return;
             }
             if (responce.Resultativity != Resultativity.DataRequest
-                || responce.Resultativity != Resultativity.Accepted)
+                && responce.Resultativity != Resultativity.Accepted)
             {
                 _logger.Debug(this, $"Устройство вернуло код {responce.Resultativity}");
                 RaiseError(new ExchangeException("Ошибка запроса данных"));

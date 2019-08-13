@@ -28,6 +28,7 @@ namespace Logger
         {
             ErrorRaised?.Invoke(sender, message);
             _logger.Error(exception, message);
+            Debug(sender, $"{message}: {exception}");
         }
 
         public void Info(object sender, string message)
