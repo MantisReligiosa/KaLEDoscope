@@ -1,5 +1,6 @@
 ﻿using BaseDevice;
 using CommandProcessing.Responces;
+using Extensions.Exceptions;
 using System;
 using Xunit;
 
@@ -46,6 +47,17 @@ namespace Testing
             var identity = identityResponce.Cast();
             Assert.Equal(0xabce, identity.Id);
             Assert.Equal("deviceName", identity.Name);
+        }
+
+        [Fact]
+        public void IdentityResponce_ArthurTest() 
+        {
+            var identityResponce = new IdentityResponce();
+            identityResponce.SetByteSequence(new byte[]
+            {
+                0xAB, 0xCD, 0x03, 0x00, 0x0B, 0x0A, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x4E, 0x61, 0xD6, 0x65
+            });
+            Assert.Throws<ExctractionException>(() => identityResponce.Cast());
         }
 
         [Fact]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extensions.Exceptions;
+using System;
 using System.Text;
 
 namespace Extensions
@@ -25,15 +26,29 @@ namespace Extensions
         }
         public static ushort ExtractUshort(this byte[] bytes, int position)
         {
+            var length = 2;
+            if (bytes.Length < position + length)
+            {
+                throw new ExctractionException($"Ошибка извлечения USHORT. Ожидалось {length} байт, но найдено {bytes.Length - position} байт");
+            }
             return (ushort)((bytes[position] << 8) + bytes[position + 1]);
         }
         public static uint ExtractUint(this byte[] bytes, int position)
         {
-            return (uint)((bytes[position] << 24) + (bytes[position + 1] << 16) 
+            var length = 4;
+            if (bytes.Length < position + length)
+            {
+                throw new ExctractionException($"Ошибка извлечения UINT. Ожидалось {length} байт, но найдено {bytes.Length - position} байт");
+            }
+            return (uint)((bytes[position] << 24) + (bytes[position + 1] << 16)
                 + (bytes[position + 2] << 8) + bytes[position + 3]);
         }
         public static string ExtractString(this byte[] bytes, int position, int length)
         {
+            if (bytes.Length < position + length)
+            {
+                throw new ExctractionException($"Ошибка извлечения STRING. Ожидалось {length} байт, но найдено {bytes.Length - position} байт");
+            }
             var bytesStr = new byte[length];
             Array.Copy(bytes, position, bytesStr, 0, length);
             return Encoding.ASCII.GetString(bytesStr);
