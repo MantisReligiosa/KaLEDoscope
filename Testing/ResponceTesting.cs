@@ -50,7 +50,7 @@ namespace Testing
         }
 
         [Fact]
-        public void IdentityResponce_ArthurTest() 
+        public void IdentityResponce_IdMissingTest() 
         {
             var identityResponce = new IdentityResponce();
             identityResponce.SetByteSequence(new byte[]
