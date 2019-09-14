@@ -1,4 +1,5 @@
 ﻿using CommandProcessing;
+using System;
 
 namespace PixelBoardDevice.Requests
 {
@@ -8,7 +9,7 @@ namespace PixelBoardDevice.Requests
 
         public override byte[] MakeData(object o)
         {
-            return new byte[] { (byte)(int)o };
+            return new byte[] { Convert.ToByte(o) };
         }
     }
 }
