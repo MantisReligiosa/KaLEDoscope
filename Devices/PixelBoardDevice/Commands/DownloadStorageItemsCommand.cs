@@ -69,6 +69,7 @@ namespace PixelBoardDevice.Commands
 
         private void OnIdentityRecieved(IdListResponce responce)
         {
+            _timer.Stop();
             if (responce.Resultativity == Resultativity.Busy)
             {
                 _logger.Debug(this, "Устройстов занято");
@@ -90,7 +91,7 @@ namespace PixelBoardDevice.Commands
                 RaiseError(new ExchangeException("Ошибка получения списка идентификаторов"));
                 return;
             }
-            _timer.Stop();
+            
             _networkAgent.Close();
             CleanupItemListBeforeRecievingItems();
             if (!_idList.Items.Any())
