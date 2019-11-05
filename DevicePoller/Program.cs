@@ -5,6 +5,7 @@ using DeviceBuilding;
 using DevicePoller.Properties;
 using PixelBoardDevice;
 using ServiceInterfaces;
+using SevenSegmentBoardDevice;
 using System;
 using TcpExcange;
 
@@ -20,6 +21,7 @@ namespace DevicePoller
 
             var deviceFactory = new DeviceFactory(logger);
             deviceFactory.AddBuilder(new PixelDeviceBuilder());
+            deviceFactory.AddBuilder(new SevenSegmentDeviceBuilder());
             var service = new ConfigurationService(networkAgent, deviceFactory, logger, _config);
             var device = new Device
             {

@@ -72,6 +72,10 @@
       <Project>{F22FAA1E-1120-4B56-992B-7473F9DF1B45}</Project>
       <Name>PixelBoardDevice</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Devices\SevenSegmentBoardDevice\SevenSegmentBoardDevice.csproj">
+      <Project>{96D808B9-C3F8-4604-BE96-2C85074EC088}</Project>
+      <Name>SevenSegmentBoardDevice</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Domain\BaseDevice\BaseDevice.csproj">
       <Project>{677B5FDE-5DA7-4065-B446-014822533CBC}</Project>
       <Name>BaseDevice</Name>
