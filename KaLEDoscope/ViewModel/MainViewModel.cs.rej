@@ -1,0 +1,41 @@
+diff a/KaLEDoscope/ViewModel/MainViewModel.cs b/KaLEDoscope/ViewModel/MainViewModel.cs	(rejected hunks)
+@@ -219,39 +219,6 @@
+             }
+         }
+ 
+-        private void DirectConnectDeviceScanner_OnScanCompleted(List<Device> devices)
+-        {
+-            _dispatcher.Invoke(() =>
+-            {
+-                foreach (var device in devices)
+-                {
+-                    var existsDeviceNode = FindDeviceNodeFor(device);
+-                    if (!existsDeviceNode.IsNull())
+-                    {
+-                        existsDeviceNode.Device = device;
+-                        existsDeviceNode.Name = device.Name;
+-                        existsDeviceNode.AllowDownload = true;
+-                        existsDeviceNode.AllowLoad = true;
+-                        existsDeviceNode.AllowSave = true;
+-                        existsDeviceNode.AllowUpload = true;
+-                    }
+-                    else
+-                    {
+-                        StructureNodes.Add(new DeviceNode
+-                        {
+-                            Device = device,
+-                            Name = device.Name,
+-                            AllowDownload = true,
+-                            AllowLoad = true,
+-                            AllowSave = true,
+-                            AllowUpload = true
+-                        });
+-                    }
+-                }
+-                HaveUnsavedData = devices.Any();
+-            });
+-            IsScanEnabled = true;
+-        }
+         private DelegateCommand _options;
+         public Input.ICommand Options
+         {

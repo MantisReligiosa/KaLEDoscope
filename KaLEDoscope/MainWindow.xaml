@@ -1,0 +1,270 @@
+﻿<Window x:Class="KaLEDoscope.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:self="clr-namespace:KaLEDoscope"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+        mc:Ignorable="d"
+        xmlns:dd="urn:gong-wpf-dragdrop"
+        Title="{Binding Title}" d:DesignWidth="900" d:DesignHeight="540" WindowState="Maximized" Icon="Resources/Logo.ico">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding Quit}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Ctrl" Command="{Binding ClearStructure}"/>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenStructure}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveStructure}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="{Binding SaveStructureAs}"/>
+        <KeyBinding Key="F5" Command="{Binding ScanDevices}"/>
+    </Window.InputBindings>
+    <Window.Resources>
+        <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="3*"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="1*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition Width="4*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <DockPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="10">
+            <Menu DockPanel.Dock="Top">
+                <MenuItem Header="_Файл">
+                    <MenuItem Header="_Новый проект" InputGestureText="Ctrl+N" Command="{Binding ClearStructure}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\New.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="Открыть..." InputGestureText="Ctrl+O" Command="{Binding OpenStructure}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Folder.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Сохранить" InputGestureText="Ctrl+S" Command="{Binding SaveStructure}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Save.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Coхранить как..." InputGestureText="Ctrl+Shift+S" Command="{Binding SaveStructureAs}"/>
+                    <Separator/>
+                    <MenuItem Header="_Настройки..." Command="{Binding Options}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Settings.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator/>
+                    <MenuItem Header="_Выход" InputGestureText="Alt+F4" Command="{Binding Quit}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Exit.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="_Структура">
+                    <MenuItem Header="_Добавить элемент">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\edit_add.png"/>
+                        </MenuItem.Icon>
+                        <MenuItem Header="_Агрегатор" Command="{Binding NewAggregator}">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\Aggregation.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="_Папку" Command="{Binding NewFolder}">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\Folder.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Header="_Устройство" ItemsSource="{Binding DeviceItems}">
+                            <MenuItem.Icon>
+                                <Image Source="Resources\HardDisk.png"/>
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem Header="_Редактировать элемент" Command="{Binding EditNode}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\edit_small.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Удалить элемент" Command="{Binding RemoveNode}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\trashBin.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <MenuItem Header="_Сканировать" InputGestureText="F5" Command="{Binding ScanDevices}" IsEnabled="{Binding IsScanEnabled}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Search.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="Справка">
+                    <MenuItem Header="О программе..." Command="{Binding About}">
+                        <MenuItem.Icon>
+                            <Image Source="Resources\Help.png"/>
+                        </MenuItem.Icon>
+                    </MenuItem>
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <ToolBar x:Name="toolbar" Grid.Row="1" Grid.ColumnSpan="10" Height="27" ToolBarTray.IsLocked="True">
+            <ToolBar.Items>
+                <Button Command="{Binding ClearStructure}" ToolTip="Новый проект">
+                    <Image Source="Resources\New.png"/>
+                </Button>
+                <Button Command="{Binding OpenStructure}" >
+                    <Image Source="Resources\Folder.png" ToolTip="Открыть"/>
+                </Button>
+                <Button Command="{Binding SaveStructure}" >
+                    <Image Source="Resources\Save.png" ToolTip="Сохранить"/>
+                </Button>
+                <Separator/>
+                <Button>
+                    <i:Interaction.Behaviors>
+                        <self:DropDownButtonBehavior/>
+                    </i:Interaction.Behaviors>
+                    <Image Source="Resources\edit_add.png" ToolTip="Добавить элемент"/>
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="_Агрегатор" Command="{Binding NewAggregator}">
+                                <MenuItem.Icon>
+                                    <Image Source="Resources\Aggregation.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="_Папку" Command="{Binding NewFolder}">
+                                <MenuItem.Icon>
+                                    <Image Source="Resources\Folder.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem Header="_Устройство" ItemsSource="{Binding DeviceItems}">
+                                <MenuItem.Icon>
+                                    <Image Source="Resources\HardDisk.png"/>
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+                <Button Command="{Binding EditNode}" IsEnabled="{Binding AllowRename}">
+                    <Image Source="Resources\edit_small.png" ToolTip="Редактировать элемент"/>
+                </Button>
+                <Button Command="{Binding RemoveNode}">
+                    <Image Source="Resources\trashBin.png" ToolTip="Удалить элемент"/>
+                </Button>
+                <Separator/>
+                <Button Command="{Binding ScanDevices}" VerticalAlignment="Bottom" IsEnabled="{Binding IsScanEnabled}" ToolTip="Сканировать">
+                    <Image Source="Resources\Search.png"/>
+                </Button>
+            </ToolBar.Items>
+        </ToolBar>
+        <GridSplitter Grid.Row="2" Grid.Column="1" Grid.RowSpan="3" Width="5"
+                      VerticalAlignment="Stretch" HorizontalAlignment="Center"></GridSplitter>
+        <GridSplitter Grid.Row="3" Grid.Column="2" Height="5"
+                      VerticalAlignment="Center" HorizontalAlignment="Stretch"></GridSplitter>
+        <TreeView Grid.Row="2" Grid.RowSpan="3" x:Name="trvMenu" ItemsSource="{Binding Path=StructureNodes}" Style="{StaticResource TreeViewStyle}"
+                          dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}">
+            <i:Interaction.Behaviors>
+                <self:TreeViewBehaviour SelectedItem="{Binding SelectedNode, Mode=TwoWay}"/>
+            </i:Interaction.Behaviors>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type self:FolderNode}" ItemsSource="{Binding Path=Nodes}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\Folder.png" Margin="0,0,5,0" Height="16"/>
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type self:AggregationNode}" ItemsSource="{Binding Path=Nodes}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\Aggregation.png" Margin="0,0,5,0" Height="16"/>
+                        <TextBlock Text="{Binding Name}" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type self:DeviceNode}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="Resources\HardDisk.png" Margin="0,0,5,0" Height="16"/>
+                        <TextBlock Text="{Binding Path=Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+        <Grid Grid.Column="2" Grid.Row="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <ToolBar Grid.Row="0" ToolBarTray.IsLocked="True">
+                <ToolBar.Items>
+                    <CheckBox IsChecked="{Binding AllowDebugLog}" Command="{Binding ApplyLogFilter}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\Debug.png" Margin="0,0,5,0" Height="16"/>
+                            <TextBlock Text="{Binding Debugs}"/>
+                            <TextBlock Text=" Debugs"/>
+                        </StackPanel>
+                    </CheckBox>
+                    <Separator/>
+                    <CheckBox IsChecked="{Binding AllowInfoLog}" Command="{Binding ApplyLogFilter}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\Info.png" Margin="0,0,5,0" Height="16"/>
+                            <TextBlock Text="{Binding Infos}"/>
+                            <TextBlock Text=" Infos"/>
+                        </StackPanel>
+                    </CheckBox>
+                    <Separator/>
+                    <CheckBox IsChecked="{Binding AllowWarnLog}" Command="{Binding ApplyLogFilter}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\Warning.png" Margin="0,0,5,0" Height="16"/>
+                            <TextBlock Text="{Binding Warnings}"/>
+                            <TextBlock Text=" Warnings"/>
+                        </StackPanel>
+                    </CheckBox>
+                    <Separator/>
+                    <CheckBox IsChecked="{Binding AllowErrorLog}" Command="{Binding ApplyLogFilter}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="Resources\Error.png" Margin="0,0,5,0" Height="16"/>
+                            <TextBlock Text="{Binding Errors}"/>
+                            <TextBlock Text=" Errors"/>
+                        </StackPanel>
+                    </CheckBox>
+                </ToolBar.Items>
+            </ToolBar>
+            <DataGrid Grid.Row="1" IsReadOnly="True" AutoGenerateColumns="False" ItemsSource="{Binding FilteredLogItems}" CanUserReorderColumns="False" CanUserResizeRows="False" HorizontalGridLinesBrush="#FFE0E0E0" VerticalGridLinesBrush="#FFE0E0E0">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Name="Level" Source="Resources\Debug.png" Height="16"/>
+                                <DataTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding LogLevel}" Value="Info">
+                                        <Setter TargetName="Level" Property="Source" Value="Resources\Info.png"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LogLevel}" Value="Warn">
+                                        <Setter TargetName="Level" Property="Source" Value="Resources\Warning.png"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding LogLevel}" Value="Error">
+                                        <Setter TargetName="Level" Property="Source" Value="Resources\Error.png"/>
+                                    </DataTrigger>
+                                </DataTemplate.Triggers>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Время" Binding="{Binding TimeSpanStr}" SortDirection="Descending"/>
+                    <DataGridTextColumn Header="Сообщение" Width="*" Binding="{Binding Message}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+        <TabControl 
+                x:Name="tabControl" 
+                Grid.Column="2" 
+                Grid.Row="2" 
+                ItemsSource="{Binding Path=DeviceTabs}" 
+                SelectedItem="{Binding SelectedTabItem, Mode=TwoWay}">
+
+        </TabControl>
+    </Grid>
+</Window>

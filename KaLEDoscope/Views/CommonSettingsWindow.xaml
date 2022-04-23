@@ -1,0 +1,13 @@
+﻿<Window x:Class="KaLEDoscope.Views.CommonSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KaLEDoscope.Views"
+        xmlns:kaledoscope="clr-namespace:KaLEDoscope"
+        mc:Ignorable="d"
+        Title="Базовые настройки" ResizeMode="NoResize" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterOwner" ShowInTaskbar="False" Topmost="True" Icon="/KaLEDoscope;component/Resources/Logo.ico">
+    <Grid>
+        <kaledoscope:BaseDeviceControl x:Name="commonSettingsControl"></kaledoscope:BaseDeviceControl>
+    </Grid>
+</Window>

@@ -1,0 +1,342 @@
+﻿<UserControl x:Class="KaLEDoscope.BaseDeviceControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:local="clr-namespace:KaLEDoscope"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+            <ColumnDefinition Width="auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" 
+                  Grid.ColumnSpan="2"
+                  Header="Идентификация"
+                  Style="{StaticResource GroupBoxStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                        <ColumnDefinition Width="*"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"></RowDefinition>
+                    </Grid.RowDefinitions>
+                    <Label Content="Id" 
+                       Grid.Row="0" 
+                       Grid.Column="0" 
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top"/>
+                    <TextBox Grid.Row="0"
+                             Grid.Column="1"
+                             Text="{Binding Id}"
+                             IsReadOnly="False"/>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid HorizontalAlignment="Right" Width="188">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Label Content="Имя" 
+                       Grid.Row="0" 
+                       Grid.Column="0" 
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top"/>
+                        <TextBox Grid.Row="0" 
+                                    Grid.Column="1" 
+                                    Height="23"
+                                    TextWrapping="Wrap" 
+                                    VerticalAlignment="Top"
+                                    Text="{Binding Name}"
+                                    />
+                    </Grid>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="1" 
+                  Grid.Column="0" 
+                  Header="Сетевые параметры"
+                  Style="{StaticResource GroupBoxStyle}">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                </Grid.RowDefinitions>
+
+
+                <Label Content="IP адрес" 
+                       Grid.Row="1" 
+                       Grid.Column="0" 
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top"/>
+                <TextBox Grid.Row="1" 
+                                    Grid.Column="1" 
+                                    Height="23"
+                                    TextWrapping="Wrap">
+                    <TextBox.Text>
+                        <Binding Path="IpAddress">
+                            <Binding.ValidationRules>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <Label Content="IP порт" 
+                       Grid.Row="2" 
+                       Grid.Column="0" 
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top"/>
+                <xctk:IntegerUpDown Grid.Row="2" 
+                                    Grid.Column="2"
+                                    Value="{Binding Port}"
+                                    Minimum="1"/>
+                <Label Content="Маска подсети" 
+                       Grid.Row="3" 
+                       Grid.Column="0" 
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top"/>
+                <Grid Grid.Column="1" Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"></ColumnDefinition>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" 
+                             Height="23"
+                             TextWrapping="Wrap" 
+                             VerticalAlignment="Top">
+                        <TextBox.Text>
+                            <Binding Path="SubnetMask" Mode="TwoWay">
+                                <Binding.ValidationRules>
+                                    <ExceptionValidationRule/>
+                                </Binding.ValidationRules>
+                            </Binding>
+                        </TextBox.Text>
+                    </TextBox>
+                </Grid>
+                <Label Content="Шлюз" 
+                       Grid.Row="4" 
+                       Grid.Column="0" 
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top"/>
+                <TextBox Grid.Row="4" 
+                                    Grid.Column="1" 
+                                    Height="23"
+                                    TextWrapping="Wrap" 
+                                    VerticalAlignment="Top"
+                                    >
+                    <TextBox.Text>
+                        <Binding Path="Gateway">
+                            <Binding.ValidationRules>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+                <Label Content="DNS сервер" 
+                       Grid.Row="5" 
+                       Grid.Column="0" 
+                       HorizontalAlignment="Left" 
+                       VerticalAlignment="Top"/>
+                <TextBox Grid.Row="5" 
+                                    Grid.Column="1" 
+                                    Height="23"
+                                    TextWrapping="Wrap"
+                                    >
+                    <TextBox.Text>
+                        <Binding Path="DnsServer">
+                            <Binding.ValidationRules>
+                                <ExceptionValidationRule/>
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </TextBox.Text>
+                </TextBox>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Grid.RowSpan="2"
+                  Grid.Column="1" 
+                  Header="Управление яркостью"
+                  Style="{StaticResource GroupBoxStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="auto"></RowDefinition>
+                    <RowDefinition Height="*"></RowDefinition>
+                </Grid.RowDefinitions>
+                <RadioButton Grid.Row="0" Content="Автоматическое" IsChecked="{Binding AutomaticBrightness}"/>
+                <RadioButton Grid.Row="1" Content="Ручная настройка" IsChecked="{Binding ManualBrightness}"/>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="140*"></ColumnDefinition>
+                        <ColumnDefinition Width="69*"/>
+                        <ColumnDefinition Width="auto"></ColumnDefinition>
+                    </Grid.ColumnDefinitions>
+                    <Slider SmallChange="0" Value="{Binding ManualBrightnessValue}" IsEnabled="{Binding ManualBrightness}" Grid.ColumnSpan="2" Maximum="{Binding MaxBrightnessValue}"/>
+                    <xctk:IntegerUpDown Grid.Column="2" 
+                                        Value="{Binding ManualBrightnessValue}" 
+                                        IsEnabled="{Binding ManualBrightness}" 
+                                        Maximum="{Binding MaxBrightnessValue}"
+                                        Increment="{Binding BrightnessIncrement}"
+                                        Minimum="0"/>
+                </Grid>
+                <RadioButton Grid.Row="3" Content="По расписанию" IsChecked="{Binding ScheduledBrightness}"/>
+                <Grid Grid.Row="4">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <DataGrid Grid.Row="0" 
+                              Grid.ColumnSpan="2" 
+                              IsEnabled="{Binding ScheduledBrightness}" 
+                              ItemsSource="{Binding BrightnessPeriods}" 
+                              SelectedItem="{Binding SelectedBrightnessPeriod}" 
+                              AutoGenerateColumns="False"
+                              Width="250" CanUserAddRows="False">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Добавить"
+                                      Command="{Binding AddBrightnessItem}"/>
+                                <MenuItem Header="Удалить"
+                                      Command="{Binding RemoveBrightnessItem}"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="От" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <xctk:TimePicker Text="{Binding Path=PeriodStart, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="До" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <xctk:TimePicker Text="{Binding Path=PeriodEnd, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="Яркость" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <xctk:IntegerUpDown 
+                                            Value="{Binding Path=Value}" 
+                                            Maximum="{Binding DataContext.MaxBrightnessValue, RelativeSource={RelativeSource AncestorType=local:BaseDeviceControl}}"
+                                            Increment="{Binding DataContext.BrightnessIncrement, RelativeSource={RelativeSource AncestorType=local:BaseDeviceControl}}"
+                                            Minimum="0"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Row="1" Grid.Column="0" Content="Добавить" Command="{Binding AddBrightnessItem}" IsEnabled="{Binding ScheduledBrightness}"/>
+                    <Button Grid.Row="1" Grid.Column="1" Content="Удалить" Command="{Binding RemoveBrightnessItem}" IsEnabled="{Binding ScheduledBrightness}"/>
+                </Grid>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Column="0" 
+                  Grid.Row="2" 
+                  Header="Расписание работы"
+                  Style="{StaticResource GroupBoxStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Header="Время работы" Style="{StaticResource GroupBoxStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                            <ColumnDefinition Width="auto"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="auto"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <Label Content="Старт" 
+                               Grid.Row="0" 
+                               Grid.Column="0" 
+                               HorizontalAlignment="Left" 
+                               VerticalAlignment="Top"
+                               IsEnabled="{Binding IsScheduledWork}"
+                               />
+                        <xctk:TimePicker Grid.Row="0" 
+                                         Grid.Column="1"
+                                         Text="{Binding ScheduledWorkStart}"
+                                         IsEnabled="{Binding IsScheduledWork}"
+                                         Format="ShortTime"
+                                         Width="80"/>
+                        <Label Content="Стоп" 
+                               Grid.Row="0" 
+                               Grid.Column="2" 
+                               HorizontalAlignment="Left" 
+                               VerticalAlignment="Top"
+                               IsEnabled="{Binding IsScheduledWork}"
+                               />
+                        <xctk:TimePicker Grid.Row="0" 
+                                         Grid.Column="3"
+                                         Text="{Binding ScheduledWorkEnd}"
+                                         IsEnabled="{Binding IsScheduledWork}"
+                                         Format="ShortTime"
+                                         Width="80"/>
+                        <CheckBox Grid.Row="1" Grid.ColumnSpan="2" Content="Круглосуточно" IsChecked="{Binding ScheduleWorkAroundTheClock}"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Воспроизводить по дням недели" Style="{StaticResource GroupBoxStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                            <RowDefinition Height="*"></RowDefinition>
+                        </Grid.RowDefinitions>
+                        <CheckBox Grid.Row="0" Grid.Column="0"  Content="Пн." IsChecked="{Binding RunInMon}" IsEnabled="{Binding RunByDaysOfWeek}"/>
+                        <CheckBox Grid.Row="0" Grid.Column="1"  Content="Вт." IsChecked="{Binding RunInTue}" IsEnabled="{Binding RunByDaysOfWeek}"/>
+                        <CheckBox Grid.Row="0" Grid.Column="2"  Content="Ср." IsChecked="{Binding RunInWed}" IsEnabled="{Binding RunByDaysOfWeek}"/>
+                        <CheckBox Grid.Row="1" Grid.Column="0"  Content="Чт." IsChecked="{Binding RunInThu}" IsEnabled="{Binding RunByDaysOfWeek}"/>
+                        <CheckBox Grid.Row="1" Grid.Column="1"  Content="Пт." IsChecked="{Binding RunInFri}" IsEnabled="{Binding RunByDaysOfWeek}"/>
+                        <CheckBox Grid.Row="1" Grid.Column="2"  Content="Сб." IsChecked="{Binding RunInSat}" IsEnabled="{Binding RunByDaysOfWeek}"/>
+                        <CheckBox Grid.Row="2" Grid.Column="0"  Content="Вс." IsChecked="{Binding RunInSun}" IsEnabled="{Binding RunByDaysOfWeek}"/>
+                        <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3"  Content="Каждый день" IsChecked="{Binding RunAllWeek}"/>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

@@ -1,0 +1,34 @@
+﻿<Window x:Class="KaLEDoscope.Views.PreviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KaLEDoscope.Views"
+        mc:Ignorable="d"
+        Title="Предпросмотр" Height="450" Width="800" Icon="/KaLEDoscope;component/Resources/Logo.ico" ResizeMode="NoResize" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Border Name="previewBorder" Grid.Row="0"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Width="30" Height="30" Command="{Binding PlayPause}" ToolTip="Пуск/Пауза">
+                <Image Source="{Binding PlayPauseIconSource}"/>
+            </Button>
+            <Button Grid.Column="1" Margin="2,0,0,0" Width="30" Height="30" Command="{Binding Stop}" ToolTip="Стоп">
+                <Image Source="/KaLEDoscope;component/Resources/stop.png"/>
+            </Button>
+            <ToggleButton Grid.Column="2" Width="30" Height="30" Margin="1,0,0,0" IsChecked="{Binding RepeatEnabled}" ToolTip="Непрерывно">
+                <Image Source="/KaLEDoscope;component/Resources/repeat.png"/>
+            </ToggleButton>
+            <Slider Grid.Column="3" TickPlacement="BottomRight" Margin="5,0,0,0" Maximum="{Binding Duration}" Value="{Binding Position}"/>
+        </Grid>
+    </Grid>
+</Window>

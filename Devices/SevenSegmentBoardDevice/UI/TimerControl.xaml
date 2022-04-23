@@ -1,0 +1,188 @@
+﻿<UserControl x:Class="SevenSegmentBoardDevice.UI.TimerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SevenSegmentBoardDevice.UI"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary Source="pack://application:,,,/Resources;component/ResourceDictionary.xaml"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="Тип табло"  Style="{StaticResource GroupBoxStyle}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Тип платы"/>
+                    <Label Grid.Row="1" Grid.Column="0" Content="Шрифт"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Вид часов"/>
+                    <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding DisplayTypes}" DisplayMemberPath="Name" 
+                              SelectedItem="{Binding DisplayType}"/>
+                    <ComboBox Grid.Row="1" Grid.Column="1" IsEnabled="{Binding Path=DisplayType.IsFontEnabled}" 
+                              ItemsSource="{Binding FontTypes}" DisplayMemberPath="Name" SelectedItem="{Binding FontType}"/>
+                    <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding DisplayFormats}" 
+                              DisplayMemberPath="Name" SelectedItem="{Binding DisplayFormat}"/>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Конфигурация будильников" HorizontalAlignment="Right" Width="252"  Style="{StaticResource GroupBoxStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="150"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <DataGrid Grid.ColumnSpan="2" 
+                              Grid.Row="0" 
+                              ItemsSource="{Binding AlarmSchedule}" 
+                              SelectedItem="{Binding SelectedAlarm}"
+                              AutoGenerateColumns="False" CanUserAddRows="False">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Добавить новый"
+                                      Command="{Binding AddAlarm}"/>
+                                <MenuItem Header="Удалить"
+                                      Command="{Binding RemoveAlarm}"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                        <DataGrid.Columns>
+                            <DataGridCheckBoxColumn Header="" Width="30" Binding="{Binding Path=IsActive}"/>
+                            <DataGridTextColumn Header="Время" Width="80" Binding="{Binding Path=StartTimeSpan}"/>
+                            <DataGridTextColumn Header="Длительность" Width="*" Binding="{Binding Path=Period}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Grid.Column="0" Grid.Row="1" Content="Добавить" Command="{Binding AddAlarm}"/>
+                    <Button Grid.Column="1" Grid.Row="1" Content="Удалить" Command="{Binding RemoveAlarm}"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <GroupBox Grid.Row="0" Grid.Column="1" Header="Отображаемая информация"  Style="{StaticResource GroupBoxStyle}" Width="350">
+            <DataGrid ItemsSource="{Binding DisplayFrames}" Grid.Row="0" Grid.ColumnSpan="2" AutoGenerateColumns="False" CanUserAddRows="False">
+                <DataGrid.Resources>
+                    <Style TargetType="{x:Type DataGridRow}" BasedOn="{StaticResource {x:Type DataGridRow}}">
+                        <Setter Property="IsEnabled" Value="True"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
+                <DataGrid.Columns>
+                    <DataGridCheckBoxColumn Header="" Width="30" Binding="{Binding Path=IsChecked}"/>
+                    <DataGridTextColumn Header="Объекты" Width="120" Binding="{Binding Path=Name}"/>
+                    <DataGridTextColumn Header="Время отображения, сек" Width="*" Binding="{Binding Path=DisplayPeriod}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+        <GroupBox Grid.Row="0" Grid.Column="2" Header="Источник времени"  Style="{StaticResource GroupBoxStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="150"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <ComboBox Grid.Row="0" Grid.ColumnSpan="2" ItemsSource="{Binding SyncSources}" DisplayMemberPath="Name" SelectedItem="{Binding SyncSource}"/>
+                <Label Grid.Row="1" Grid.Column="0" Content="Часовой пояс" IsEnabled="{Binding SyncSource.AllowTimezones}"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding TimeZones}" IsEnabled="{Binding SyncSource.AllowTimezones}" DisplayMemberPath="DisplayName" SelectedItem="{Binding TimeZone}"/>
+                <Label Grid.Row="2" Grid.ColumnSpan="2" Content="Параметры синхронизации" HorizontalContentAlignment="Center" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <Label Grid.Row="3" Grid.Column="0" Content="Период синхронизации, минут" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <ComboBox Grid.Row="3" Grid.Column="1" 
+                                      Text="{Binding SyncIntervalStr}" 
+                                      IsEditable="True" 
+                                      IsSynchronizedWithCurrentItem="False" StaysOpenOnEdit="True">
+                    <ListBoxItem Content="5"/>
+                    <ListBoxItem Content="15"/>
+                    <ListBoxItem Content="30"/>
+                    <ListBoxItem Content="45"/>
+                    <ListBoxItem Content="60"/>
+                </ComboBox>
+                <!--<xctk:TimePicker Grid.Row="3" 
+                                         Grid.Column="1"
+                                         Text="{Binding TimeSyncPeriod}"
+                                         IsEnabled="{Binding SyncSource.IsCutomized}"
+                                 DefaultValue="2:00"
+                                         Format="ShortTime"/>-->
+                <Label Grid.Row="4" Grid.Column="0" Content="Адрес сервера" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <TextBox Grid.Row="4" Grid.Column="1" IsEnabled="{Binding SyncSource.IsCutomized}" Text="{Binding TimeSyncServerIp}"/>
+                <Label Grid.Row="5" Grid.Column="0" Content="Порт" IsEnabled="{Binding SyncSource.IsCutomized}"/>
+                <xctk:IntegerUpDown Grid.Row="5" Grid.Column="1" IsEnabled="{Binding SyncSource.IsCutomized}" Value="{Binding TimeSyncServerPort}" Minimum="0"/>
+            </Grid>
+        </GroupBox >
+        <GroupBox Visibility="Collapsed" Grid.Row="1" Grid.Column="0" Header="Настройка таймера/секундомера"  Style="{StaticResource GroupBoxStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Режим"/>
+                    <ComboBox Grid.Column="1" ItemsSource="{Binding CountdownTypes}" 
+                              DisplayMemberPath="Name" SelectedItem="{Binding CountdownType}"/>
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.Column="0" Content="Стартовое значение"/>
+                    <TextBox Grid.Column="1" Text="{Binding CountdownStart}"/>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0" Grid.Column="0" Content="Старт" Command="{Binding StartTimer}" />
+                    <Button Grid.Row="0" Grid.Column="1" Content="Пауза" Command="{Binding PauseTimer}"/>
+                    <Button Grid.Row="1" Grid.ColumnSpan="2" Content="Сброс к стартовому значению" Command="{Binding ResetTimer}"/>
+                    <Button Grid.Row="2" Grid.ColumnSpan="2" Content="СТОП (сброс в 00:00:00)" Command="{Binding StopResetTimer}"/>
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</UserControl>
